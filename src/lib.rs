@@ -5,30 +5,30 @@ use serde::{Deserialize, Serialize};
 #[derive(Debug, Serialize, Deserialize, PartialEq)]
 #[serde(rename_all = "PascalCase")]
 pub struct Kontrolluppgift {
-    avsandare: Avsandare,
-    blankettgemensamt: Blankettgemensamt,
+    pub avsandare: Avsandare,
+    pub blankettgemensamt: Blankettgemensamt,
     #[serde(rename = "Blankett")]
-    blanketter: Vec<Blankett>
+    pub blanketter: Vec<Blankett>
 }
 #[derive(Debug, Serialize, Deserialize, PartialEq)]
 #[serde(rename_all = "PascalCase")]
 pub struct Blankettgemensamt {
-    uppgiftslamnare: Uppgiftslamnare,
+    pub uppgiftslamnare: Uppgiftslamnare,
 }
 #[derive(Debug, Serialize, Deserialize, PartialEq)]
 #[serde(rename_all = "PascalCase")]
 pub struct Uppgiftslamnare {
-    uppgiftslamnare_pers_orgnr: String,
-    kontaktperson: Kontaktperson,
+    pub uppgiftslamnare_pers_orgnr: String,
+    pub kontaktperson: Kontaktperson,
 }
 
 #[derive(Debug, Serialize, Deserialize, PartialEq)]
 #[serde(rename_all = "PascalCase")]
 pub struct Blankett {
     #[serde(rename = "nummer")]
-    nummer: i64,
-    arendeinformation: Arendeinformation,
-    blankettinnehall: KontrolluppgiftType,
+    pub nummer: i64,
+    pub arendeinformation: Arendeinformation,
+    pub blankettinnehall: KontrolluppgiftType,
 }
 
 #[derive(Debug, Serialize, Deserialize, PartialEq)]
@@ -38,45 +38,45 @@ pub enum KontrolluppgiftType {
 
 #[derive(Debug, Serialize, Deserialize, PartialEq)]
 pub struct Value<T> {
-    faltkod: String,
+    pub faltkod: String,
     #[serde(rename = "$value")]
-    value: T
+    pub value: T
 }
 #[derive(Debug, Serialize, Deserialize, PartialEq)]
 #[serde(rename_all = "PascalCase")]
 pub struct Arendeinformation {
-    arendeagare: String,
-    period: String,
-    arendenummer: Option<String>
+    pub arendeagare: String,
+    pub period: String,
+    pub arendenummer: Option<String>
 }
 
 #[derive(Debug, Serialize, Deserialize, PartialEq)]
 #[serde(rename_all = "PascalCase")]
 pub struct Kontaktperson {
-    namn: String,
-    telefon: String,
-    epostadress: String,
-    sakomrade: Option<String>
+    pub namn: String,
+    pub telefon: String,
+    pub epostadress: String,
+    pub sakomrade: Option<String>
 }
 
 #[derive(Debug, Serialize, Deserialize, PartialEq)]
 #[serde(rename_all = "PascalCase")]
 pub struct Avsandare {
-    programnamn: String,
-    organisationsnummer: String,
-    teknisk_kontaktperson: TekniskKontaktperson,
-    skapad: String,
+    pub programnamn: String,
+    pub organisationsnummer: String,
+    pub teknisk_kontaktperson: TekniskKontaktperson,
+    pub skapad: String,
 }
 #[derive(Debug, Serialize, Deserialize, PartialEq)]
 #[serde(rename_all = "PascalCase")]
 pub struct TekniskKontaktperson {
-    namn: String,
-    telefon: String,
-    epostadress: String,
-    utdelningsadress1: Option<String>,
-    utdelningsadress2: Option<String>,
-    postnummer: Option<String>,
-    postort: Option<String>,
+    pub namn: String,
+    pub telefon: String,
+    pub epostadress: String,
+    pub utdelningsadress1: Option<String>,
+    pub utdelningsadress2: Option<String>,
+    pub postnummer: Option<String>,
+    pub postort: Option<String>,
 }
 
 
