@@ -1,6 +1,6 @@
 # Kontrolluppgift
 
-This is a library for parsing and handling the xml format known as kontrolluppgift
+This is a rust library for parsing and handling the xml format known as kontrolluppgift
 
 ## The specification
 The specification for this is maintained by skatteverket, current version: 8
@@ -10,7 +10,7 @@ The specification for this is maintained by skatteverket, current version: 8
 this crate is not yet done it aims to be able to handle all types of "kontrolluppgift", 
 current status of this is:
 
--  [ ] KU10
+-  [x] KU10
 -  [ ] KU13
 -  [ ] KU14
 -  [ ] KU16
