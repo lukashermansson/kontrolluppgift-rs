@@ -1,4 +1,4 @@
-![Crates.io](https://img.shields.io/crates/v/kontrolluppgift)
+[![Crates.io](https://img.shields.io/crates/v/kontrolluppgift)](https://crates.io/crates/kontrolluppgift)
 ![spec version](https://img.shields.io/badge/Spec%20version-8.0-blue)
 # Kontrolluppgift
 This is a rust library containing the types defined in the xml format defined by skatteverket known as "Kontrolluppgift"
