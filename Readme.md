@@ -1,14 +1,15 @@
+![Crates.io](https://img.shields.io/crates/v/kontrolluppgift)
+![spec version](https://img.shields.io/badge/Spec%20version-8.0-blue)
 # Kontrolluppgift
-
-This is a rust library for parsing and handling the xml format known as kontrolluppgift
+This is a rust library containing the types defined in the xml format defined by skatteverket known as "Kontrolluppgift"
 
 ## The specification
-The specification for this is maintained by skatteverket, current version: 8
+The specification for this is maintained by Skatteverket
+We aim to target only the newest version of the specification 
 
 ## Development status
-
-this crate is not yet done it aims to be able to handle all types of "kontrolluppgift", 
-current status of this is:
+This crate is still to be considered in early development, none of the types are stable, With this being said, 
+the current status of implemtation of the "Kontrolluppgift" variants is:
 
 -  [x] KU10
 -  [ ] KU13
@@ -19,7 +20,7 @@ current status of this is:
 -  [ ] KU19
 -  [x] KU20
 -  [ ] KU21
--  [ ] KU25
+-  [X] KU25
 -  [ ] KU26
 -  [ ] KU28
 -  [ ] KU30
@@ -44,7 +45,6 @@ current status of this is:
 -  [ ] KU81
 
 ## Contributing
-
 Contributions are welcome.
 
 * field names should be kept to the extent possible, even tho they are defined in swedish.

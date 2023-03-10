@@ -1,33 +1,26 @@
-use crate::{Value};
+use crate::Value;
 use serde::{Deserialize, Serialize};
 
-/// Kontrolluppgift 20
 #[derive(Debug, Serialize, Deserialize, PartialEq)]
 #[serde(rename_all = "PascalCase")]
-pub struct KU20 {
-    pub avdragen_skatt: Option<Value<i64>>,
+pub struct KU25 {
     pub delagare: Option<Value<bool>>,
-    pub inkomstar: Value<String>,
+    pub inkomstar: Option<Value<String>>,
     pub borttag: Option<Value<bool>>,
-    pub ranteinkomst: Option<Value<i64>>,
-    pub forfogarkonto: Option<Value<bool>>,
-    pub ranteinkomst_ej_konto: Option<Value<i64>>,
-    pub annan_inkomst: Option<Value<i64>>,
+    pub avdragsgill_ranta: Option<Value<i64>>,
+    pub total_inbetald_ranta: Option<Value<i64>>,
+    pub betald_rantekompensation: Option<Value<i64>>,
+    pub gemensamt_lan: Option<Value<i64>>,
     pub specifikationsnummer: Value<i64>,
-    #[serde(rename = "InkomsttagareKU20")]
-    pub inkomsttagare: InkomsttagareKU20,
-    #[serde(rename = "UppgiftslamnareKU20")]
-    pub uppgiftslamnare: UppgiftslamnareKU20,
-
+    #[serde(rename = "InkomsttagareKU25")]
+    pub inkomsttagare: InkomsttagareKU25,
+    #[serde(rename = "UppgiftslamnareKU25")]
+    pub uppgiftslamnare: UppgiftslamnareKU25,
 }
 
 #[derive(Debug, Serialize, Deserialize, PartialEq)]
 #[serde(rename_all = "PascalCase")]
-pub struct InkomsttagareKU20 {
-    #[serde(rename = "LandskodTin")]
-    pub landskod_tin: Option<Value<String>>,
-    pub fodelseort: Option<Value<String>>,
-    pub landskod_fodelseort: Option<Value<String>>,
+pub struct InkomsttagareKU25 {
     pub inkomsttagare: Option<Value<String>>,
     pub fornamn: Option<Value<String>>,
     pub efternamn: Option<Value<String>>,
@@ -41,16 +34,15 @@ pub struct InkomsttagareKU20 {
     pub org_namn: Option<Value<String>>,
     pub gatuadress2: Option<Value<String>>,
     pub fri_adress: Option<Value<String>>,
-    #[serde(rename = "TIN")]
-    pub tin: Option<Value<String>>,
 }
 
 #[derive(Debug, Serialize, Deserialize, PartialEq)]
 #[serde(rename_all = "PascalCase")]
-pub struct UppgiftslamnareKU20 {
+pub struct UppgiftslamnareKU25 {
     pub uppgiftslamnar_id: Value<String>,
     pub namn_uppgiftslamnare: Option<Value<String>>,
 }
+
 
 #[cfg(test)]
 mod tests {
@@ -59,11 +51,12 @@ mod tests {
     use crate::Kontrolluppgift;
 
     #[test]
-    fn ku20_is_read() {
-        let xml = fs::read_to_string("EXEMPELFIL KONTROLLUPPGIFTER RÄNTA, UTDELNING M.M. KU20 FÖR_2022.xml").unwrap();
+    fn ku25_is_read() {
+        let xml = fs::read_to_string("EXEMPELFIL KONTROLLUPPGIFTER RÄNTA, UTDELNING M.M. KU25 FÖR_2022.xml").unwrap();
 
         let parsed = from_str::<Kontrolluppgift>(&*xml);
 
-        assert!(parsed.is_ok())
+        assert!(parsed.is_ok());
+        println!("{:?}", parsed.unwrap())
     }
 }

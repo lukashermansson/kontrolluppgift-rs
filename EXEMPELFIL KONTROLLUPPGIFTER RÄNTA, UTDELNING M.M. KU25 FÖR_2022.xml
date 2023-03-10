@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<Skatteverket xmlns="http://xmls.skatteverket.se/se/skatteverket/ai/instans/infoForBeskattning/8.0" 
+xmlns:gm="http://xmls.skatteverket.se/se/skatteverket/ai/gemensamt/infoForBeskattning/8.0" 
+xmlns:ku="http://xmls.skatteverket.se/se/skatteverket/ai/komponent/infoForBeskattning/8.0" 
+xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" omrade="Kontrolluppgifter" 
+xsi:schemaLocation="http://xmls.skatteverket.se/se/skatteverket/ai/instans/infoForBeskattning/8.0
+http://xmls.skatteverket.se/se/skatteverket/ai/kontrolluppgift/instans/Kontrolluppgifter_8.0.xsd ">
+  <ku:Avsandare>
+    <ku:Programnamn>KUfilsprogrammet</ku:Programnamn>
+    <ku:Organisationsnummer>162234567895</ku:Organisationsnummer>
+    <ku:TekniskKontaktperson>
+      <ku:Namn>John Doe</ku:Namn>
+      <ku:Telefon>+46812345678</ku:Telefon>
+      <ku:Epostadress>siv.karlsson@aktiebolagetab.se</ku:Epostadress>
+      <ku:Utdelningsadress1>Artillerigatan 11</ku:Utdelningsadress1>
+      <ku:Postnummer>62145</ku:Postnummer>
+      <ku:Postort>Visby</ku:Postort>
+    </ku:TekniskKontaktperson>
+    <ku:Skapad>2022-01-01T13:52:48</ku:Skapad>
+  </ku:Avsandare>
+  <ku:Blankettgemensamt>
+    <ku:Uppgiftslamnare>
+      <ku:UppgiftslamnarePersOrgnr>165599990602</ku:UppgiftslamnarePersOrgnr>
+      <ku:Kontaktperson>
+        <ku:Namn>John Doe</ku:Namn>
+        <ku:Telefon>+46812345678</ku:Telefon>
+        <ku:Epostadress>siv.karlsson@sonjasfrohandel.se</ku:Epostadress>
+        <ku:Sakomrade>Skatteverket</ku:Sakomrade>
+      </ku:Kontaktperson>
+    </ku:Uppgiftslamnare>
+  </ku:Blankettgemensamt>
+
+<!-- Kontrolluppgift 3 -->
+<ku:Blankett nummer="2336">
+	<ku:Arendeinformation>
+		<ku:Arendeagare>165599990602</ku:Arendeagare>
+		<ku:Period>2022</ku:Period>
+	</ku:Arendeinformation>
+	<ku:Blankettinnehall>
+		<ku:KU25>
+		<ku:Inkomstar faltkod="203">2022</ku:Inkomstar>
+		<ku:AvdragsgillRanta faltkod="540">2020</ku:AvdragsgillRanta>
+		<ku:Specifikationsnummer faltkod="570">09</ku:Specifikationsnummer>
+		<ku:UppgiftslamnareKU25>
+			<ku:UppgiftslamnarId faltkod="201">165599990602</ku:UppgiftslamnarId>
+		</ku:UppgiftslamnareKU25>
+		<ku:InkomsttagareKU25>
+			<ku:Inkomsttagare faltkod="215">193211056969</ku:Inkomsttagare>
+		</ku:InkomsttagareKU25>
+	</ku:KU25>
+	</ku:Blankettinnehall>
+</ku:Blankett>
+</Skatteverket>
+

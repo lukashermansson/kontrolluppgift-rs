@@ -1,5 +1,6 @@
 pub mod ku20;
 pub mod ku10;
+pub mod ku25;
 
 use serde::{Deserialize, Serialize};
 
@@ -38,6 +39,7 @@ pub struct Blankett {
 pub enum KontrolluppgiftType {
     KU10(ku10::KU10),
     KU20(ku20::KU20),
+    KU25(ku25::KU25),
 }
 
 #[derive(Debug, Serialize, Deserialize, PartialEq)]
