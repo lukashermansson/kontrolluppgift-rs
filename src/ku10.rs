@@ -1,82 +1,121 @@
+use std::borrow::Cow;
 use crate::Value;
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Serialize, Deserialize, PartialEq)]
 #[serde(rename_all = "PascalCase")]
-pub struct KU10 {
-    pub kontant_bruttolon_mm: Option<Value<i64>>,
-    pub forman_utom_bil_drivmedel: Option<Value<i64>>,
-    pub drivmedel_utom_drivmedel: Option<Value<i64>>,
-    pub andra_kostnadsers: Option<Value<i64>>,
-    pub underlag_rutarbete: Option<Value<i64>>,
-    pub underlag_rotarbete: Option<Value<i64>>,
-    pub ers_m_egenavgifter: Option<Value<i64>>,
-    pub tjanstepension: Option<Value<i64>>,
-    pub ers_ej_soc_avg: Option<Value<i64>>,
-    pub ers_ej_soc_avg_ej_jobbavd: Option<Value<i64>>,
-    pub forsarskattenamnden: Option<Value<i64>>,
-    pub vissa_avdrag: Option<Value<i64>>,
-    pub hyresersattning: Option<Value<i64>>,
-    pub bostad_smahus: Option<Value<bool>>,
-    pub bostad_ej_smahus: Option<Value<bool>>,
-    pub forman_har_justerats: Option<Value<bool>>,
-    pub forman_som_pension: Option<Value<bool>>,
-    pub bilersattning: Option<Value<bool>>,
-    pub traktamente: Option<Value<bool>>,
-    pub personaloption_forvarv_andel: Option<Value<bool>>,
-    pub arbetsstallenummer: Option<Value<String>>,
-    pub delagare: Option<Value<bool>>,
-    pub social_avgifts_avtal: Option<Value<bool>>,
-    pub inkomstar: Value<String>,
-    pub borttag: Option<Value<bool>>,
-    pub specifikationsnummer: Value<i64>,
+pub struct KU10<'a> {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub kontant_bruttolon_mm: Option<Value<'a, i32>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub forman_utom_bil_drivmedel: Option<Value<'a, i32>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub drivmedel_utom_drivmedel: Option<Value<'a, i32>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub andra_kostnadsers: Option<Value<'a, i32>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub underlag_rutarbete: Option<Value<'a, i32>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub underlag_rotarbete: Option<Value<'a, i32>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub ers_m_egenavgifter: Option<Value<'a, i32>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub tjanstepension: Option<Value<'a, i32>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub ers_ej_soc_avg: Option<Value<'a, i32>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub ers_ej_soc_avg_ej_jobbavd: Option<Value<'a, i32>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub forsarskattenamnden: Option<Value<'a, i32>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub vissa_avdrag: Option<Value<'a, i32>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub hyresersattning: Option<Value<'a, i32>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub bostad_smahus: Option<Value<'a, bool>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub bostad_ej_smahus: Option<Value<'a, bool>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub forman_har_justerats: Option<Value<'a, bool>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub forman_som_pension: Option<Value<'a, bool>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub bilersattning: Option<Value<'a, bool>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub traktamente: Option<Value<'a, bool>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub personaloption_forvarv_andel: Option<Value<'a, bool>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub arbetsstallenummer: Option<Value<'a, Cow<'a, str>>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub delagare: Option<Value<'a, bool>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub social_avgifts_avtal: Option<Value<'a, bool>>,
+    pub inkomstar: Value<'a, Cow<'a, str>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub borttag: Option<Value<'a, bool>>,
+    pub specifikationsnummer: Value<'a, i32>,
     #[serde(rename = "InkomsttagareKU10")]
-    pub inkomsttagare: InkomsttagareKU10,
+    pub inkomsttagare: InkomsttagareKU10<'a>,
     #[serde(rename = "UppgiftslamnareKU10")]
-    pub uppgiftslamnare: UppgiftslamnareKU10,
+    pub uppgiftslamnare: UppgiftslamnareKU10<'a>,
 
 }
 
 #[derive(Debug, Serialize, Deserialize, PartialEq)]
 #[serde(rename_all = "PascalCase")]
-pub struct UppgiftslamnareKU10 {
-    pub uppgiftslamnar_id: Value<String>,
-    pub namn_uppgiftslamnare: Option<Value<String>>,
+pub struct UppgiftslamnareKU10<'a> {
+    pub uppgiftslamnar_id: Value<'a, Cow<'a, str>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub namn_uppgiftslamnare: Option<Value<'a, Cow<'a, str>>>,
 }
 
 #[derive(Debug, Serialize, Deserialize, PartialEq)]
 #[serde(rename_all = "PascalCase")]
-pub struct InkomsttagareKU10 {
-    #[serde(rename = "LandskodTin")]
-    pub landskod_tin: Option<Value<String>>,
-    pub inkomsttagare: Option<Value<String>>,
-    pub fornamn: Option<Value<String>>,
-    pub efternamn: Option<Value<String>>,
-    pub gatuadress: Option<Value<String>>,
-    pub postnummer: Option<Value<String>>,
-    pub postort: Option<Value<String>>,
-    pub landskod_postort: Option<Value<String>>,
-    pub fodelsetid: Option<Value<String>>,
+pub struct InkomsttagareKU10<'a> {
+    #[serde(rename = "LandskodTIN")]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub landskod_tin: Option<Value<'a, Cow<'a, str>>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub inkomsttagare: Option<Value<'a, Cow<'a, str>>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub fornamn: Option<Value<'a, Cow<'a, str>>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub efternamn: Option<Value<'a,Cow<'a, str>>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub gatuadress: Option<Value<'a, Cow<'a, str>>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub postnummer: Option<Value<'a, Cow<'a, str>>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub postort: Option<Value<'a, Cow<'a, str>>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub landskod_postort: Option<Value<'a, Cow<'a, str>>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub fodelsetid: Option<Value<'a, Cow<'a, str>>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "AnnatIDNr")]
-    pub annat_id_nr: Option<Value<String>>,
-    pub org_namn: Option<Value<String>>,
-    pub gatuadress2: Option<Value<String>>,
-    pub fri_adress: Option<Value<String>>,
+    pub annat_id_nr: Option<Value<'a, Cow<'a, str>>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub org_namn: Option<Value<'a, Cow<'a, str>>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub gatuadress2: Option<Value<'a, Cow<'a, str>>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub fri_adress: Option<Value<'a, Cow<'a, str>>>,
     #[serde(rename = "TIN")]
-    pub tin: Option<Value<String>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub tin: Option<Value<'a, Cow<'a, str>>>,
 }
 
 #[cfg(test)]
 mod tests {
     use std::fs;
-    use serde_xml_rs::from_str;
-    use crate::Kontrolluppgift;
+    use crate::{from_str};
 
     #[test]
     fn ku10_is_read() {
         let xml = fs::read_to_string("EXEMPELFIL KONTROLLUPPGIFT FÖR ARBETSGIVARE MED SOCIALAVGIFTSAVTAL (KU10)_2022.xml").unwrap();
 
-        let parsed = from_str::<Kontrolluppgift>(&*xml);
+        let parsed = from_str(&*xml);
         assert!(parsed.is_ok())
     }
 }
