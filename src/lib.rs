@@ -1,6 +1,7 @@
 pub mod ku20;
 pub mod ku10;
 pub mod ku25;
+pub mod ku28;
 
 use std::borrow::Cow;
 use std::io::Cursor;
@@ -51,6 +52,7 @@ pub enum KontrolluppgiftType<'a> {
     KU10(ku10::KU10<'a>),
     KU20(ku20::KU20<'a>),
     KU25(ku25::KU25<'a>),
+    KU28(ku28::KU28<'a>),
 }
 
 #[derive(Debug, Serialize, Deserialize, PartialEq)]
