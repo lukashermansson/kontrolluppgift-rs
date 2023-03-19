@@ -1,6 +1,6 @@
 [package]
 name = "kontrolluppgift"
-version = "0.7.0"
+version = "0.8.0"
 edition = "2021"
 description = "A library for dealing with Skatteverkets data format for Kontrolluppgift"
 license= "MIT"
@@ -10,7 +10,5 @@ keywords = ["skatteverket"]
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-serde = { version = "1.0.152", features = ["derive"]}
-quick-xml = { version = "0.28.0", features = ["serialize"]}
+quick-xml = { version = "0.28.0"}
 
-[dev-dependencies]
