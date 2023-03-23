@@ -1,7 +1,7 @@
 use std::borrow::Cow;
 use quick_xml::events::{BytesStart, Event};
-use quick_xml::NsReader;
-use crate::{DeError, to_bool };
+use quick_xml::{NsReader, Writer};
+use crate::{DeError, to_bool, Write};
 use crate::DeError::{MissingField, UnexpectedElement};
 
 /// Kontrolluppgift 28
@@ -24,6 +24,31 @@ pub struct KU28<'a> {
     pub inkomsttagare: InkomsttagareKU28<'a>,
     pub uppgiftslamnare: UppgiftslamnareKU28<'a>,
 
+}
+impl<'a> KU28<'a> {
+    pub(crate) fn write<W>(&self, w: &mut Writer<W>) -> Result<(), quick_xml::Error> where W : std::io::Write  {
+        w.create_element("KU28").write_inner_content(|w| {
+            w.write_node_with_code("Delagare", "061", &self.delagare)?;
+            w.write_node_with_code("Inkomstar", "203", &self.inkomstar)?;
+            w.write_node_with_code("Borttag", "205", &self.borttag)?;
+            w.write_node_with_code("UnderlagForInvesteraravdrag", "528", &self.underlag_for_investeraravdrag)?;
+            w.write_node_with_code("TotUnderlagInvesteraravdrag", "529", &self.tot_underlag_investeraravdrag)?;
+            w.write_node_with_code("Betalningsar", "530", &self.betalningsar)?;
+            w.write_node_with_code("AterforingAvyttring", "531", &self.aterforing_avyttring)?;
+            w.write_node_with_code("AterforingUtflyttning", "532", &self.aterforing_utflyttning)?;
+            w.write_node_with_code("AterforingHogVardeoverforing", "533", &self.aterforing_hog_vardeoverforing)?;
+            w.write_node_with_code("AterforingInternaForvarv", "534", &self.aterforing_interna_forvarv)?;
+            w.write_node_with_code("DatumForvarv", "535", &self.datum_forvarv)?;
+            w.write_node_with_code("Region", "536", &self.region)?;
+            w.write_node_with_code("Verksamhetsomrade", "537", &self.verksamhetsomrade)?;
+            w.write_node_with_code("Specifikationsnummer", "570", &self.specifikationsnummer)?;
+
+            self.inkomsttagare.write(w)?;
+            self.uppgiftslamnare.write(w)?;
+            Ok(())
+        })?;
+        Ok(())
+    }
 }
 
 impl<'a> KU28<'a> {
@@ -143,6 +168,30 @@ pub struct InkomsttagareKU28<'a> {
     pub fri_adress: Option<Cow<'a, str>>,
     pub tin: Option<Cow<'a, str>>,
 }
+impl<'a> InkomsttagareKU28<'a> {
+    fn write<W>(&self, w: &mut Writer<W>) -> Result<(), quick_xml::Error> where W : std::io::Write  {
+        w.create_element("InkomsttagareKU28").write_inner_content(|w| {
+            w.write_node_with_code("LandskodTIN", "076", &self.landskod_tin)?;
+            w.write_node_with_code("Inkomsttagare", "215", &self.inkomsttagare)?;
+            w.write_node_with_code("Fornamn", "216", &self.fornamn)?;
+            w.write_node_with_code("Efternamn", "217", &self.efternamn)?;
+            w.write_node_with_code("Gatuadress", "218", &self.gatuadress)?;
+            w.write_node_with_code("Postnummer", "219", &self.postnummer)?;
+            w.write_node_with_code("Postort", "220", &self.postort)?;
+            w.write_node_with_code("LandskodPostort", "221", &self.landskod_postort)?;
+            w.write_node_with_code("Fodelsetid", "222", &self.fodelsetid)?;
+            w.write_node_with_code("AnnatIDNr", "224", &self.annat_id_nr)?;
+            w.write_node_with_code("OrgNamn", "226", &self.org_namn)?;
+            w.write_node_with_code("Gatuadress2", "228", &self.gatuadress2)?;
+            w.write_node_with_code("FriAdress", "230", &self.fri_adress)?;
+            w.write_node_with_code("TIN", "252", &self.tin)?;
+
+            Ok(())
+        })?;
+
+        Ok(())
+    }
+}
 
 impl<'a> InkomsttagareKU28<'a> {
     fn read(reader: &mut NsReader<&'a [u8]>, tag: &BytesStart) -> Result<Self, DeError> {
@@ -240,6 +289,18 @@ pub struct UppgiftslamnareKU28<'a> {
 }
 
 impl<'a> UppgiftslamnareKU28<'a> {
+    fn write<W>(&self, w: &mut Writer<W>) -> Result<(), quick_xml::Error> where W : std::io::Write  {
+        w.create_element("UppgiftslamnareKU28").write_inner_content(|w| {
+            w.write_node_with_code("UppgiftslamnarId", "201", &self.uppgiftslamnar_id)?;
+            w.write_node_with_code("NamnUppgiftslamnare", "202", &self.namn_uppgiftslamnare)?;
+
+            Ok(())
+        })?;
+
+        Ok(())
+    }
+}
+impl<'a> UppgiftslamnareKU28<'a> {
     fn read(reader: &mut NsReader<&'a [u8]>, tag: &BytesStart) -> Result<Self, DeError> {
         let mut uppgiftslamnar_id = None;
         let mut namn_uppgiftslamnare = None;
@@ -271,14 +332,17 @@ impl<'a> UppgiftslamnareKU28<'a> {
 #[cfg(test)]
 mod tests {
     use std::fs;
-    use crate::{from_str};
+    use crate::{from_str, to_string};
 
     #[test]
     fn ku28_is_read() {
         let xml = fs::read_to_string("EXEMPELFIL KONTROLLUPPGIFT INVESTERARAVDRAG (KU28)_2022.xml").unwrap();
 
-        let parsed = from_str(&*xml);
+        let parsed = from_str(&*xml).unwrap();
         println!("{:?}", &parsed);
-        assert!(parsed.is_ok())
+        let unparsed = to_string(&parsed).unwrap();
+        println!("{}", &unparsed);
+        let parsed2 = from_str(&*unparsed).unwrap();
+        assert_eq!(parsed, parsed2);
     }
 }

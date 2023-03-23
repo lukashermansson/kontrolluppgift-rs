@@ -1,7 +1,7 @@
 use std::borrow::Cow;
 use quick_xml::events::{BytesStart, Event};
-use quick_xml::NsReader;
-use crate::{DeError, to_bool };
+use quick_xml::{NsReader, Writer};
+use crate::{DeError, to_bool, Write};
 use crate::DeError::{MissingField, UnexpectedElement};
 
 /// Kontrolluppgift 21
@@ -11,7 +11,7 @@ pub struct KU21<'a> {
     pub inkomstar: Cow<'a, str>,
     pub borttag: Option<bool>,
     pub annan_inkomst: Option<i32>,
-    pub ranta_fodringsratter: Option<i32>,
+    pub ranta_fordringsratter: Option<i32>,
     pub utbetalt_i_vissa_fall: Option<i32>,
     pub depanummer: Option<i32>,
     pub andel_av_depan: Option<f32>,
@@ -24,6 +24,31 @@ pub struct KU21<'a> {
     pub inkomsttagare: InkomsttagareKU21<'a>,
     pub uppgiftslamnare: UppgiftslamnareKU21<'a>,
 
+}
+impl<'a> KU21<'a> {
+    pub(crate) fn write<W>(&self, w: &mut Writer<W>) -> Result<(), quick_xml::Error> where W : std::io::Write{
+        w.create_element("KU21").write_inner_content(|w| {
+            w.write_node_with_code("AvdragenSkatt", "001", &self.avdragen_skatt)?;
+            w.write_node_with_code("Inkomstar", "061", &self.inkomstar)?;
+            w.write_node_with_code("Borttag", "205", &self.borttag)?;
+            w.write_node_with_code("AnnanInkomst", "504", &self.annan_inkomst)?;
+            w.write_node_with_code("RantaFordringsratter", "520", &self.ranta_fordringsratter)?;
+            w.write_node_with_code("UtbetaltIVissaFall", "522", &self.utbetalt_i_vissa_fall)?;
+            w.write_node_with_code("Depanummer", "523", &self.depanummer)?;
+            w.write_node_with_code("AndelAvDepan", "524", &self.andel_av_depan)?;
+            w.write_node_with_code("ErhallenRantekompensation", "525", &self.erhallen_rantekompensation)?;
+            w.write_node_with_code("Specifikationsnummer", "570", &self.specifikationsnummer)?;
+            w.write_node_with_code("VPNamn", "571", &self.vp_namn)?;
+            w.write_node_with_code("ISIN", "572", &self.isin)?;
+            w.write_node_with_code("AvyttradTillISK", "573", &self.avyttrad_till_isk)?;
+            w.write_node_with_code("OkandVarde", "599", &self.okand_varde)?;
+
+            self.inkomsttagare.write(w)?;
+            self.uppgiftslamnare.write(w)?;
+            Ok(())
+        })?;
+        Ok(())
+    }
 }
 
 #[derive(Debug, PartialEq)]
@@ -51,6 +76,19 @@ pub struct UppgiftslamnareKU21<'a> {
     pub uppgiftslamnar_id: Cow<'a, str>,
     pub namn_uppgiftslamnare: Option<Cow<'a, str>>,
 }
+impl<'a> UppgiftslamnareKU21<'a> {
+    fn write<W>(&self, w: &mut Writer<W>) -> Result<(), quick_xml::Error> where W : std::io::Write  {
+        w.create_element("UppgiftslamnareKU21").write_inner_content(|w| {
+            w.write_node_with_code("UppgiftslamnarId", "201", &self.uppgiftslamnar_id)?;
+            w.write_node_with_code("NamnUppgiftslamnare", "202", &self.namn_uppgiftslamnare)?;
+
+            Ok(())
+        })?;
+
+        Ok(())
+    }
+}
+
 impl<'a> KU21<'a> {
     pub(crate) fn read(reader: &mut NsReader<&'a [u8]>, tag: &BytesStart) -> Result<Self, DeError> {
         let mut avdragen_skatt = None;
@@ -129,7 +167,7 @@ impl<'a> KU21<'a> {
                             inkomstar: inkomstar.ok_or_else(|| MissingField("Inkomstar".to_string()))?,
                             borttag,
                             annan_inkomst,
-                            ranta_fodringsratter,
+                            ranta_fordringsratter: ranta_fodringsratter,
                             utbetalt_i_vissa_fall,
                             depanummer,
                             andel_av_depan,
@@ -149,6 +187,33 @@ impl<'a> KU21<'a> {
         }
     }
 }
+impl<'a> InkomsttagareKU21<'a> {
+    fn write<W>(&self, w: &mut Writer<W>) -> Result<(), quick_xml::Error> where W : std::io::Write  {
+        w.create_element("InkomsttagareKU21").write_inner_content(|w| {
+            w.write_node_with_code("LandskodTIN", "076", &self.landskod_tin)?;
+            w.write_node_with_code("Fodelseort", "077", &self.fodelseort)?;
+            w.write_node_with_code("LandskodFodelseort", "078", &self.landskod_fodelseort)?;
+            w.write_node_with_code("Inkomsttagare", "215", &self.inkomsttagare)?;
+            w.write_node_with_code("Fornamn", "216", &self.fornamn)?;
+            w.write_node_with_code("Efternamn", "217", &self.efternamn)?;
+            w.write_node_with_code("Gatuadress", "218", &self.gatuadress)?;
+            w.write_node_with_code("Postnummer", "219", &self.postnummer)?;
+            w.write_node_with_code("Postort", "220", &self.postort)?;
+            w.write_node_with_code("LandskodPostort", "221", &self.landskod_postort)?;
+            w.write_node_with_code("Fodelsetid", "222", &self.fodelsetid)?;
+            w.write_node_with_code("AnnatIDNr", "224", &self.annat_id_nr)?;
+            w.write_node_with_code("OrgNamn", "226", &self.org_namn)?;
+            w.write_node_with_code("Gatuadress2", "228", &self.gatuadress2)?;
+            w.write_node_with_code("FriAdress", "230", &self.fri_adress)?;
+            w.write_node_with_code("TIN", "252", &self.tin)?;
+
+            Ok(())
+        })?;
+
+        Ok(())
+    }
+}
+
 impl<'a> InkomsttagareKU21<'a> {
     fn read(reader: &mut NsReader<&'a [u8]>, tag: &BytesStart) -> Result<Self, DeError> {
 
@@ -281,15 +346,18 @@ impl<'a> UppgiftslamnareKU21<'a> {
 #[cfg(test)]
 mod tests {
     use std::fs;
-    use crate::{from_str};
+    use crate::{from_str, to_string};
 
     #[test]
     fn ku21_is_read() {
         let xml = fs::read_to_string("EXEMPELFIL KONTROLLUPPGIFTER RÄNTA, UTDELNING M.M. KU21 FÖR_2022.xml").unwrap();
 
-        let parsed = from_str(&*xml);
-
+        let parsed = from_str(&*xml).unwrap();
         println!("{:?}", &parsed);
-        assert!(parsed.is_ok())
+        let unparsed = to_string(&parsed).unwrap();
+        println!("{}", &unparsed);
+        let parsed2 = from_str(&*unparsed).unwrap();
+        assert_eq!(parsed, parsed2);
+
     }
 }

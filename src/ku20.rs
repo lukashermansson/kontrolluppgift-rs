@@ -1,7 +1,7 @@
 use std::borrow::Cow;
 use quick_xml::events::{BytesStart, Event};
-use quick_xml::NsReader;
-use crate::{DeError, to_bool };
+use quick_xml::{NsReader, Writer};
+use crate::{DeError, to_bool, Write};
 use crate::DeError::{MissingField, UnexpectedElement};
 
 /// Kontrolluppgift 20
@@ -19,6 +19,27 @@ pub struct KU20<'a> {
     pub inkomsttagare: InkomsttagareKU20<'a>,
     pub uppgiftslamnare: UppgiftslamnareKU20<'a>,
 
+}
+
+impl<'a> KU20<'a> {
+    pub(crate) fn write<W>(&self, w: &mut Writer<W>) -> Result<(), quick_xml::Error> where W : std::io::Write  {
+        w.create_element("KU20").write_inner_content(|w| {
+            w.write_node_with_code("AvdragenSkatt", "001", &self.avdragen_skatt)?;
+            w.write_node_with_code("Delagare", "061", &self.delagare)?;
+            w.write_node_with_code("Inkomstar", "203", &self.inkomstar)?;
+            w.write_node_with_code("Borttag", "205", &self.borttag)?;
+            w.write_node_with_code("Ranteinkomst", "500", &self.ranteinkomst)?;
+            w.write_node_with_code("Forfogarkonto", "502", &self.forfogarkonto)?;
+            w.write_node_with_code("RanteinkomstEjKonto", "503", &self.ranteinkomst_ej_konto)?;
+            w.write_node_with_code("AnnanInkomst", "504", &self.annan_inkomst)?;
+            w.write_node_with_code("Specifikationsnummer", "570", &self.specifikationsnummer)?;
+
+            self.inkomsttagare.write(w)?;
+            self.uppgiftslamnare.write(w)?;
+            Ok(())
+        })?;
+        Ok(())
+    }
 }
 
 #[derive(Debug, PartialEq)]
@@ -41,10 +62,50 @@ pub struct InkomsttagareKU20<'a> {
     pub tin: Option<Cow<'a, str>>,
 }
 
+impl<'a> InkomsttagareKU20<'a> {
+   fn write<W>(&self, w: &mut Writer<W>) -> Result<(), quick_xml::Error> where W : std::io::Write  {
+        w.create_element("InkomsttagareKU20").write_inner_content(|w| {
+            w.write_node_with_code("LandskodTIN", "076", &self.landskod_tin)?;
+            w.write_node_with_code("Fodelseort", "077", &self.fodelseort)?;
+            w.write_node_with_code("LandskodFodelseort", "078", &self.landskod_fodelseort)?;
+            w.write_node_with_code("Inkomsttagare", "215", &self.inkomsttagare)?;
+            w.write_node_with_code("Fornamn", "216", &self.fornamn)?;
+            w.write_node_with_code("Efternamn", "217", &self.efternamn)?;
+            w.write_node_with_code("Gatuadress", "218", &self.gatuadress)?;
+            w.write_node_with_code("Postnummer", "219", &self.postnummer)?;
+            w.write_node_with_code("Postort", "220", &self.postort)?;
+            w.write_node_with_code("LandskodPostort", "221", &self.landskod_postort)?;
+            w.write_node_with_code("Fodelsetid", "222", &self.fodelsetid)?;
+            w.write_node_with_code("AnnatIDNr", "224", &self.annat_id_nr)?;
+            w.write_node_with_code("OrgNamn", "226", &self.org_namn)?;
+            w.write_node_with_code("Gatuadress2", "228", &self.gatuadress2)?;
+            w.write_node_with_code("FriAdress", "230", &self.fri_adress)?;
+            w.write_node_with_code("TIN", "252", &self.tin)?;
+
+            Ok(())
+        })?;
+
+        Ok(())
+    }
+}
+
 #[derive(Debug, PartialEq)]
 pub struct UppgiftslamnareKU20<'a> {
     pub uppgiftslamnar_id: Cow<'a, str>,
     pub namn_uppgiftslamnare: Option<Cow<'a, str>>,
+}
+
+impl<'a> UppgiftslamnareKU20<'a> {
+    fn write<W>(&self, w: &mut Writer<W>) -> Result<(), quick_xml::Error> where W : std::io::Write  {
+        w.create_element("UppgiftslamnareKU20").write_inner_content(|w| {
+            w.write_node_with_code("UppgiftslamnarId", "201", &self.uppgiftslamnar_id)?;
+            w.write_node_with_code("NamnUppgiftslamnare", "202", &self.namn_uppgiftslamnare)?;
+
+            Ok(())
+        })?;
+
+        Ok(())
+    }
 }
 
 impl<'a> KU20<'a> {
@@ -75,7 +136,6 @@ impl<'a> KU20<'a> {
                     b"Borttag" => {
                         borttag = Some(to_bool(reader.read_text(element.name()).unwrap()).unwrap());
                     }
-
                     b"Ranteinkomst" => {
                         ranteinkomst = Some(reader.read_text(element.name()).unwrap().parse().unwrap());
                     }
@@ -254,14 +314,17 @@ impl<'a> UppgiftslamnareKU20<'a> {
 #[cfg(test)]
 mod tests {
     use std::fs;
-    use crate::{from_str};
+    use crate::{from_str, to_string};
 
     #[test]
     fn ku20_is_read() {
         let xml = fs::read_to_string("EXEMPELFIL KONTROLLUPPGIFTER RÄNTA, UTDELNING M.M. KU20 FÖR_2022.xml").unwrap();
 
-        let parsed = from_str(&*xml);
+        let parsed = from_str(&*xml).unwrap();
         println!("{:?}", &parsed);
-        assert!(parsed.is_ok())
+        let unparsed = to_string(&parsed).unwrap();
+        println!("{}", &unparsed);
+        let parsed2 = from_str(&*unparsed).unwrap();
+        assert_eq!(parsed, parsed2);
     }
 }

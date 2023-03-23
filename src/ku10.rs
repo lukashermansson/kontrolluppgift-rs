@@ -1,14 +1,15 @@
 use std::borrow::Cow;
 use quick_xml::events::{BytesStart, Event};
-use quick_xml::NsReader;
+use quick_xml::{NsReader, Writer};
 use crate::DeError::{MissingField, UnexpectedElement};
-use crate::{DeError, to_bool};
+use crate::{DeError, to_bool, Write};
 
+/// Kontrolluppgift 10
 #[derive(Debug, PartialEq)]
 pub struct KU10<'a> {
     pub kontant_bruttolon_mm: Option<i32>,
     pub forman_utom_bil_drivmedel: Option<i32>,
-    pub bilforman_utom_bil_drivmedel: Option<i32>,
+    pub bilforman_utom_drivmedel: Option<i32>,
     pub drivmedel_vid_bilforman: Option<i32>,
     pub andra_kostnadsers: Option<i32>,
     pub underlag_rutarbete: Option<i32>,
@@ -38,10 +39,48 @@ pub struct KU10<'a> {
 }
 
 impl<'a> KU10<'a> {
+    pub(crate) fn write<W>(&self, w: &mut Writer<W>) -> Result<(), quick_xml::Error> where W : std::io::Write  {
+        w.create_element("KU10").write_inner_content(|w| {
+
+            w.write_node_with_code("KontantBruttolonMm", "011", &self.kontant_bruttolon_mm)?;
+            w.write_node_with_code("FormanUtomBilDrivmedel", "012", &self.forman_utom_bil_drivmedel)?;
+            w.write_node_with_code("BilformanUtomDrivmedel", "013", &self.bilforman_utom_drivmedel)?;
+            w.write_node_with_code("DrivmedelVidBilforman", "018", &self.drivmedel_vid_bilforman)?;
+            w.write_node_with_code("AndraKostnadsers", "020", &self.andra_kostnadsers)?;
+            w.write_node_with_code("UnderlagRotarbete", "022", &self.underlag_rotarbete)?;
+            w.write_node_with_code("ErsMEgenavgifter", "025", &self.ers_m_egenavgifter)?;
+            w.write_node_with_code("Tjanstepension", "030", &self.tjanstepension)?;
+            w.write_node_with_code("ErsEjSocAvg", "031", &self.ers_ej_soc_avg)?;
+            w.write_node_with_code("ErsEjSocAvgEjJobbavd", "032", &self.ers_ej_soc_avg_ej_jobbavd)?;
+            w.write_node_with_code("Forskarskattenamnden", "035", &self.forsarskattenamnden)?;
+            w.write_node_with_code("VissaAvdrag", "037", &self.vissa_avdrag)?;
+            w.write_node_with_code("Hyresersattning", "039", &self.hyresersattning)?;
+            w.write_node_with_code("BostadSmahus", "041", &self.bostad_smahus)?;
+            w.write_node_with_code("BostadEjSmahus", "043", &self.bostad_ej_smahus)?;
+            w.write_node_with_code("FormanHarJusterats", "048", &self.forman_har_justerats)?;
+            w.write_node_with_code("FormanSomPension", "049", &self.forman_som_pension)?;
+            w.write_node_with_code("Bilersattning", "050", &self.bilersattning)?;
+            w.write_node_with_code("Traktamente", "051", &self.traktamente)?;
+            w.write_node_with_code("PersonaloptionForvarvAndel", "059", &self.personaloption_forvarv_andel)?;
+            w.write_node_with_code("Arbetsstallenummer", "060", &self.arbetsstallenummer)?;
+            w.write_node_with_code("Delagare", "061", &self.delagare)?;
+            w.write_node_with_code("SocialAvgiftsAvtal", "093", &self.social_avgifts_avtal)?;
+            w.write_node_with_code("Inkomstar", "203", &self.inkomstar)?;
+            w.write_node_with_code("Borttag", "205", &self.borttag)?;
+            w.write_node_with_code("Specifikationsnummer", "570", &self.specifikationsnummer)?;
+
+            self.inkomsttagare.write(w)?;
+            self.uppgiftslamnare.write(w)?;
+            Ok(())
+        })?;
+        Ok(())
+    }
+}
+impl<'a> KU10<'a> {
     pub(crate) fn read(reader: &mut NsReader<&'a [u8]>, tag: &BytesStart) -> Result<Self, DeError> {
         let mut kontant_bruttolon_mm = None;
         let mut forman_utom_bil_drivmedel = None;
-        let mut bilforman_utom_bil_drivmedel = None;
+        let mut bilforman_utom_drivmedel = None;
         let mut drivmedel_vid_bilforman = None;
         let mut andra_kostnadsers = None;
         let mut underlag_rutarbete = None;
@@ -77,8 +116,8 @@ impl<'a> KU10<'a> {
                     b"FormanUtomBilDrivmedel" => {
                         forman_utom_bil_drivmedel = Some(reader.read_text(element.name()).unwrap().parse().unwrap());
                     }
-                    b"BilformanUtomBilDrivmedel" => {
-                        bilforman_utom_bil_drivmedel = Some(reader.read_text(element.name()).unwrap().parse().unwrap());
+                    b"BilformanUtomDrivmedel" => {
+                        bilforman_utom_drivmedel = Some(reader.read_text(element.name()).unwrap().parse().unwrap());
                     }
                     b"DrivmedelVidBilforman" => {
                         drivmedel_vid_bilforman = Some(reader.read_text(element.name()).unwrap().parse().unwrap());
@@ -168,7 +207,7 @@ impl<'a> KU10<'a> {
                         return Ok(Self {
                             kontant_bruttolon_mm,
                             forman_utom_bil_drivmedel,
-                            bilforman_utom_bil_drivmedel,
+                            bilforman_utom_drivmedel,
                             drivmedel_vid_bilforman,
                             andra_kostnadsers,
                             underlag_rutarbete,
@@ -210,6 +249,19 @@ pub struct UppgiftslamnareKU10<'a> {
     pub namn_uppgiftslamnare: Option<Cow<'a, str>>,
 }
 
+
+impl<'a> UppgiftslamnareKU10<'a> {
+    fn write<W>(&self, w: &mut Writer<W>) -> Result<(), quick_xml::Error> where W : std::io::Write  {
+        w.create_element("UppgiftslamnareKU10").write_inner_content(|w| {
+            w.write_node_with_code("UppgiftslamnarId", "201", &self.uppgiftslamnar_id)?;
+            w.write_node_with_code("NamnUppgiftslamnare", "202", &self.namn_uppgiftslamnare)?;
+
+            Ok(())
+        })?;
+
+        Ok(())
+    }
+}
 impl<'a> UppgiftslamnareKU10<'a> {
     fn read(reader: &mut NsReader<&'a [u8]>, tag: &BytesStart) -> Result<Self, DeError> {
         let mut uppgiftslamnar_id = None;
@@ -255,6 +307,31 @@ pub struct InkomsttagareKU10<'a> {
     pub gatuadress2: Option<Cow<'a, str>>,
     pub fri_adress: Option<Cow<'a, str>>,
     pub tin: Option<Cow<'a, str>>,
+}
+
+impl<'a> InkomsttagareKU10<'a> {
+    fn write<W>(&self, w: &mut Writer<W>) -> Result<(), quick_xml::Error> where W : std::io::Write  {
+        w.create_element("InkomsttagareKU10").write_inner_content(|w| {
+            w.write_node_with_code("LandskodTIN", "076", &self.landskod_tin)?;
+            w.write_node_with_code("Inkomsttagare", "215", &self.inkomsttagare)?;
+            w.write_node_with_code("Fornamn", "216", &self.fornamn)?;
+            w.write_node_with_code("Efternamn", "217", &self.efternamn)?;
+            w.write_node_with_code("Gatuadress", "218", &self.gatuadress)?;
+            w.write_node_with_code("Postnummer", "219", &self.postnummer)?;
+            w.write_node_with_code("Postort", "220", &self.postort)?;
+            w.write_node_with_code("LandskodPostort", "221", &self.landskod_postort)?;
+            w.write_node_with_code("Fodelsetid", "222", &self.fodelsetid)?;
+            w.write_node_with_code("AnnatIDNr", "224", &self.annat_id_nr)?;
+            w.write_node_with_code("OrgNamn", "226", &self.org_namn)?;
+            w.write_node_with_code("Gatuadress2", "228", &self.gatuadress2)?;
+            w.write_node_with_code("FriAdress", "230", &self.fri_adress)?;
+            w.write_node_with_code("TIN", "252", &self.tin)?;
+
+            Ok(())
+        })?;
+
+        Ok(())
+    }
 }
 
 impl<'a> InkomsttagareKU10<'a> {
@@ -349,14 +426,19 @@ impl<'a> InkomsttagareKU10<'a> {
 #[cfg(test)]
 mod tests {
     use std::fs;
-    use crate::{from_str};
+    use crate::{from_str, to_string};
 
     #[test]
     fn ku10_is_read() {
         let xml = fs::read_to_string("EXEMPELFIL KONTROLLUPPGIFT FÖR ARBETSGIVARE MED SOCIALAVGIFTSAVTAL (KU10)_2022.xml").unwrap();
 
-        let parsed = from_str(&*xml);
+
+        let parsed = from_str(&*xml).unwrap();
         println!("{:?}", &parsed);
-        assert!(parsed.is_ok())
+        let unparsed = to_string(&parsed).unwrap();
+        println!("{}", &unparsed);
+        let parsed2 = from_str(&*unparsed).unwrap();
+        assert_eq!(parsed, parsed2);
+
     }
 }
