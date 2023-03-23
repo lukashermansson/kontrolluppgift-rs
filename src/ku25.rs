@@ -5,7 +5,7 @@ use crate::{DeError, to_bool, Write};
 use crate::DeError::{MissingField, UnexpectedElement};
 
 #[derive(Debug, PartialEq)]
-pub struct KU25<'a> {
+pub struct KU25Type<'a> {
     pub delagare: Option<bool>,
     pub inkomstar: Cow<'a, str>,
     pub borttag: Option<bool>,
@@ -18,8 +18,8 @@ pub struct KU25<'a> {
     pub uppgiftslamnare: UppgiftslamnareKU25<'a>,
 }
 
-impl<'a> KU25<'a> {
-    pub(crate) fn write<W>(&self, w: &mut Writer<W>) -> Result<(), quick_xml::Error> where W : std::io::Write  {
+impl<'a> KU25Type<'a> {
+    pub(crate) fn write<W>(&self, w: &mut Writer<W>) -> Result<(), quick_xml::Error> where W: std::io::Write {
         w.create_element("KU25").write_inner_content(|w| {
             w.write_node_with_code("Delagare", "061", &self.delagare)?;
             w.write_node_with_code("Inkomstar", "203", &self.inkomstar)?;
@@ -37,7 +37,8 @@ impl<'a> KU25<'a> {
         Ok(())
     }
 }
-impl<'a> KU25<'a> {
+
+impl<'a> KU25Type<'a> {
     pub(crate) fn read(reader: &mut NsReader<&'a [u8]>, tag: &BytesStart) -> Result<Self, DeError> {
         let mut delagare = None;
         let mut inkomstar = None;
@@ -52,7 +53,6 @@ impl<'a> KU25<'a> {
         loop {
             match reader.read_event().unwrap() {
                 Event::Start(element) => match element.local_name().as_ref() {
-                   
                     b"Delagare" => {
                         delagare = Some(to_bool(reader.read_text(element.name()).unwrap())).unwrap();
                     }
@@ -107,6 +107,7 @@ impl<'a> KU25<'a> {
         }
     }
 }
+
 #[derive(Debug, PartialEq)]
 pub struct InkomsttagareKU25<'a> {
     pub inkomsttagare: Option<Cow<'a, str>>,
@@ -130,7 +131,7 @@ pub struct UppgiftslamnareKU25<'a> {
 }
 
 impl<'a> UppgiftslamnareKU25<'a> {
-    fn write<W>(&self, w: &mut Writer<W>) -> Result<(), quick_xml::Error> where W : std::io::Write  {
+    fn write<W>(&self, w: &mut Writer<W>) -> Result<(), quick_xml::Error> where W: std::io::Write {
         w.create_element("UppgiftslamnareKU25").write_inner_content(|w| {
             w.write_node_with_code("UppgiftslamnarId", "201", &self.uppgiftslamnar_id)?;
             w.write_node_with_code("NamnUppgiftslamnare", "202", &self.namn_uppgiftslamnare)?;
@@ -143,7 +144,7 @@ impl<'a> UppgiftslamnareKU25<'a> {
 }
 
 impl<'a> InkomsttagareKU25<'a> {
-    fn write<W>(&self, w: &mut Writer<W>) -> Result<(), quick_xml::Error> where W : std::io::Write  {
+    fn write<W>(&self, w: &mut Writer<W>) -> Result<(), quick_xml::Error> where W: std::io::Write {
         w.create_element("InkomsttagareKU25").write_inner_content(|w| {
             w.write_node_with_code("Inkomsttagare", "215", &self.inkomsttagare)?;
             w.write_node_with_code("Fornamn", "216", &self.fornamn)?;
@@ -243,6 +244,7 @@ impl<'a> InkomsttagareKU25<'a> {
         }
     }
 }
+
 impl<'a> UppgiftslamnareKU25<'a> {
     fn read(reader: &mut NsReader<&'a [u8]>, tag: &BytesStart) -> Result<Self, DeError> {
         let mut uppgiftslamnar_id = None;
@@ -275,17 +277,76 @@ impl<'a> UppgiftslamnareKU25<'a> {
 #[cfg(test)]
 mod tests {
     use std::fs;
-    use crate::{from_str, to_string};
+    use crate::{Arendeinformation, Avsandare, Blankett, Blankettgemensamt, from_str, Kontaktperson, Kontrolluppgift, TekniskKontaktperson, to_string, Uppgiftslamnare};
+    use crate::KontrolluppgiftType::KU25;
+    use crate::ku25::{InkomsttagareKU25, KU25Type, UppgiftslamnareKU25};
 
     #[test]
     fn ku25_is_read() {
         let xml = fs::read_to_string("EXEMPELFIL KONTROLLUPPGIFTER RÄNTA, UTDELNING M.M. KU25 FÖR_2022.xml").unwrap();
 
         let parsed = from_str(&*xml).unwrap();
-        println!("{:?}", &parsed);
         let unparsed = to_string(&parsed).unwrap();
-        println!("{}", &unparsed);
         let parsed2 = from_str(&*unparsed).unwrap();
         assert_eq!(parsed, parsed2);
+    }
+
+    #[test]
+    fn ku25_is_parsed_to_and_back() {
+        let ku25 = Kontrolluppgift {
+            avsandare: Avsandare {
+                teknisk_kontaktperson: TekniskKontaktperson {
+                    ..Default::default()
+                },
+                ..Default::default()
+            },
+            blankettgemensamt: Blankettgemensamt {
+                uppgiftslamnare: Uppgiftslamnare {
+                    kontaktperson: Kontaktperson {
+                        ..Default::default()
+                    },
+                    ..Default::default()
+                }
+            },
+            blanketter: vec![
+                Blankett {
+                    nummer: 0,
+                    arendeinformation: Arendeinformation {
+                        ..Default::default()
+                    },
+                    blankettinnehall: KU25(KU25Type {
+                        delagare: Some(false),
+                        inkomstar: "2022".into(),
+                        borttag: Some(true),
+                        avdragsgill_ranta: Some(1),
+                        totalt_inbetald_ranta: Some(2),
+                        betald_rantekompensation: Some(3),
+                        gemensamt_lan: Some(false),
+                        specifikationsnummer: 5,
+                        inkomsttagare: InkomsttagareKU25 {
+                            inkomsttagare: Some("202301062382".into()),
+                            fornamn: Some("Test".into()),
+                            efternamn: Some("Testsson".into()),
+                            gatuadress: Some("Gata".into()),
+                            postnummer: Some("7456".into()),
+                            postort: Some("Postort".into()),
+                            landskod_postort: Some("FI".into()),
+                            fodelsetid: Some("20230106".into()),
+                            annat_id_nr: Some("202".into()),
+                            org_namn: Some("Organization".into()),
+                            gatuadress2: Some("Gata2".into()),
+                            fri_adress: Some("Storgatan 3".into()),
+                        },
+                        uppgiftslamnare: UppgiftslamnareKU25 {
+                            uppgiftslamnar_id: "165599990602".into(),
+                            namn_uppgiftslamnare: Some("Foretag 1".into()),
+                        },
+                    }),
+                }
+            ],
+        };
+        let unparsed = to_string(&ku25).unwrap();
+        let re_parsed = from_str(&*unparsed).unwrap();
+        assert_eq!(ku25, re_parsed);
     }
 }

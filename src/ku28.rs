@@ -6,7 +6,7 @@ use crate::DeError::{MissingField, UnexpectedElement};
 
 /// Kontrolluppgift 28
 #[derive(Debug, PartialEq)]
-pub struct KU28<'a> {
+pub struct KU28Type<'a> {
     pub delagare: Option<bool>,
     pub inkomstar: Cow<'a, str>,
     pub borttag: Option<bool>,
@@ -25,8 +25,9 @@ pub struct KU28<'a> {
     pub uppgiftslamnare: UppgiftslamnareKU28<'a>,
 
 }
-impl<'a> KU28<'a> {
-    pub(crate) fn write<W>(&self, w: &mut Writer<W>) -> Result<(), quick_xml::Error> where W : std::io::Write  {
+
+impl<'a> KU28Type<'a> {
+    pub(crate) fn write<W>(&self, w: &mut Writer<W>) -> Result<(), quick_xml::Error> where W: std::io::Write {
         w.create_element("KU28").write_inner_content(|w| {
             w.write_node_with_code("Delagare", "061", &self.delagare)?;
             w.write_node_with_code("Inkomstar", "203", &self.inkomstar)?;
@@ -51,7 +52,7 @@ impl<'a> KU28<'a> {
     }
 }
 
-impl<'a> KU28<'a> {
+impl<'a> KU28Type<'a> {
     pub(crate) fn read(reader: &mut NsReader<&'a [u8]>, tag: &BytesStart) -> Result<Self, DeError> {
         let mut delagare = None;
         let mut inkomstar = None;
@@ -94,7 +95,7 @@ impl<'a> KU28<'a> {
                         aterforing_avyttring = Some(to_bool(reader.read_text(element.name()).unwrap()).unwrap());
                     }
                     b"AterforingUtflyttning" => {
-                        aterforing_utflyttning =  Some(to_bool(reader.read_text(element.name()).unwrap()).unwrap());
+                        aterforing_utflyttning = Some(to_bool(reader.read_text(element.name()).unwrap()).unwrap());
                     }
                     b"AterforingHogVardeoverforing" => {
                         aterforing_hog_vardeoverforing = Some(to_bool(reader.read_text(element.name()).unwrap()).unwrap());
@@ -168,8 +169,9 @@ pub struct InkomsttagareKU28<'a> {
     pub fri_adress: Option<Cow<'a, str>>,
     pub tin: Option<Cow<'a, str>>,
 }
+
 impl<'a> InkomsttagareKU28<'a> {
-    fn write<W>(&self, w: &mut Writer<W>) -> Result<(), quick_xml::Error> where W : std::io::Write  {
+    fn write<W>(&self, w: &mut Writer<W>) -> Result<(), quick_xml::Error> where W: std::io::Write {
         w.create_element("InkomsttagareKU28").write_inner_content(|w| {
             w.write_node_with_code("LandskodTIN", "076", &self.landskod_tin)?;
             w.write_node_with_code("Inkomsttagare", "215", &self.inkomsttagare)?;
@@ -289,7 +291,7 @@ pub struct UppgiftslamnareKU28<'a> {
 }
 
 impl<'a> UppgiftslamnareKU28<'a> {
-    fn write<W>(&self, w: &mut Writer<W>) -> Result<(), quick_xml::Error> where W : std::io::Write  {
+    fn write<W>(&self, w: &mut Writer<W>) -> Result<(), quick_xml::Error> where W: std::io::Write {
         w.create_element("UppgiftslamnareKU28").write_inner_content(|w| {
             w.write_node_with_code("UppgiftslamnarId", "201", &self.uppgiftslamnar_id)?;
             w.write_node_with_code("NamnUppgiftslamnare", "202", &self.namn_uppgiftslamnare)?;
@@ -300,6 +302,7 @@ impl<'a> UppgiftslamnareKU28<'a> {
         Ok(())
     }
 }
+
 impl<'a> UppgiftslamnareKU28<'a> {
     fn read(reader: &mut NsReader<&'a [u8]>, tag: &BytesStart) -> Result<Self, DeError> {
         let mut uppgiftslamnar_id = None;
@@ -332,17 +335,84 @@ impl<'a> UppgiftslamnareKU28<'a> {
 #[cfg(test)]
 mod tests {
     use std::fs;
-    use crate::{from_str, to_string};
+    use crate::{Arendeinformation, Avsandare, Blankett, Blankettgemensamt, from_str, Kontaktperson, Kontrolluppgift, TekniskKontaktperson, to_string, Uppgiftslamnare};
+    use crate::KontrolluppgiftType::KU28;
+    use crate::ku28::{InkomsttagareKU28, KU28Type, UppgiftslamnareKU28};
 
     #[test]
     fn ku28_is_read() {
         let xml = fs::read_to_string("EXEMPELFIL KONTROLLUPPGIFT INVESTERARAVDRAG (KU28)_2022.xml").unwrap();
 
         let parsed = from_str(&*xml).unwrap();
-        println!("{:?}", &parsed);
         let unparsed = to_string(&parsed).unwrap();
-        println!("{}", &unparsed);
         let parsed2 = from_str(&*unparsed).unwrap();
         assert_eq!(parsed, parsed2);
+    }
+
+    #[test]
+    fn ku28_is_parsed_to_and_back() {
+        let ku28 = Kontrolluppgift {
+            avsandare: Avsandare {
+                teknisk_kontaktperson: TekniskKontaktperson {
+                    ..Default::default()
+                },
+                ..Default::default()
+            },
+            blankettgemensamt: Blankettgemensamt {
+                uppgiftslamnare: Uppgiftslamnare {
+                    kontaktperson: Kontaktperson {
+                        ..Default::default()
+                    },
+                    ..Default::default()
+                }
+            },
+            blanketter: vec![
+                Blankett {
+                    nummer: 0,
+                    arendeinformation: Arendeinformation {
+                        ..Default::default()
+                    },
+                    blankettinnehall: KU28(KU28Type {
+                        delagare: Some(false),
+                        inkomstar: "2022".into(),
+                        borttag: Some(true),
+                        underlag_for_investeraravdrag: Some(1),
+                        tot_underlag_investeraravdrag: Some(2),
+                        betalningsar: Some("2023".into()),
+                        aterforing_avyttring: Some(true),
+                        aterforing_utflyttning: Some(false),
+                        aterforing_hog_vardeoverforing: Some(true),
+                        aterforing_interna_forvarv: Some(false),
+                        datum_forvarv: Some("2021-01-01".into()),
+                        region: Some("region".into()),
+                        verksamhetsomrade: Some("verksamhetsomrade".into()),
+                        specifikationsnummer: 5,
+                        inkomsttagare: InkomsttagareKU28 {
+                            landskod_tin: Some("landskod tin".into()),
+                            inkomsttagare: Some("202301062382".into()),
+                            fornamn: Some("Test".into()),
+                            efternamn: Some("Testsson".into()),
+                            gatuadress: Some("Gata".into()),
+                            postnummer: Some("7456".into()),
+                            postort: Some("Postort".into()),
+                            landskod_postort: Some("FI".into()),
+                            fodelsetid: Some("20230106".into()),
+                            annat_id_nr: Some("202".into()),
+                            org_namn: Some("Organization".into()),
+                            gatuadress2: Some("Gata2".into()),
+                            fri_adress: Some("Storgatan 3".into()),
+                            tin: Some("Tin".into()),
+                        },
+                        uppgiftslamnare: UppgiftslamnareKU28 {
+                            uppgiftslamnar_id: "165599990602".into(),
+                            namn_uppgiftslamnare: Some("Foretag 1".into()),
+                        },
+                    }),
+                }
+            ],
+        };
+        let unparsed = to_string(&ku28).unwrap();
+        let re_parsed = from_str(&*unparsed).unwrap();
+        assert_eq!(ku28, re_parsed);
     }
 }

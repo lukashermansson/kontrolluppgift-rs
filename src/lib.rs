@@ -11,11 +11,11 @@ use quick_xml::events::{BytesStart, BytesText, Event};
 use quick_xml::name::QName;
 use crate::DeError::{MissingAttribute, MissingField, Read, ReadError, UnexpectedElement};
 use crate::KontrolluppgiftType::{KU10, KU20, KU21, KU25, KU28};
-use crate::ku10::{KU10 as KU10Type};
-use crate::ku20::{KU20 as KU20Type};
-use crate::ku25::{KU25 as KU25Type};
-use crate::ku21::{KU21 as KU21Type};
-use crate::ku28::{KU28 as KU28Type};
+use crate::ku10::{KU10Type};
+use crate::ku20::{KU20Type};
+use crate::ku25::{KU25Type};
+use crate::ku21::{KU21Type};
+use crate::ku28::{KU28Type};
 
 #[derive(Debug, PartialEq)]
 pub struct Kontrolluppgift<'a> {
@@ -63,7 +63,7 @@ impl<'a> Blankettgemensamt<'a> {
     }
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Default)]
 pub struct Uppgiftslamnare<'a> {
     pub uppgiftslamnare_pers_orgnr: Cow<'a, str>,
     pub kontaktperson: Kontaktperson<'a>,
@@ -106,11 +106,11 @@ impl<'a> Blankett<'a> {
 
 #[derive(Debug, PartialEq)]
 pub enum KontrolluppgiftType<'a> {
-    KU10(ku10::KU10<'a>),
-    KU20(ku20::KU20<'a>),
-    KU21(ku21::KU21<'a>),
-    KU25(ku25::KU25<'a>),
-    KU28(ku28::KU28<'a>),
+    KU10(KU10Type<'a>),
+    KU20(KU20Type<'a>),
+    KU21(KU21Type<'a>),
+    KU25(KU25Type<'a>),
+    KU28(KU28Type<'a>),
 }
 
 impl<'a> KontrolluppgiftType<'a> {
@@ -137,7 +137,7 @@ impl<'a> KontrolluppgiftType<'a> {
     }
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Default)]
 pub struct Arendeinformation<'a> {
     pub arendeagare: Cow<'a, str>,
     pub period: Cow<'a, str>,
@@ -158,7 +158,7 @@ impl<'a> Arendeinformation<'a> {
     }
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Default)]
 pub struct Kontaktperson<'a> {
     pub namn: Cow<'a, str>,
     pub telefon: Cow<'a, str>,
@@ -181,7 +181,7 @@ impl<'a> Kontaktperson<'a> {
     }
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Default)]
 pub struct Avsandare<'a> {
     pub programnamn: Cow<'a, str>,
     pub organisationsnummer: Cow<'a, str>,
@@ -204,7 +204,7 @@ impl<'a> Avsandare<'a> {
     }
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Default)]
 pub struct TekniskKontaktperson<'a> {
     pub namn: Cow<'a, str>,
     pub telefon: Cow<'a, str>,
@@ -584,7 +584,7 @@ pub enum DeError {
 pub(crate) fn to_bool(input: Cow<str>) -> Option<bool> {
     return match input.as_ref() {
         "1" => Some(true),
-        "2" => Some(false),
+        "0" => Some(false),
         _ => None
     };
 }

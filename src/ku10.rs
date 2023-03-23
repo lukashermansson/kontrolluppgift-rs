@@ -6,7 +6,7 @@ use crate::{DeError, to_bool, Write};
 
 /// Kontrolluppgift 10
 #[derive(Debug, PartialEq)]
-pub struct KU10<'a> {
+pub struct KU10Type<'a> {
     pub kontant_bruttolon_mm: Option<i32>,
     pub forman_utom_bil_drivmedel: Option<i32>,
     pub bilforman_utom_drivmedel: Option<i32>,
@@ -38,15 +38,15 @@ pub struct KU10<'a> {
     pub uppgiftslamnare: UppgiftslamnareKU10<'a>,
 }
 
-impl<'a> KU10<'a> {
-    pub(crate) fn write<W>(&self, w: &mut Writer<W>) -> Result<(), quick_xml::Error> where W : std::io::Write  {
+impl<'a> KU10Type<'a> {
+    pub(crate) fn write<W>(&self, w: &mut Writer<W>) -> Result<(), quick_xml::Error> where W: std::io::Write {
         w.create_element("KU10").write_inner_content(|w| {
-
             w.write_node_with_code("KontantBruttolonMm", "011", &self.kontant_bruttolon_mm)?;
             w.write_node_with_code("FormanUtomBilDrivmedel", "012", &self.forman_utom_bil_drivmedel)?;
             w.write_node_with_code("BilformanUtomDrivmedel", "013", &self.bilforman_utom_drivmedel)?;
             w.write_node_with_code("DrivmedelVidBilforman", "018", &self.drivmedel_vid_bilforman)?;
             w.write_node_with_code("AndraKostnadsers", "020", &self.andra_kostnadsers)?;
+            w.write_node_with_code("UnderlagRutarbete", "021", &self.underlag_rutarbete)?;
             w.write_node_with_code("UnderlagRotarbete", "022", &self.underlag_rotarbete)?;
             w.write_node_with_code("ErsMEgenavgifter", "025", &self.ers_m_egenavgifter)?;
             w.write_node_with_code("Tjanstepension", "030", &self.tjanstepension)?;
@@ -76,7 +76,8 @@ impl<'a> KU10<'a> {
         Ok(())
     }
 }
-impl<'a> KU10<'a> {
+
+impl<'a> KU10Type<'a> {
     pub(crate) fn read(reader: &mut NsReader<&'a [u8]>, tag: &BytesStart) -> Result<Self, DeError> {
         let mut kontant_bruttolon_mm = None;
         let mut forman_utom_bil_drivmedel = None;
@@ -251,7 +252,7 @@ pub struct UppgiftslamnareKU10<'a> {
 
 
 impl<'a> UppgiftslamnareKU10<'a> {
-    fn write<W>(&self, w: &mut Writer<W>) -> Result<(), quick_xml::Error> where W : std::io::Write  {
+    fn write<W>(&self, w: &mut Writer<W>) -> Result<(), quick_xml::Error> where W: std::io::Write {
         w.create_element("UppgiftslamnareKU10").write_inner_content(|w| {
             w.write_node_with_code("UppgiftslamnarId", "201", &self.uppgiftslamnar_id)?;
             w.write_node_with_code("NamnUppgiftslamnare", "202", &self.namn_uppgiftslamnare)?;
@@ -262,6 +263,7 @@ impl<'a> UppgiftslamnareKU10<'a> {
         Ok(())
     }
 }
+
 impl<'a> UppgiftslamnareKU10<'a> {
     fn read(reader: &mut NsReader<&'a [u8]>, tag: &BytesStart) -> Result<Self, DeError> {
         let mut uppgiftslamnar_id = None;
@@ -310,7 +312,7 @@ pub struct InkomsttagareKU10<'a> {
 }
 
 impl<'a> InkomsttagareKU10<'a> {
-    fn write<W>(&self, w: &mut Writer<W>) -> Result<(), quick_xml::Error> where W : std::io::Write  {
+    fn write<W>(&self, w: &mut Writer<W>) -> Result<(), quick_xml::Error> where W: std::io::Write {
         w.create_element("InkomsttagareKU10").write_inner_content(|w| {
             w.write_node_with_code("LandskodTIN", "076", &self.landskod_tin)?;
             w.write_node_with_code("Inkomsttagare", "215", &self.inkomsttagare)?;
@@ -426,19 +428,98 @@ impl<'a> InkomsttagareKU10<'a> {
 #[cfg(test)]
 mod tests {
     use std::fs;
-    use crate::{from_str, to_string};
+    use crate::{Arendeinformation, Avsandare, Blankett, Blankettgemensamt, from_str, Kontaktperson, Kontrolluppgift, TekniskKontaktperson, to_string, Uppgiftslamnare};
+    use crate::KontrolluppgiftType::KU10;
+    use crate::ku10::{InkomsttagareKU10, KU10Type, UppgiftslamnareKU10};
 
     #[test]
     fn ku10_is_read() {
         let xml = fs::read_to_string("EXEMPELFIL KONTROLLUPPGIFT FÖR ARBETSGIVARE MED SOCIALAVGIFTSAVTAL (KU10)_2022.xml").unwrap();
 
-
         let parsed = from_str(&*xml).unwrap();
-        println!("{:?}", &parsed);
         let unparsed = to_string(&parsed).unwrap();
-        println!("{}", &unparsed);
         let parsed2 = from_str(&*unparsed).unwrap();
         assert_eq!(parsed, parsed2);
+    }
 
+    #[test]
+    fn ku10_is_parsed_to_and_back() {
+        let ku28 = Kontrolluppgift {
+            avsandare: Avsandare {
+                teknisk_kontaktperson: TekniskKontaktperson {
+                    ..Default::default()
+                },
+                ..Default::default()
+            },
+            blankettgemensamt: Blankettgemensamt {
+                uppgiftslamnare: Uppgiftslamnare {
+                    kontaktperson: Kontaktperson {
+                        ..Default::default()
+                    },
+                    ..Default::default()
+                }
+            },
+            blanketter: vec![
+                Blankett {
+                    nummer: 0,
+                    arendeinformation: Arendeinformation {
+                        ..Default::default()
+                    },
+                    blankettinnehall: KU10(KU10Type {
+                        kontant_bruttolon_mm: Some(1),
+                        forman_utom_bil_drivmedel: Some(2),
+                        bilforman_utom_drivmedel: Some(3),
+                        drivmedel_vid_bilforman: Some(4),
+                        andra_kostnadsers: Some(5),
+                        underlag_rutarbete: Some(6),
+                        underlag_rotarbete: Some(7),
+                        ers_m_egenavgifter: Some(8),
+                        tjanstepension: Some(9),
+                        ers_ej_soc_avg: Some(10),
+                        ers_ej_soc_avg_ej_jobbavd: Some(11),
+                        forsarskattenamnden: Some(12),
+                        vissa_avdrag: Some(13),
+                        hyresersattning: Some(14),
+                        bostad_smahus: Some(true),
+                        bostad_ej_smahus: Some(false),
+                        forman_har_justerats: Some(true),
+                        forman_som_pension: Some(false),
+                        bilersattning: Some(true),
+                        traktamente: Some(false),
+                        personaloption_forvarv_andel: Some(true),
+                        arbetsstallenummer: Some("12".into()),
+                        delagare: Some(false),
+                        social_avgifts_avtal: Some(true),
+                        inkomstar: "2022".into(),
+                        borttag: Some(false),
+
+                        specifikationsnummer: 5,
+                        inkomsttagare: InkomsttagareKU10 {
+                            landskod_tin: Some("landskod tin".into()),
+                            inkomsttagare: Some("202301062382".into()),
+                            fornamn: Some("Test".into()),
+                            efternamn: Some("Testsson".into()),
+                            gatuadress: Some("Gata".into()),
+                            postnummer: Some("7456".into()),
+                            postort: Some("Postort".into()),
+                            landskod_postort: Some("FI".into()),
+                            fodelsetid: Some("20230106".into()),
+                            annat_id_nr: Some("202".into()),
+                            org_namn: Some("Organization".into()),
+                            gatuadress2: Some("Gata2".into()),
+                            fri_adress: Some("Storgatan 3".into()),
+                            tin: Some("Tin".into()),
+                        },
+                        uppgiftslamnare: UppgiftslamnareKU10 {
+                            uppgiftslamnar_id: "165599990602".into(),
+                            namn_uppgiftslamnare: Some("Foretag 1".into()),
+                        },
+                    }),
+                }
+            ],
+        };
+        let unparsed = to_string(&ku28).unwrap();
+        let re_parsed = from_str(&*unparsed).unwrap();
+        assert_eq!(ku28, re_parsed);
     }
 }

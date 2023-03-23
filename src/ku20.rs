@@ -6,7 +6,7 @@ use crate::DeError::{MissingField, UnexpectedElement};
 
 /// Kontrolluppgift 20
 #[derive(Debug, PartialEq)]
-pub struct KU20<'a> {
+pub struct KU20Type<'a> {
     pub avdragen_skatt: Option<i32>,
     pub delagare: Option<bool>,
     pub inkomstar: Cow<'a, str>,
@@ -21,8 +21,8 @@ pub struct KU20<'a> {
 
 }
 
-impl<'a> KU20<'a> {
-    pub(crate) fn write<W>(&self, w: &mut Writer<W>) -> Result<(), quick_xml::Error> where W : std::io::Write  {
+impl<'a> KU20Type<'a> {
+    pub(crate) fn write<W>(&self, w: &mut Writer<W>) -> Result<(), quick_xml::Error> where W: std::io::Write {
         w.create_element("KU20").write_inner_content(|w| {
             w.write_node_with_code("AvdragenSkatt", "001", &self.avdragen_skatt)?;
             w.write_node_with_code("Delagare", "061", &self.delagare)?;
@@ -63,7 +63,7 @@ pub struct InkomsttagareKU20<'a> {
 }
 
 impl<'a> InkomsttagareKU20<'a> {
-   fn write<W>(&self, w: &mut Writer<W>) -> Result<(), quick_xml::Error> where W : std::io::Write  {
+    fn write<W>(&self, w: &mut Writer<W>) -> Result<(), quick_xml::Error> where W: std::io::Write {
         w.create_element("InkomsttagareKU20").write_inner_content(|w| {
             w.write_node_with_code("LandskodTIN", "076", &self.landskod_tin)?;
             w.write_node_with_code("Fodelseort", "077", &self.fodelseort)?;
@@ -96,7 +96,7 @@ pub struct UppgiftslamnareKU20<'a> {
 }
 
 impl<'a> UppgiftslamnareKU20<'a> {
-    fn write<W>(&self, w: &mut Writer<W>) -> Result<(), quick_xml::Error> where W : std::io::Write  {
+    fn write<W>(&self, w: &mut Writer<W>) -> Result<(), quick_xml::Error> where W: std::io::Write {
         w.create_element("UppgiftslamnareKU20").write_inner_content(|w| {
             w.write_node_with_code("UppgiftslamnarId", "201", &self.uppgiftslamnar_id)?;
             w.write_node_with_code("NamnUppgiftslamnare", "202", &self.namn_uppgiftslamnare)?;
@@ -108,7 +108,7 @@ impl<'a> UppgiftslamnareKU20<'a> {
     }
 }
 
-impl<'a> KU20<'a> {
+impl<'a> KU20Type<'a> {
     pub(crate) fn read(reader: &mut NsReader<&'a [u8]>, tag: &BytesStart) -> Result<Self, DeError> {
         let mut avdragen_skatt = None;
         let mut delagare = None;
@@ -314,17 +314,81 @@ impl<'a> UppgiftslamnareKU20<'a> {
 #[cfg(test)]
 mod tests {
     use std::fs;
-    use crate::{from_str, to_string};
+    use crate::{Arendeinformation, Avsandare, Blankett, Blankettgemensamt, from_str, Kontaktperson, Kontrolluppgift, TekniskKontaktperson, to_string, Uppgiftslamnare};
+    use crate::KontrolluppgiftType::KU20;
+    use crate::ku20::{InkomsttagareKU20, KU20Type, UppgiftslamnareKU20};
 
     #[test]
     fn ku20_is_read() {
         let xml = fs::read_to_string("EXEMPELFIL KONTROLLUPPGIFTER RÄNTA, UTDELNING M.M. KU20 FÖR_2022.xml").unwrap();
 
         let parsed = from_str(&*xml).unwrap();
-        println!("{:?}", &parsed);
         let unparsed = to_string(&parsed).unwrap();
-        println!("{}", &unparsed);
         let parsed2 = from_str(&*unparsed).unwrap();
         assert_eq!(parsed, parsed2);
+    }
+
+    #[test]
+    fn ku20_is_parsed_to_and_back() {
+        let ku20 = Kontrolluppgift {
+            avsandare: Avsandare {
+                teknisk_kontaktperson: TekniskKontaktperson {
+                    ..Default::default()
+                },
+                ..Default::default()
+            },
+            blankettgemensamt: Blankettgemensamt {
+                uppgiftslamnare: Uppgiftslamnare {
+                    kontaktperson: Kontaktperson {
+                        ..Default::default()
+                    },
+                    ..Default::default()
+                }
+            },
+            blanketter: vec![
+                Blankett {
+                    nummer: 0,
+                    arendeinformation: Arendeinformation {
+                        ..Default::default()
+                    },
+                    blankettinnehall: KU20(KU20Type {
+                        avdragen_skatt: Some(1),
+                        delagare: Some(true),
+                        inkomstar: "2022".into(),
+                        borttag: Some(true),
+                        ranteinkomst: Some(2),
+                        forfogarkonto: Some(false),
+                        ranteinkomst_ej_konto: Some(3),
+                        annan_inkomst: Some(4),
+                        specifikationsnummer: 5,
+                        inkomsttagare: InkomsttagareKU20 {
+                            landskod_tin: Some("landskod tin".into()),
+                            fodelseort: Some("Ort".into()),
+                            landskod_fodelseort: Some("SE".into()),
+                            inkomsttagare: Some("202301062382".into()),
+                            fornamn: Some("Test".into()),
+                            efternamn: Some("Testsson".into()),
+                            gatuadress: Some("Gata".into()),
+                            postnummer: Some("7456".into()),
+                            postort: Some("Postort".into()),
+                            landskod_postort: Some("FI".into()),
+                            fodelsetid: Some("20230106".into()),
+                            annat_id_nr: Some("202".into()),
+                            org_namn: Some("Organization".into()),
+                            gatuadress2: Some("Gata2".into()),
+                            fri_adress: Some("Storgatan 3".into()),
+                            tin: Some("TIN".into()),
+                        },
+                        uppgiftslamnare: UppgiftslamnareKU20 {
+                            uppgiftslamnar_id: "165599990602".into(),
+                            namn_uppgiftslamnare: Some("Foretag 1".into()),
+                        },
+                    }),
+                }
+            ],
+        };
+        let unparsed = to_string(&ku20).unwrap();
+        let re_parsed = from_str(&*unparsed).unwrap();
+        assert_eq!(ku20, re_parsed);
     }
 }
