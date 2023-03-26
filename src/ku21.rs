@@ -1,8 +1,9 @@
 use std::borrow::Cow;
 use quick_xml::events::{BytesStart, Event};
 use quick_xml::{NsReader, Writer};
-use crate::{DeError, to_bool, Write};
-use crate::DeError::{MissingField, UnexpectedElement};
+use crate::error::Error;
+use crate::{Reader, unexpected_element, Write};
+use crate::error::Error::MissingElement;
 
 /// Kontrolluppgift 21
 #[derive(Debug, PartialEq)]
@@ -38,7 +39,7 @@ impl<'a> KU21Type<'a> {
             w.write_node_with_code("Depanummer", "523", &self.depanummer)?;
             w.write_node_with_code("AndelAvDepan", "524", &self.andel_av_depan)?;
             w.write_node_with_code("ErhallenRantekompensation", "525", &self.erhallen_rantekompensation)?;
-            w.write_node_with_code("Specifikationsnummer", "570", &self.specifikationsnummer)?;
+            w.write_node_with_code("Specifikationsnummer", "570", self.specifikationsnummer)?;
             w.write_node_with_code("VPNamn", "571", &self.vp_namn)?;
             w.write_node_with_code("ISIN", "572", &self.isin)?;
             w.write_node_with_code("AvyttradTillISK", "573", &self.avyttrad_till_isk)?;
@@ -92,7 +93,7 @@ impl<'a> UppgiftslamnareKU21<'a> {
 }
 
 impl<'a> KU21Type<'a> {
-    pub(crate) fn read(reader: &mut NsReader<&'a [u8]>, tag: &BytesStart) -> Result<Self, DeError> {
+    pub(crate) fn read(reader: &mut NsReader<&'a [u8]>, tag: &BytesStart) -> Result<Self, Error> {
         let mut avdragen_skatt = None;
         let mut inkomstar = None;
         let mut borttag = None;
@@ -110,63 +111,35 @@ impl<'a> KU21Type<'a> {
         let mut inkomsttagare = None;
         let mut uppgiftslamnare = None;
         loop {
-            match reader.read_event().unwrap() {
+            match reader.read_event()? {
                 Event::Start(element) => match element.local_name().as_ref() {
-                    b"AvdragenSkatt" => {
-                        avdragen_skatt = Some(reader.read_text(element.name()).unwrap().parse().unwrap());
-                    }
-                    b"Inkomstar" => {
-                        inkomstar = Some(reader.read_text(element.name()).unwrap());
-                    }
-                    b"Borttag" => {
-                        borttag = Some(to_bool(reader.read_text(element.name()).unwrap()).unwrap());
-                    }
-                    b"AnnanInkomst" => {
-                        annan_inkomst = Some(reader.read_text(element.name()).unwrap().parse().unwrap());
-                    }
-                    b"RantaFordringsratter" => {
-                        ranta_fodringsratter = Some(reader.read_text(element.name()).unwrap().parse().unwrap());
-                    }
-                    b"UtbetaltIVissaFall" => {
-                        utbetalt_i_vissa_fall = Some(reader.read_text(element.name()).unwrap().parse().unwrap());
-                    }
-                    b"Depanummer" => {
-                        depanummer = Some(reader.read_text(element.name()).unwrap().parse().unwrap());
-                    }
-                    b"AndelAvDepan" => {
-                        andel_av_depan = Some(reader.read_text(element.name()).unwrap().parse().unwrap());
-                    }
-                    b"ErhallenRantekompensation" => {
-                        erhallen_rantekompensation = Some(reader.read_text(element.name()).unwrap().parse().unwrap());
-                    }
-                    b"Specifikationsnummer" => {
-                        specificationsnummer = Some(reader.read_text(element.name()).unwrap().parse().unwrap());
-                    }
-                    b"VPNamn" => {
-                        vp_namn = Some(reader.read_text(element.name()).unwrap());
-                    }
-                    b"ISIN" => {
-                        isin = Some(reader.read_text(element.name()).unwrap());
-                    }
-                    b"AvyttradTillISK" => {
-                        avyttrad_till_isk = Some(to_bool(reader.read_text(element.name()).unwrap()).unwrap());
-                    }
-                    b"OkandVarde" => {
-                        okand_varde = Some(to_bool(reader.read_text(element.name()).unwrap()).unwrap());
-                    }
+                    b"AvdragenSkatt" => reader.read_node_into(element, &mut avdragen_skatt)?,
+                    b"Inkomstar" => reader.read_node_into(element, &mut inkomstar)?,
+                    b"Borttag" => reader.read_node_into(element, &mut borttag)?,
+                    b"AnnanInkomst" => reader.read_node_into(element, &mut annan_inkomst)?,
+                    b"RantaFordringsratter" => reader.read_node_into(element, &mut ranta_fodringsratter)?,
+                    b"UtbetaltIVissaFall" => reader.read_node_into(element, &mut utbetalt_i_vissa_fall)?,
+                    b"Depanummer" => reader.read_node_into(element, &mut depanummer)?,
+                    b"AndelAvDepan" => reader.read_node_into(element, &mut andel_av_depan)?,
+                    b"ErhallenRantekompensation" => reader.read_node_into(element, &mut erhallen_rantekompensation)?,
+                    b"Specifikationsnummer" => reader.read_node_into(element, &mut specificationsnummer)?,
+                    b"VPNamn" => reader.read_node_into(element, &mut vp_namn)?,
+                    b"ISIN" => reader.read_node_into(element, &mut isin)?,
+                    b"AvyttradTillISK" => reader.read_node_into(element, &mut avyttrad_till_isk)?,
+                    b"OkandVarde" => reader.read_node_into(element, &mut okand_varde)?,
                     b"InkomsttagareKU21" => {
                         inkomsttagare = Some(InkomsttagareKU21::read(reader, &element)?)
                     }
                     b"UppgiftslamnareKU21" => {
                         uppgiftslamnare = Some(UppgiftslamnareKU21::read(reader, &element)?)
                     }
-                    &_ => return Err(UnexpectedElement(std::str::from_utf8(element.name().as_ref()).unwrap().to_string()))
+                    &_ => unexpected_element(&element)?
                 }
                 Event::End(element) => {
                     if element.name() == tag.name() {
                         return Ok(Self {
                             avdragen_skatt,
-                            inkomstar: inkomstar.ok_or_else(|| MissingField("Inkomstar".to_string()))?,
+                            inkomstar: inkomstar.ok_or_else(|| MissingElement("Inkomstar".to_string()))?,
                             borttag,
                             annan_inkomst,
                             ranta_fordringsratter: ranta_fodringsratter,
@@ -174,13 +147,13 @@ impl<'a> KU21Type<'a> {
                             depanummer,
                             andel_av_depan,
                             erhallen_rantekompensation,
-                            specifikationsnummer: specificationsnummer.ok_or_else(|| MissingField("Specifikationsnummer".to_string()))?,
+                            specifikationsnummer: specificationsnummer.ok_or_else(|| MissingElement("Specifikationsnummer".to_string()))?,
                             vp_namn,
                             isin,
                             avyttrad_till_isk,
                             okand_varde,
-                            inkomsttagare: inkomsttagare.ok_or_else(|| MissingField("InkomsttagareKU21".to_string()))?,
-                            uppgiftslamnare: uppgiftslamnare.ok_or_else(|| MissingField("UppgiftslamnareKU21".to_string()))?,
+                            inkomsttagare: inkomsttagare.ok_or_else(|| MissingElement("Inkomsttagare".to_string()))?,
+                            uppgiftslamnare: uppgiftslamnare.ok_or_else(|| MissingElement("Uppgiftslamnare".to_string()))?,
                         });
                     }
                 }
@@ -218,7 +191,7 @@ impl<'a> InkomsttagareKU21<'a> {
 }
 
 impl<'a> InkomsttagareKU21<'a> {
-    fn read(reader: &mut NsReader<&'a [u8]>, tag: &BytesStart) -> Result<Self, DeError> {
+    fn read(reader: &mut NsReader<&'a [u8]>, tag: &BytesStart) -> Result<Self, Error> {
         let mut landskod_tin = None;
         let mut fodelseort = None;
         let mut landskod_fodelseort = None;
@@ -236,57 +209,25 @@ impl<'a> InkomsttagareKU21<'a> {
         let mut fri_adress = None;
         let mut tin = None;
         loop {
-            match reader.read_event().unwrap() {
+            match reader.read_event()? {
                 Event::Start(element) => match element.local_name().as_ref() {
-                    b"LandskodTIN" => {
-                        landskod_tin = Some(reader.read_text(element.name()).unwrap());
-                    }
-                    b"Fodelseort" => {
-                        fodelseort = Some(reader.read_text(element.name()).unwrap());
-                    }
-                    b"LandskodFodelseort" => {
-                        landskod_fodelseort = Some(reader.read_text(element.name()).unwrap());
-                    }
-                    b"Inkomsttagare" => {
-                        inkomsttagare = Some(reader.read_text(element.name()).unwrap());
-                    }
-                    b"Fornamn" => {
-                        fornamn = Some(reader.read_text(element.name()).unwrap());
-                    }
-                    b"Efternamn" => {
-                        efternamn = Some(reader.read_text(element.name()).unwrap());
-                    }
-                    b"Gatuadress" => {
-                        gatuadress = Some(reader.read_text(element.name()).unwrap());
-                    }
-                    b"Postnummer" => {
-                        postnummer = Some(reader.read_text(element.name()).unwrap());
-                    }
-                    b"Postort" => {
-                        postort = Some(reader.read_text(element.name()).unwrap());
-                    }
-                    b"LandskodPostort" => {
-                        landskod_postort = Some(reader.read_text(element.name()).unwrap());
-                    }
-                    b"Fodelsetid" => {
-                        fodelsetid = Some(reader.read_text(element.name()).unwrap());
-                    }
-                    b"AnnatIDNr" => {
-                        annat_id_nr = Some(reader.read_text(element.name()).unwrap());
-                    }
-                    b"OrgNamn" => {
-                        org_namn = Some(reader.read_text(element.name()).unwrap());
-                    }
-                    b"Gatuadress2" => {
-                        gatuadress2 = Some(reader.read_text(element.name()).unwrap());
-                    }
-                    b"FriAdress" => {
-                        fri_adress = Some(reader.read_text(element.name()).unwrap());
-                    }
-                    b"TIN" => {
-                        tin = Some(reader.read_text(element.name()).unwrap());
-                    }
-                    &_ => return Err(UnexpectedElement(std::str::from_utf8(element.name().as_ref()).unwrap().to_string()))
+                    b"LandskodTIN" => reader.read_node_into(element, &mut landskod_tin)?,
+                    b"Fodelseort" => reader.read_node_into(element, &mut fodelseort)?,
+                    b"LandskodFodelseort" => reader.read_node_into(element, &mut landskod_fodelseort)?,
+                    b"Inkomsttagare" => reader.read_node_into(element, &mut inkomsttagare)?,
+                    b"Fornamn" => reader.read_node_into(element, &mut fornamn)?,
+                    b"Efternamn" => reader.read_node_into(element, &mut efternamn)?,
+                    b"Gatuadress" => reader.read_node_into(element, &mut gatuadress)?,
+                    b"Postnummer" => reader.read_node_into(element, &mut postnummer)?,
+                    b"Postort" => reader.read_node_into(element, &mut postort)?,
+                    b"LandskodPostort" => reader.read_node_into(element, &mut landskod_postort)?,
+                    b"Fodelsetid" => reader.read_node_into(element, &mut fodelsetid)?,
+                    b"AnnatIDNr" => reader.read_node_into(element, &mut annat_id_nr)?,
+                    b"OrgNamn" => reader.read_node_into(element, &mut org_namn)?,
+                    b"Gatuadress2" => reader.read_node_into(element, &mut gatuadress2)?,
+                    b"FriAdress" => reader.read_node_into(element, &mut fri_adress)?,
+                    b"TIN" => reader.read_node_into(element, &mut tin)?,
+                    &_ => unexpected_element(&element)?
                 }
                 Event::End(element) => {
                     if element.name() == tag.name() {
@@ -317,24 +258,20 @@ impl<'a> InkomsttagareKU21<'a> {
 }
 
 impl<'a> UppgiftslamnareKU21<'a> {
-    fn read(reader: &mut NsReader<&'a [u8]>, tag: &BytesStart) -> Result<Self, DeError> {
+    fn read(reader: &mut NsReader<&'a [u8]>, tag: &BytesStart) -> Result<Self, Error> {
         let mut uppgiftslamnar_id = None;
         let mut namn_uppgiftslamnare = None;
         loop {
-            match reader.read_event().unwrap() {
+            match reader.read_event()? {
                 Event::Start(element) => match element.local_name().as_ref() {
-                    b"UppgiftslamnarId" => {
-                        uppgiftslamnar_id = Some(reader.read_text(element.name()).unwrap());
-                    }
-                    b"NamnUppgiftslamnare" => {
-                        namn_uppgiftslamnare = Some(reader.read_text(element.name()).unwrap());
-                    }
-                    &_ => return Err(UnexpectedElement(std::str::from_utf8(element.name().as_ref()).unwrap().to_string()))
+                    b"UppgiftslamnarId" => reader.read_node_into(element, &mut uppgiftslamnar_id)?,
+                    b"NamnUppgiftslamnare" => reader.read_node_into(element, &mut namn_uppgiftslamnare)?,
+                    &_ => unexpected_element(&element)?
                 }
                 Event::End(element) => {
                     if element.name() == tag.name() {
                         return Ok(Self {
-                            uppgiftslamnar_id: uppgiftslamnar_id.ok_or_else(|| MissingField("UppgiftslamnarId".to_string()))?,
+                            uppgiftslamnar_id: uppgiftslamnar_id.ok_or_else(|| MissingElement("UppgiftslamnarId".to_string()))?,
                             namn_uppgiftslamnare,
                         });
                     }
@@ -344,6 +281,7 @@ impl<'a> UppgiftslamnareKU21<'a> {
         }
     }
 }
+
 
 #[cfg(test)]
 mod tests {

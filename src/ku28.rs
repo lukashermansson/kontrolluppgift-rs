@@ -1,8 +1,9 @@
 use std::borrow::Cow;
 use quick_xml::events::{BytesStart, Event};
 use quick_xml::{NsReader, Writer};
-use crate::{DeError, to_bool, Write};
-use crate::DeError::{MissingField, UnexpectedElement};
+use crate::error::Error;
+use crate::{Reader, unexpected_element, Write};
+use crate::error::Error::MissingElement;
 
 /// Kontrolluppgift 28
 #[derive(Debug, PartialEq)]
@@ -42,7 +43,7 @@ impl<'a> KU28Type<'a> {
             w.write_node_with_code("DatumForvarv", "535", &self.datum_forvarv)?;
             w.write_node_with_code("Region", "536", &self.region)?;
             w.write_node_with_code("Verksamhetsomrade", "537", &self.verksamhetsomrade)?;
-            w.write_node_with_code("Specifikationsnummer", "570", &self.specifikationsnummer)?;
+            w.write_node_with_code("Specifikationsnummer", "570", self.specifikationsnummer)?;
 
             self.inkomsttagare.write(w)?;
             self.uppgiftslamnare.write(w)?;
@@ -53,7 +54,7 @@ impl<'a> KU28Type<'a> {
 }
 
 impl<'a> KU28Type<'a> {
-    pub(crate) fn read(reader: &mut NsReader<&'a [u8]>, tag: &BytesStart) -> Result<Self, DeError> {
+    pub(crate) fn read(reader: &mut NsReader<&'a [u8]>, tag: &BytesStart) -> Result<Self, Error> {
         let mut delagare = None;
         let mut inkomstar = None;
         let mut borttag = None;
@@ -71,64 +72,35 @@ impl<'a> KU28Type<'a> {
         let mut inkomsttagare = None;
         let mut uppgiftslamnare = None;
         loop {
-            match reader.read_event().unwrap() {
+            match reader.read_event()? {
                 Event::Start(element) => match element.local_name().as_ref() {
-                    b"Delagare" => {
-                        delagare = Some(to_bool(reader.read_text(element.name()).unwrap()).unwrap());
-                    }
-                    b"Inkomstar" => {
-                        inkomstar = Some(reader.read_text(element.name()).unwrap());
-                    }
-                    b"Borttag" => {
-                        borttag = Some(to_bool(reader.read_text(element.name()).unwrap()).unwrap());
-                    }
-                    b"UnderlagForInvesteraravdrag" => {
-                        underlag_for_investeraravdrag = Some(reader.read_text(element.name()).unwrap().parse().unwrap());
-                    }
-                    b"TotUnderlagInvesteraravdrag" => {
-                        tot_underlag_investeraravdrag = Some(reader.read_text(element.name()).unwrap().parse().unwrap());
-                    }
-                    b"Betalningsar" => {
-                        betalningsar = Some(reader.read_text(element.name()).unwrap());
-                    }
-                    b"AterforingAvyttring" => {
-                        aterforing_avyttring = Some(to_bool(reader.read_text(element.name()).unwrap()).unwrap());
-                    }
-                    b"AterforingUtflyttning" => {
-                        aterforing_utflyttning = Some(to_bool(reader.read_text(element.name()).unwrap()).unwrap());
-                    }
-                    b"AterforingHogVardeoverforing" => {
-                        aterforing_hog_vardeoverforing = Some(to_bool(reader.read_text(element.name()).unwrap()).unwrap());
-                    }
-                    b"AterforingInternaForvarv" => {
-                        aterforing_interna_forvarv = Some(to_bool(reader.read_text(element.name()).unwrap()).unwrap());
-                    }
-                    b"DatumForvarv" => {
-                        datum_forvarv = Some(reader.read_text(element.name()).unwrap());
-                    }
-                    b"Region" => {
-                        region = Some(reader.read_text(element.name()).unwrap());
-                    }
-                    b"Verksamhetsomrade" => {
-                        verksamhetsomrade = Some(reader.read_text(element.name()).unwrap());
-                    }
-                    b"Specifikationsnummer" => {
-                        specificationsnummer = Some(reader.read_text(element.name()).unwrap().parse().unwrap());
-                    }
-
+                    b"Delagare" => reader.read_node_into(element, &mut delagare)?,
+                    b"Inkomstar" => reader.read_node_into(element, &mut inkomstar)?,
+                    b"Borttag" => reader.read_node_into(element, &mut borttag)?,
+                    b"UnderlagForInvesteraravdrag" => reader.read_node_into(element, &mut underlag_for_investeraravdrag)?,
+                    b"TotUnderlagInvesteraravdrag" => reader.read_node_into(element, &mut tot_underlag_investeraravdrag)?,
+                    b"Betalningsar" => reader.read_node_into(element, &mut betalningsar)?,
+                    b"AterforingAvyttring" => reader.read_node_into(element, &mut aterforing_avyttring)?,
+                    b"AterforingUtflyttning" => reader.read_node_into(element, &mut aterforing_utflyttning)?,
+                    b"AterforingHogVardeoverforing" => reader.read_node_into(element, &mut aterforing_hog_vardeoverforing)?,
+                    b"AterforingInternaForvarv" => reader.read_node_into(element, &mut aterforing_interna_forvarv)?,
+                    b"DatumForvarv" => reader.read_node_into(element, &mut datum_forvarv)?,
+                    b"Region" => reader.read_node_into(element, &mut region)?,
+                    b"Verksamhetsomrade" => reader.read_node_into(element, &mut verksamhetsomrade)?,
+                    b"Specifikationsnummer" => reader.read_node_into(element, &mut specificationsnummer)?,
                     b"InkomsttagareKU28" => {
                         inkomsttagare = Some(InkomsttagareKU28::read(reader, &element)?)
                     }
                     b"UppgiftslamnareKU28" => {
                         uppgiftslamnare = Some(UppgiftslamnareKU28::read(reader, &element)?)
                     }
-                    &_ => return Err(UnexpectedElement(std::str::from_utf8(element.name().as_ref()).unwrap().to_string()))
+                    &_ => unexpected_element(&element)?
                 }
                 Event::End(element) => {
                     if element.name() == tag.name() {
                         return Ok(Self {
                             delagare,
-                            inkomstar: inkomstar.ok_or_else(|| MissingField("Inkomstar".to_string()))?,
+                            inkomstar: inkomstar.ok_or_else(|| MissingElement("Inkomstar".to_string()))?,
                             borttag,
                             underlag_for_investeraravdrag,
                             tot_underlag_investeraravdrag,
@@ -140,9 +112,9 @@ impl<'a> KU28Type<'a> {
                             datum_forvarv,
                             region,
                             verksamhetsomrade,
-                            specifikationsnummer: specificationsnummer.ok_or_else(|| MissingField("Specifikationsnummer".to_string()))?,
-                            inkomsttagare: inkomsttagare.ok_or_else(|| MissingField("InkomsttagareKU28".to_string()))?,
-                            uppgiftslamnare: uppgiftslamnare.ok_or_else(|| MissingField("UppgiftslamnareKU28".to_string()))?,
+                            specifikationsnummer: specificationsnummer.ok_or_else(|| MissingElement("Specifikationsnummer".to_string()))?,
+                            inkomsttagare: inkomsttagare.ok_or_else(|| MissingElement("Inkomsttagare".to_string()))?,
+                            uppgiftslamnare: uppgiftslamnare.ok_or_else(|| MissingElement("Uppgiftslamnare".to_string()))?,
                         });
                     }
                 }
@@ -196,7 +168,7 @@ impl<'a> InkomsttagareKU28<'a> {
 }
 
 impl<'a> InkomsttagareKU28<'a> {
-    fn read(reader: &mut NsReader<&'a [u8]>, tag: &BytesStart) -> Result<Self, DeError> {
+    fn read(reader: &mut NsReader<&'a [u8]>, tag: &BytesStart) -> Result<Self, Error> {
         let mut landskod_tin = None;
         let mut inkomsttagare = None;
         let mut fornamn = None;
@@ -212,51 +184,23 @@ impl<'a> InkomsttagareKU28<'a> {
         let mut fri_adress = None;
         let mut tin = None;
         loop {
-            match reader.read_event().unwrap() {
+            match reader.read_event()? {
                 Event::Start(element) => match element.local_name().as_ref() {
-                    b"LandskodTIN" => {
-                        landskod_tin = Some(reader.read_text(element.name()).unwrap());
-                    }
-                    b"Inkomsttagare" => {
-                        inkomsttagare = Some(reader.read_text(element.name()).unwrap());
-                    }
-                    b"Fornamn" => {
-                        fornamn = Some(reader.read_text(element.name()).unwrap());
-                    }
-                    b"Efternamn" => {
-                        efternamn = Some(reader.read_text(element.name()).unwrap());
-                    }
-                    b"Gatuadress" => {
-                        gatuadress = Some(reader.read_text(element.name()).unwrap());
-                    }
-                    b"Postnummer" => {
-                        postnummer = Some(reader.read_text(element.name()).unwrap());
-                    }
-                    b"Postort" => {
-                        postort = Some(reader.read_text(element.name()).unwrap());
-                    }
-                    b"LandskodPostort" => {
-                        landskod_postort = Some(reader.read_text(element.name()).unwrap());
-                    }
-                    b"Fodelsetid" => {
-                        fodelsetid = Some(reader.read_text(element.name()).unwrap());
-                    }
-                    b"AnnatIDNr" => {
-                        annat_id_nr = Some(reader.read_text(element.name()).unwrap());
-                    }
-                    b"OrgNamn" => {
-                        org_namn = Some(reader.read_text(element.name()).unwrap());
-                    }
-                    b"Gatuadress2" => {
-                        gatuadress2 = Some(reader.read_text(element.name()).unwrap());
-                    }
-                    b"FriAdress" => {
-                        fri_adress = Some(reader.read_text(element.name()).unwrap());
-                    }
-                    b"TIN" => {
-                        tin = Some(reader.read_text(element.name()).unwrap());
-                    }
-                    &_ => return Err(UnexpectedElement(std::str::from_utf8(element.name().as_ref()).unwrap().to_string()))
+                    b"LandskodTIN" => reader.read_node_into(element, &mut landskod_tin)?,
+                    b"Inkomsttagare" => reader.read_node_into(element, &mut inkomsttagare)?,
+                    b"Fornamn" => reader.read_node_into(element, &mut fornamn)?,
+                    b"Efternamn" => reader.read_node_into(element, &mut efternamn)?,
+                    b"Gatuadress" => reader.read_node_into(element, &mut gatuadress)?,
+                    b"Postnummer" => reader.read_node_into(element, &mut postnummer)?,
+                    b"Postort" => reader.read_node_into(element, &mut postort)?,
+                    b"LandskodPostort" => reader.read_node_into(element, &mut landskod_postort)?,
+                    b"Fodelsetid" => reader.read_node_into(element, &mut fodelsetid)?,
+                    b"AnnatIDNr" => reader.read_node_into(element, &mut annat_id_nr)?,
+                    b"OrgNamn" => reader.read_node_into(element, &mut org_namn)?,
+                    b"Gatuadress2" => reader.read_node_into(element, &mut gatuadress2)?,
+                    b"FriAdress" => reader.read_node_into(element, &mut fri_adress)?,
+                    b"TIN" => reader.read_node_into(element, &mut tin)?,
+                    &_ => unexpected_element(&element)?
                 }
                 Event::End(element) => {
                     if element.name() == tag.name() {
@@ -304,24 +248,20 @@ impl<'a> UppgiftslamnareKU28<'a> {
 }
 
 impl<'a> UppgiftslamnareKU28<'a> {
-    fn read(reader: &mut NsReader<&'a [u8]>, tag: &BytesStart) -> Result<Self, DeError> {
+    fn read(reader: &mut NsReader<&'a [u8]>, tag: &BytesStart) -> Result<Self, Error> {
         let mut uppgiftslamnar_id = None;
         let mut namn_uppgiftslamnare = None;
         loop {
-            match reader.read_event().unwrap() {
+            match reader.read_event()? {
                 Event::Start(element) => match element.local_name().as_ref() {
-                    b"UppgiftslamnarId" => {
-                        uppgiftslamnar_id = Some(reader.read_text(element.name()).unwrap());
-                    }
-                    b"NamnUppgiftslamnare" => {
-                        namn_uppgiftslamnare = Some(reader.read_text(element.name()).unwrap());
-                    }
-                    &_ => return Err(UnexpectedElement(std::str::from_utf8(element.name().as_ref()).unwrap().to_string()))
+                    b"UppgiftslamnarId" => reader.read_node_into(element, &mut uppgiftslamnar_id)?,
+                    b"NamnUppgiftslamnare" => reader.read_node_into(element, &mut namn_uppgiftslamnare)?,
+                    &_ => unexpected_element(&element)?
                 }
                 Event::End(element) => {
                     if element.name() == tag.name() {
                         return Ok(Self {
-                            uppgiftslamnar_id: uppgiftslamnar_id.ok_or_else(|| MissingField("UppgiftslamnarId".to_string()))?,
+                            uppgiftslamnar_id: uppgiftslamnar_id.ok_or_else(|| MissingElement("UppgiftslamnarId".to_string()))?,
                             namn_uppgiftslamnare,
                         });
                     }
@@ -331,6 +271,7 @@ impl<'a> UppgiftslamnareKU28<'a> {
         }
     }
 }
+
 
 #[cfg(test)]
 mod tests {
