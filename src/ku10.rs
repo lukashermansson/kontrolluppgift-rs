@@ -112,33 +112,33 @@ impl<'a> KU10Type<'a> {
         loop {
             match reader.read_event()? {
                 Event::Start(element) => match element.local_name().as_ref() {
-                    b"KontantBruttolonMm" => reader.read_node_into(element, &mut kontant_bruttolon_mm)?,
-                    b"FormanUtomBilDrivmedel" => reader.read_node_into(element, &mut forman_utom_bil_drivmedel)?,
-                    b"BilformanUtomDrivmedel" => reader.read_node_into(element, &mut bilforman_utom_drivmedel)?,
-                    b"DrivmedelVidBilforman" => reader.read_node_into(element, &mut drivmedel_vid_bilforman)?,
-                    b"AndraKostnadsers" => reader.read_node_into(element, &mut andra_kostnadsers)?,
-                    b"UnderlagRutarbete" => reader.read_node_into(element, &mut underlag_rutarbete)?,
-                    b"UnderlagRotarbete" => reader.read_node_into(element, &mut underlag_rotarbete)?,
-                    b"ErsMEgenavgifter" => reader.read_node_into(element, &mut ers_m_egenavgifter)?,
-                    b"Tjanstepension" => reader.read_node_into(element, &mut tjanstepension)?,
-                    b"ErsEjSocAvg" => reader.read_node_into(element, &mut ers_ej_soc_avg)?,
-                    b"ErsEjSocAvgEjJobbavd" => reader.read_node_into(element, &mut ers_ej_soc_avg_ej_jobbavd)?,
-                    b"Forskarskattenamnden" => reader.read_node_into(element, &mut forsarskattenamnden)?,
-                    b"VissaAvdrag" => reader.read_node_into(element, &mut vissa_avdrag)?,
-                    b"Hyresersattning" => reader.read_node_into(element, &mut hyresersattning)?,
-                    b"BostadSmahus" => reader.read_node_into(element, &mut bostad_smahus)?,
-                    b"BostadEjSmahus" => reader.read_node_into(element, &mut bostad_ej_smahus)?,
-                    b"FormanHarJusterats" => reader.read_node_into(element, &mut forman_har_justerats)?,
-                    b"FormanSomPension" => reader.read_node_into(element, &mut forman_som_pension)?,
-                    b"Bilersattning" => reader.read_node_into(element, &mut bilersattning)?,
-                    b"Traktamente" => reader.read_node_into(element, &mut traktamente)?,
-                    b"PersonaloptionForvarvAndel" => reader.read_node_into(element, &mut personaloption_forvarv_andel)?,
-                    b"Arbetsstallenummer" => reader.read_node_into(element, &mut arbetsstallenummer)?,
-                    b"Delagare" => reader.read_node_into(element, &mut delagare)?,
-                    b"SocialAvgiftsAvtal" => reader.read_node_into(element, &mut social_avgifts_avtal)?,
-                    b"Inkomstar" => reader.read_node_into(element, &mut inkomstar)?,
-                    b"Borttag" => reader.read_node_into(element, &mut borttag)?,
-                    b"Specifikationsnummer" => reader.read_node_into(element, &mut specificationsnummer)?,
+                    b"KontantBruttolonMm" => reader.read_node_into_with_code(element, "011", &mut kontant_bruttolon_mm)?,
+                    b"FormanUtomBilDrivmedel" => reader.read_node_into_with_code(element, "012", &mut forman_utom_bil_drivmedel)?,
+                    b"BilformanUtomDrivmedel" => reader.read_node_into_with_code(element, "013", &mut bilforman_utom_drivmedel)?,
+                    b"DrivmedelVidBilforman" => reader.read_node_into_with_code(element, "018", &mut drivmedel_vid_bilforman)?,
+                    b"AndraKostnadsers" => reader.read_node_into_with_code(element, "020", &mut andra_kostnadsers)?,
+                    b"UnderlagRutarbete" => reader.read_node_into_with_code(element, "021", &mut underlag_rutarbete)?,
+                    b"UnderlagRotarbete" => reader.read_node_into_with_code(element, "022", &mut underlag_rotarbete)?,
+                    b"ErsMEgenavgifter" => reader.read_node_into_with_code(element, "025", &mut ers_m_egenavgifter)?,
+                    b"Tjanstepension" => reader.read_node_into_with_code(element, "030", &mut tjanstepension)?,
+                    b"ErsEjSocAvg" => reader.read_node_into_with_code(element, "031", &mut ers_ej_soc_avg)?,
+                    b"ErsEjSocAvgEjJobbavd" => reader.read_node_into_with_code(element, "032", &mut ers_ej_soc_avg_ej_jobbavd)?,
+                    b"Forskarskattenamnden" => reader.read_node_into_with_code(element, "035", &mut forsarskattenamnden)?,
+                    b"VissaAvdrag" => reader.read_node_into_with_code(element, "037", &mut vissa_avdrag)?,
+                    b"Hyresersattning" => reader.read_node_into_with_code(element, "039", &mut hyresersattning)?,
+                    b"BostadSmahus" => reader.read_node_into_with_code(element, "041", &mut bostad_smahus)?,
+                    b"BostadEjSmahus" => reader.read_node_into_with_code(element, "043", &mut bostad_ej_smahus)?,
+                    b"FormanHarJusterats" => reader.read_node_into_with_code(element, "048", &mut forman_har_justerats)?,
+                    b"FormanSomPension" => reader.read_node_into_with_code(element, "049", &mut forman_som_pension)?,
+                    b"Bilersattning" => reader.read_node_into_with_code(element, "050", &mut bilersattning)?,
+                    b"Traktamente" => reader.read_node_into_with_code(element, "051", &mut traktamente)?,
+                    b"PersonaloptionForvarvAndel" => reader.read_node_into_with_code(element, "059", &mut personaloption_forvarv_andel)?,
+                    b"Arbetsstallenummer" => reader.read_node_into_with_code(element, "060", &mut arbetsstallenummer)?,
+                    b"Delagare" => reader.read_node_into_with_code(element, "061", &mut delagare)?,
+                    b"SocialAvgiftsAvtal" => reader.read_node_into_with_code(element, "093", &mut social_avgifts_avtal)?,
+                    b"Inkomstar" => reader.read_node_into_with_code(element, "203", &mut inkomstar)?,
+                    b"Borttag" => reader.read_node_into_with_code(element, "205", &mut borttag)?,
+                    b"Specifikationsnummer" => reader.read_node_into_with_code(element, "570", &mut specificationsnummer)?,
                     b"InkomsttagareKU10" => {
                         inkomsttagare = Some(InkomsttagareKU10::read(reader, &element)?)
                     }
@@ -215,8 +215,8 @@ impl<'a> UppgiftslamnareKU10<'a> {
         loop {
             match reader.read_event()? {
                 Event::Start(element) => match element.local_name().as_ref() {
-                    b"UppgiftslamnarId" => reader.read_node_into(element, &mut uppgiftslamnar_id)?,
-                    b"NamnUppgiftslamnare" => reader.read_node_into(element, &mut namn_uppgiftslamnare)?,
+                    b"UppgiftslamnarId" => reader.read_node_into_with_code(element, "201", &mut uppgiftslamnar_id)?,
+                    b"NamnUppgiftslamnare" => reader.read_node_into_with_code(element, "202", &mut namn_uppgiftslamnare)?,
                     &_ => unexpected_element(&element)?
                 }
                 Event::End(element) => {
@@ -296,20 +296,20 @@ impl<'a> InkomsttagareKU10<'a> {
         loop {
             match reader.read_event()? {
                 Event::Start(element) => match element.local_name().as_ref() {
-                    b"LandskodTIN" => reader.read_node_into(element, &mut landskod_tin)?,
-                    b"Inkomsttagare" => reader.read_node_into(element, &mut inkomsttagare)?,
-                    b"Fornamn" => reader.read_node_into(element, &mut fornamn)?,
-                    b"Efternamn" => reader.read_node_into(element, &mut efternamn)?,
-                    b"Gatuadress" => reader.read_node_into(element, &mut gatuadress)?,
-                    b"Postnummer" => reader.read_node_into(element, &mut postnummer)?,
-                    b"Postort" => reader.read_node_into(element, &mut postort)?,
-                    b"LandskodPostort" => reader.read_node_into(element, &mut landskod_postort)?,
-                    b"Fodelsetid" => reader.read_node_into(element, &mut fodelsetid)?,
-                    b"AnnatIDNr" => reader.read_node_into(element, &mut annat_id_nr)?,
-                    b"OrgNamn" => reader.read_node_into(element, &mut org_namn)?,
-                    b"Gatuadress2" => reader.read_node_into(element, &mut gatuadress2)?,
-                    b"FriAdress" => reader.read_node_into(element, &mut fri_adress)?,
-                    b"TIN" => reader.read_node_into(element, &mut tin)?,
+                    b"LandskodTIN" => reader.read_node_into_with_code(element, "076", &mut landskod_tin)?,
+                    b"Inkomsttagare" => reader.read_node_into_with_code(element, "215", &mut inkomsttagare)?,
+                    b"Fornamn" => reader.read_node_into_with_code(element, "216", &mut fornamn)?,
+                    b"Efternamn" => reader.read_node_into_with_code(element, "217", &mut efternamn)?,
+                    b"Gatuadress" => reader.read_node_into_with_code(element, "218", &mut gatuadress)?,
+                    b"Postnummer" => reader.read_node_into_with_code(element, "219", &mut postnummer)?,
+                    b"Postort" => reader.read_node_into_with_code(element, "220", &mut postort)?,
+                    b"LandskodPostort" => reader.read_node_into_with_code(element, "221", &mut landskod_postort)?,
+                    b"Fodelsetid" => reader.read_node_into_with_code(element, "222", &mut fodelsetid)?,
+                    b"AnnatIDNr" => reader.read_node_into_with_code(element, "224", &mut annat_id_nr)?,
+                    b"OrgNamn" => reader.read_node_into_with_code(element, "226", &mut org_namn)?,
+                    b"Gatuadress2" => reader.read_node_into_with_code(element, "228", &mut gatuadress2)?,
+                    b"FriAdress" => reader.read_node_into_with_code(element, "230", &mut fri_adress)?,
+                    b"TIN" => reader.read_node_into_with_code(element,"252", &mut tin)?,
                     &_ => unexpected_element(&element)?
                 }
                 Event::End(element) => {

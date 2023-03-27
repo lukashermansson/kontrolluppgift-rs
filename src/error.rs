@@ -6,6 +6,7 @@ use std::io::Error as IoError;
 use quick_xml::events::attributes::AttrError;
 use quick_xml::{Error as QXMLError};
 use quick_xml::utils::write_byte_string;
+
 #[derive(Clone, Debug)]
 pub enum Error {
     Io(Arc<IoError>),
@@ -24,6 +25,7 @@ pub enum Error {
     UnknownPrefix(Vec<u8>),
     MissingElement(String)
 }
+
 impl From<QXMLError> for Error {
     fn from(value: QXMLError) -> Self {
       match value {
@@ -44,11 +46,13 @@ impl From<QXMLError> for Error {
       }
     }
 }
+
 impl From<AttrError> for Error {
     fn from(value: AttrError) -> Self {
        Self::InvalidAttr(value)
     }
 }
+
 impl fmt::Display for Error {
     fn fmt(&self, f: &mut Formatter) -> fmt::Result {
         match self {
@@ -84,8 +88,6 @@ impl fmt::Display for Error {
         }
     }
 }
-
-
 
 impl std::error::Error for Error {
     fn source(&self) -> Option<&(dyn std::error::Error + 'static)> {

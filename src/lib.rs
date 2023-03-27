@@ -236,8 +236,7 @@ impl<'a> TekniskKontaktperson<'a> {
 }
 
 /// Deserialize xml into rust types
-/// Does not validate data contained according to specification
-/// It also does not currently validate any namespace information or "faltkod" ( this may be subject to change before 1.0)
+/// It also does not currently validate any namespace information.
 pub fn from_str(str: &str) -> Result<Kontrolluppgift, Error> {
     let mut reader = NsReader::from_str(str);
 
@@ -557,10 +556,21 @@ trait Write<'a, T> where T: Writable {
 
 trait Reader<'a, 'b, T> where T: Readable<'a, 'b> {
     fn read_node_into(&mut self, element: BytesStart, x: &mut Option<T>) -> Result<(), Error>;
+    fn read_node_into_with_code(&mut self, element: BytesStart, code: &str, x: &mut Option<T>) -> Result<(), Error>;
 }
 
 impl<'a, 'b : 'a, T: Readable<'a, 'b> + 'b> Reader<'a, 'b, T> for NsReader<&'b [u8]> {
     fn read_node_into(&mut self, element: BytesStart, x: &mut Option<T>) -> Result<(), Error> {
+        *x = Some(T::get_str(self.read_text(element.name())?)?);
+        Ok(())
+    }
+
+    fn read_node_into_with_code(&mut self, element: BytesStart, code: &str, x: &mut Option<T>) -> Result<(), Error> {
+        let kod = element.try_get_attribute("faltkod")?.ok_or_else(|| MissingElement("faltkod".to_string()))?;
+        let kod = kod.decode_and_unescape_value(self)?;
+        if code != kod {
+           return Err(Error::UnexpectedToken(format!("Unexpected faltkod on {}, expected: {}, got: {}", std::str::from_utf8(element.name().as_ref()).unwrap(), code, kod)))
+        }
         *x = Some(T::get_str(self.read_text(element.name())?)?);
         Ok(())
     }

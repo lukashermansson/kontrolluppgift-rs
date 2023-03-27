@@ -54,14 +54,14 @@ impl<'a> KU25Type<'a> {
         loop {
             match reader.read_event()? {
                 Event::Start(element) => match element.local_name().as_ref() {
-                    b"Delagare" => reader.read_node_into(element, &mut delagare)?,
-                    b"Inkomstar" => reader.read_node_into(element, &mut inkomstar)?,
-                    b"Borttag" => reader.read_node_into(element, &mut borttag)?,
-                    b"AvdragsgillRanta" => reader.read_node_into(element, &mut avdragsgill_ranta)?,
-                    b"TotaltInbetaldRanta" => reader.read_node_into(element, &mut totalt_inbetald_ranta)?,
-                    b"BetaldRantekompensation" => reader.read_node_into(element, &mut betald_rantekompensation)?,
-                    b"GemensamtLan" => reader.read_node_into(element, &mut gemensamt_lan)?,
-                    b"Specifikationsnummer" => reader.read_node_into(element, &mut specificationsnummer)?,
+                    b"Delagare" => reader.read_node_into_with_code(element, "061", &mut delagare)?,
+                    b"Inkomstar" => reader.read_node_into_with_code(element, "203", &mut inkomstar)?,
+                    b"Borttag" => reader.read_node_into_with_code(element, "205", &mut borttag)?,
+                    b"AvdragsgillRanta" => reader.read_node_into_with_code(element, "540", &mut avdragsgill_ranta)?,
+                    b"TotaltInbetaldRanta" => reader.read_node_into_with_code(element, "541", &mut totalt_inbetald_ranta)?,
+                    b"BetaldRantekompensation" => reader.read_node_into_with_code(element, "543", &mut betald_rantekompensation)?,
+                    b"GemensamtLan" => reader.read_node_into_with_code(element, "544", &mut gemensamt_lan)?,
+                    b"Specifikationsnummer" => reader.read_node_into_with_code(element, "570", &mut specificationsnummer)?,
                     b"InkomsttagareKU25" => {
                         inkomsttagare = Some(InkomsttagareKU25::read(reader, &element)?)
                     }
@@ -167,18 +167,18 @@ impl<'a> InkomsttagareKU25<'a> {
         loop {
             match reader.read_event()? {
                 Event::Start(element) => match element.local_name().as_ref() {
-                    b"Inkomsttagare" => reader.read_node_into(element, &mut inkomsttagare)?,
-                    b"Fornamn" => reader.read_node_into(element, &mut fornamn)?,
-                    b"Efternamn" => reader.read_node_into(element, &mut efternamn)?,
-                    b"Gatuadress" => reader.read_node_into(element, &mut gatuadress)?,
-                    b"Postnummer" => reader.read_node_into(element, &mut postnummer)?,
-                    b"Postort" => reader.read_node_into(element, &mut postort)?,
-                    b"LandskodPostort" => reader.read_node_into(element, &mut landskod_postort)?,
-                    b"Fodelsetid" => reader.read_node_into(element, &mut fodelsetid)?,
-                    b"AnnatIDNr" => reader.read_node_into(element, &mut annat_id_nr)?,
-                    b"OrgNamn" => reader.read_node_into(element, &mut org_namn)?,
-                    b"Gatuadress2" => reader.read_node_into(element, &mut gatuadress2)?,
-                    b"FriAdress" => reader.read_node_into(element, &mut fri_adress)?,
+                    b"Inkomsttagare" => reader.read_node_into_with_code(element, "215", &mut inkomsttagare)?,
+                    b"Fornamn" => reader.read_node_into_with_code(element, "216", &mut fornamn)?,
+                    b"Efternamn" => reader.read_node_into_with_code(element, "217", &mut efternamn)?,
+                    b"Gatuadress" => reader.read_node_into_with_code(element, "218", &mut gatuadress)?,
+                    b"Postnummer" => reader.read_node_into_with_code(element, "219", &mut postnummer)?,
+                    b"Postort" => reader.read_node_into_with_code(element, "220", &mut postort)?,
+                    b"LandskodPostort" => reader.read_node_into_with_code(element, "221", &mut landskod_postort)?,
+                    b"Fodelsetid" => reader.read_node_into_with_code(element, "222", &mut fodelsetid)?,
+                    b"AnnatIDNr" => reader.read_node_into_with_code(element, "224", &mut annat_id_nr)?,
+                    b"OrgNamn" => reader.read_node_into_with_code(element, "226", &mut org_namn)?,
+                    b"Gatuadress2" => reader.read_node_into_with_code(element, "228", &mut gatuadress2)?,
+                    b"FriAdress" => reader.read_node_into_with_code(element, "230", &mut fri_adress)?,
                     &_ => unexpected_element(&element)?
                 }
                 Event::End(element) => {
@@ -212,8 +212,8 @@ impl<'a> UppgiftslamnareKU25<'a> {
         loop {
             match reader.read_event()? {
                 Event::Start(element) => match element.local_name().as_ref() {
-                    b"UppgiftslamnarId" => reader.read_node_into(element, &mut uppgiftslamnar_id)?,
-                    b"NamnUppgiftslamnare" => reader.read_node_into(element, &mut namn_uppgiftslamnare)?,
+                    b"UppgiftslamnarId" => reader.read_node_into_with_code(element, "201", &mut uppgiftslamnar_id)?,
+                    b"NamnUppgiftslamnare" => reader.read_node_into_with_code(element, "202", &mut namn_uppgiftslamnare)?,
                     &_ => unexpected_element(&element)?
                 }
                 Event::End(element) => {
