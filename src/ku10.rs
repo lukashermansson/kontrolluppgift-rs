@@ -182,6 +182,7 @@ impl<'a> KU10Type<'a> {
                         });
                     }
                 }
+                Event::Eof => return Err(Error::UnexpectedEof("While reading KU10".to_string())),
                 _ => {}
             }
         }
@@ -227,6 +228,7 @@ impl<'a> UppgiftslamnareKU10<'a> {
                         });
                     }
                 }
+                Event::Eof => return Err(Error::UnexpectedEof("While reading UppgiftslamnareKU10".to_string())),
                 _ => {}
             }
         }
@@ -332,6 +334,7 @@ impl<'a> InkomsttagareKU10<'a> {
                         });
                     }
                 }
+                Event::Eof => return Err(Error::UnexpectedEof("While reading InkomsttagareKU10".to_string())),
                 _ => {}
             }
         }

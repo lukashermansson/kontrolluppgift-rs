@@ -261,16 +261,19 @@ pub fn from_str(str: &str) -> Result<Kontrolluppgift, Error> {
                 }
                 _ => unexpected_element(&element)?
             },
-
-            Event::Eof => break, // exits the loop when reaching end of file
+            Event::End(element) => {
+                if element.local_name().as_ref() == b"Skatteverket" {
+                    return Ok(Kontrolluppgift {
+                        avsandare: g_avsandare.ok_or_else(|| MissingElement("Avsandare".to_string()))?,
+                        blankettgemensamt: blankettgemensamt.ok_or_else(|| MissingElement("Blankettgemensamt".to_string()))?,
+                        blanketter,
+                    });
+                }
+            }
+            Event::Eof => return Err(Error::UnexpectedEof("While reading Skatteverket".to_string())),
             _ => (),             // There are `Event` types not considered here
         }
     }
-    Ok(Kontrolluppgift {
-        avsandare: g_avsandare.ok_or_else(|| MissingElement("Avsandare".to_string()))?,
-        blankettgemensamt: blankettgemensamt.ok_or_else(|| MissingElement("Blankettgemensamt".to_string()))?,
-        blanketter,
-    })
 }
 
 
@@ -297,7 +300,6 @@ impl<'a> Blankett<'a> {
                 nummer = Some(a.decode_and_unescape_value(reader)?
                     .parse::<i64>().map_err(|_| MissingElement("nummer".to_string()))?)
             }
-
         }
         loop {
             match reader.read_event()? {
@@ -347,6 +349,7 @@ impl<'a> Blankett<'a> {
                         });
                     }
                 }
+                Event::Eof => return Err(Error::UnexpectedEof("While reading Blankett".to_string())),
                 _ => {}
             }
         }
@@ -375,6 +378,7 @@ impl<'a> Arendeinformation<'a> {
                         });
                     }
                 }
+                Event::Eof => return Err(Error::UnexpectedEof("While reading Arendeinformation".to_string())),
                 _ => {}
             }
         }
@@ -406,6 +410,7 @@ impl<'a> Avsandare<'a> {
                         });
                     }
                 }
+                Event::Eof => return Err(Error::UnexpectedEof("While reading Avsandare".to_string())),
                 _ => {}
             }
         }
@@ -421,7 +426,7 @@ impl<'a> Blankettgemensamt<'a> {
                     b"Uppgiftslamnare" => {
                         uppgiftslamnare = Some(Uppgiftslamnare::read(reader, element.name())?)
                     }
-                    &_ =>  unexpected_element(&element)?
+                    &_ => unexpected_element(&element)?
                 }
                 Event::End(element) => {
                     if element.name() == tag {
@@ -430,6 +435,7 @@ impl<'a> Blankettgemensamt<'a> {
                         });
                     }
                 }
+                Event::Eof => return Err(Error::UnexpectedEof("While reading Blankettgemensamt".to_string())),
                 _ => {}
             }
         }
@@ -457,6 +463,7 @@ impl<'a> Uppgiftslamnare<'a> {
                         });
                     }
                 }
+                Event::Eof => return Err(Error::UnexpectedEof("While reading Uppgiftslamnare".to_string())),
                 _ => {}
             }
         }
@@ -488,6 +495,7 @@ impl<'a> Kontaktperson<'a> {
                         });
                     }
                 }
+                Event::Eof => return Err(Error::UnexpectedEof("While reading Kontaktperson".to_string())),
                 _ => {}
             }
         }
@@ -528,6 +536,7 @@ impl<'a> TekniskKontaktperson<'a> {
                         });
                     }
                 }
+                Event::Eof => return Err(Error::UnexpectedEof("While reading TekniskKontaktperson".to_string())),
                 _ => {}
             }
         }
@@ -549,6 +558,7 @@ pub enum DeError {
 fn unexpected_element<E>(element: &BytesStart) -> Result<E, Error> {
     Err(Error::UnexpectedToken(std::str::from_utf8(element.name().as_ref()).map_err(|e| Error::NonDecodable(Some(e)))?.to_string()))
 }
+
 trait Write<'a, T> where T: Writable {
     fn write_node(&mut self, name: &str, data: T) -> Result<(), quick_xml::Error>;
     fn write_node_with_code(&mut self, name: &str, code: &str, data: T) -> Result<(), quick_xml::Error>;
@@ -569,7 +579,7 @@ impl<'a, 'b : 'a, T: Readable<'a, 'b> + 'b> Reader<'a, 'b, T> for NsReader<&'b [
         let kod = element.try_get_attribute("faltkod")?.ok_or_else(|| MissingElement("faltkod".to_string()))?;
         let kod = kod.decode_and_unescape_value(self)?;
         if code != kod {
-           return Err(Error::UnexpectedToken(format!("Unexpected faltkod on {}, expected: {}, got: {}", std::str::from_utf8(element.name().as_ref()).unwrap(), code, kod)))
+            return Err(Error::UnexpectedToken(format!("Unexpected faltkod on {}, expected: {}, got: {}", std::str::from_utf8(element.name().as_ref()).unwrap(), code, kod)));
         }
         *x = Some(T::get_str(self.read_text(element.name())?)?);
         Ok(())
@@ -624,6 +634,7 @@ impl<'a, 'b> Readable<'a, 'b> for bool {
         }
     }
 }
+
 impl<'a, 'b> Readable<'a, 'b> for i32 {
     fn get_str(data: Cow<str>) -> Result<Self, Error> {
         data.as_ref().parse().map_err(|_| Error::UnexpectedToken("expected number got: ".to_string() + data.as_ref()))
@@ -635,6 +646,7 @@ impl<'a, 'b> Readable<'a, 'b> for f32 {
         data.as_ref().parse().map_err(|_| Error::UnexpectedToken("expected fraction got: ".to_string() + data.as_ref()))
     }
 }
+
 impl<'a, 'b : 'a> Readable<'a, 'b> for Cow<'a, str> {
     fn get_str(data: Cow<'b, str>) -> Result<Self, Error> {
         Ok(data)
