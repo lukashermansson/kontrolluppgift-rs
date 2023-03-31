@@ -4,6 +4,7 @@ pub mod ku25;
 pub mod ku28;
 pub mod ku21;
 pub mod error;
+mod ku26;
 
 use std::borrow::Cow;
 use std::io::Cursor;
@@ -12,11 +13,12 @@ use quick_xml::events::{BytesStart, BytesText, Event};
 use quick_xml::name::QName;
 use crate::error::Error;
 use crate::error::Error::MissingElement;
-use crate::KontrolluppgiftType::{KU10, KU20, KU21, KU25, KU28};
+use crate::KontrolluppgiftType::{KU10, KU20, KU21, KU25, KU26, KU28};
 use crate::ku10::{KU10Type};
 use crate::ku20::{KU20Type};
 use crate::ku25::{KU25Type};
 use crate::ku21::{KU21Type};
+use crate::ku26::KU26Type;
 use crate::ku28::{KU28Type};
 
 #[derive(Debug, PartialEq)]
@@ -112,6 +114,7 @@ pub enum KontrolluppgiftType<'a> {
     KU20(KU20Type<'a>),
     KU21(KU21Type<'a>),
     KU25(KU25Type<'a>),
+    KU26(KU26Type<'a>),
     KU28(KU28Type<'a>),
 }
 
@@ -128,6 +131,9 @@ impl<'a> KontrolluppgiftType<'a> {
                 v.write(w)?;
             }
             KU25(v) => {
+                v.write(w)?;
+            }
+            KU26(v) => {
                 v.write(w)?;
             }
             KU28(v) => {
@@ -325,6 +331,10 @@ impl<'a> Blankett<'a> {
                                     }
                                     b"KU25" => {
                                         blankettinnehall = Some(KU25(KU25Type::read(reader, &element)?));
+                                        break;
+                                    }
+                                    b"KU26" => {
+                                        blankettinnehall = Some(KU26(KU26Type::read(reader, &element)?));
                                         break;
                                     }
                                     b"KU28" => {
