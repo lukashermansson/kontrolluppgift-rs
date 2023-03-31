@@ -23,7 +23,7 @@ the current status of implemtation of the "Kontrolluppgift" variants is:
 -  [x] KU20
 -  [x] KU21
 -  [X] KU25
--  [ ] KU26
+-  [X] KU26
 -  [x] KU28
 -  [ ] KU30
 -  [ ] KU31
