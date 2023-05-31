@@ -1,4 +1,4 @@
 /target
-/Cargo.lock
+/crates/kontrolluppgift/Cargo.lock
 *.iml
 .idea

@@ -21,6 +21,7 @@ use crate::ku21::{KU21Type};
 use crate::ku26::KU26Type;
 use crate::ku28::{KU28Type};
 
+
 #[derive(Debug, PartialEq)]
 pub struct Kontrolluppgift<'a> {
     pub avsandare: Avsandare<'a>,
@@ -565,6 +566,13 @@ pub enum DeError {
     UnexpectedXml(String),
 }
 
+trait KontrolluppgiftRead<'a> {
+    fn read(reader: &mut NsReader<&'a [u8]>, tag: &BytesStart) -> Result<Self, Error> where Self: Sized;
+}
+
+trait KontrolluppgiftWrite {
+   fn write<W>(&self, w: &mut Writer<W>) -> Result<(), quick_xml::Error> where W: std::io::Write;
+}
 fn unexpected_element<E>(element: &BytesStart) -> Result<E, Error> {
     Err(Error::UnexpectedToken(std::str::from_utf8(element.name().as_ref()).map_err(|e| Error::NonDecodable(Some(e)))?.to_string()))
 }
