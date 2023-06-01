@@ -1,4 +1,5 @@
 pub mod ku20;
+pub mod ku13;
 pub mod ku10;
 pub mod ku25;
 pub mod ku28;
@@ -13,13 +14,14 @@ use quick_xml::events::{BytesStart, BytesText, Event};
 use kontrolluppgift_macros::{KontrolluppgiftRead, KontrolluppgiftWrite};
 use crate::error::Error;
 use crate::error::Error::MissingElement;
-use crate::KontrolluppgiftType::{KU10, KU20, KU21, KU25, KU26, KU28};
-use crate::ku10::{KU10Type};
-use crate::ku20::{KU20Type};
-use crate::ku25::{KU25Type};
-use crate::ku21::{KU21Type};
+use crate::KontrolluppgiftType::{KU10, KU13, KU20, KU21, KU25, KU26, KU28};
+use crate::ku10::KU10Type;
+use crate::ku13::KU13Type;
+use crate::ku20::KU20Type;
+use crate::ku25::KU25Type;
+use crate::ku21::KU21Type;
 use crate::ku26::KU26Type;
-use crate::ku28::{KU28Type};
+use crate::ku28::KU28Type;
 
 
 #[derive(Debug, PartialEq)]
@@ -94,6 +96,7 @@ impl<'a> Blankett<'a> {
 #[derive(Debug, PartialEq)]
 pub enum KontrolluppgiftType<'a> {
     KU10(KU10Type<'a>),
+    KU13(KU13Type<'a>),
     KU20(KU20Type<'a>),
     KU21(KU21Type<'a>),
     KU25(KU25Type<'a>),
@@ -105,6 +108,9 @@ impl<'a> KontrolluppgiftType<'a> {
     fn write<W: std::io::Write>(&self, w: &mut Writer<W>) -> Result<(), quick_xml::Error> {
         match self {
             KU10(v) => {
+                v.write(w)?;
+            }
+            KU13(v) => {
                 v.write(w)?;
             }
             KU20(v) => {
@@ -263,6 +269,10 @@ impl<'a> Blankett<'a> {
                                 Event::Start(element) => match element.local_name().as_ref() {
                                     b"KU10" => {
                                         blankettinnehall = Some(KU10(KU10Type::read(reader, &element)?));
+                                        break;
+                                    }
+                                    b"KU13" => {
+                                        blankettinnehall = Some(KU13(KU13Type::read(reader, &element)?));
                                         break;
                                     }
                                     b"KU21" => {

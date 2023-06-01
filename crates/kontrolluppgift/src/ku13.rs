@@ -2,10 +2,10 @@ use std::borrow::Cow;
 use kontrolluppgift_macros::{KontrolluppgiftRead, KontrolluppgiftWrite};
 extern crate self as kontrolluppgift;
 
-/// Kontrolluppgift 10
+/// Kontrolluppgift 13
 #[derive(Debug, PartialEq, KontrolluppgiftRead, KontrolluppgiftWrite)]
-#[ku(name("KU10"))]
-pub struct KU10Type<'a> {
+#[ku(name("KU13"))]
+pub struct KU13Type<'a> {
     #[ku(name(b"KontantBruttolonMm"), code("011"))]
     pub kontant_bruttolon_mm: Option<i32>,
     #[ku(name(b"FormanUtomBilDrivmedel"), code("012"))]
@@ -14,38 +14,18 @@ pub struct KU10Type<'a> {
     pub bilforman_utom_drivmedel: Option<i32>,
     #[ku(name(b"drivmedelvidbilforman"), code("018"))]
     pub drivmedel_vid_bilforman: Option<i32>,
-    #[ku(name(b"AndraKostnadsers"), code("020"))]
-    pub andra_kostnadsers: Option<i32>,
-    #[ku(name(b"UnderlagRutarbete"), code("021"))]
-    pub underlag_rutarbete: Option<i32>,
-    #[ku(name(b"UnderlagRotarbete"), code("022"))]
-    pub underlag_rotarbete: Option<i32>,
-    #[ku(name(b"ErsMEgenavgifter"), code("025"))]
-    pub ers_m_egenavgifter: Option<i32>,
     #[ku(name(b"Tjanstepension"), code("030"))]
     pub tjanstepension: Option<i32>,
     #[ku(name(b"ErsEjSocAvg"), code("031"))]
     pub ers_ej_soc_avg: Option<i32>,
-    #[ku(name(b"ErsEjSocAvgEjJobbavd"), code("032"))]
-    pub ers_ej_soc_avg_ej_jobbavd: Option<i32>,
-    #[ku(name(b"Forskarskattenamnden"), code("035"))]
-    pub forsarskattenamnden: Option<i32>,
-    #[ku(name(b"VissaAvdrag"), code("037"))]
-    pub vissa_avdrag: Option<i32>,
-    #[ku(name(b"Hyresersattning"), code("039"))]
-    pub hyresersattning: Option<i32>,
+    #[ku(name(b"ErsFormanBostadMmSINK"), code("036"))]
+    pub ers_forman_bostad_mm_sink: Option<i32>,
     #[ku(name(b"BostadSmahus"), code("041"))]
     pub bostad_smahus: Option<bool>,
     #[ku(name(b"BostadEjSmahus"), code("043"))]
     pub bostad_ej_smahus: Option<bool>,
     #[ku(name(b"FormanHarJusterats"), code("048"))]
     pub forman_har_justerats: Option<bool>,
-    #[ku(name(b"FormanSomPension"), code("049"))]
-    pub forman_som_pension: Option<bool>,
-    #[ku(name(b"Bilersattning"), code("050"))]
-    pub bilersattning: Option<bool>,
-    #[ku(name(b"Traktamente"), code("051"))]
-    pub traktamente: Option<bool>,
     #[ku(name(b"PersonaloptionForvarvAndel"), code("059"))]
     pub personaloption_forvarv_andel: Option<bool>,
     #[ku(name(b"Arbetsstallenummer"), code("060"))]
@@ -60,16 +40,16 @@ pub struct KU10Type<'a> {
     pub borttag: Option<bool>,
     #[ku(name(b"Specifikationsnummer"), code("570"), required(true))]
     pub specifikationsnummer: i32,
-    #[ku(name(b"InkomsttagareKU10"), required(true), inner_ty(true))]
-    pub inkomsttagare: InkomsttagareKU10<'a>,
-    #[ku(name(b"UppgiftslamnareKU10"), required(true), inner_ty(true))]
-    pub uppgiftslamnare: UppgiftslamnareKU10<'a>,
+    #[ku(name(b"InkomsttagareKU13"), required(true), inner_ty(true))]
+    pub inkomsttagare: InkomsttagareKU13<'a>,
+    #[ku(name(b"UppgiftslamnareKU13"), required(true), inner_ty(true))]
+    pub uppgiftslamnare: UppgiftslamnareKU13<'a>,
 }
 
 
 #[derive(Debug, PartialEq, KontrolluppgiftRead, KontrolluppgiftWrite)]
-#[ku(name("UppgiftslamnareKU10"))]
-pub struct UppgiftslamnareKU10<'a> {
+#[ku(name("UppgiftslamnareKU13"))]
+pub struct UppgiftslamnareKU13<'a> {
     #[ku(name(b"UppgiftslamnarId"), code("201"), required(true))]
     pub uppgiftslamnar_id: Cow<'a, str>,
     #[ku(name(b"NamnUppgiftslamnare"), code("202"))]
@@ -77,10 +57,12 @@ pub struct UppgiftslamnareKU10<'a> {
 }
 
 #[derive(Debug, PartialEq, KontrolluppgiftRead, KontrolluppgiftWrite)]
-#[ku(name("InkomsttagareKU10"))]
-pub struct InkomsttagareKU10<'a> {
+#[ku(name("InkomsttagareKU13"))]
+pub struct InkomsttagareKU13<'a> {
     #[ku(name(b"LandskodTIN"), code("076"))]
     pub landskod_tin: Option<Cow<'a, str>>,
+    #[ku(name(b"LandskodMedborgare"), code("081"))]
+    pub landskod_medborgare: Option<Cow<'a, str>>,
     #[ku(name(b"Inkomsttagare"), code("215"))]
     pub inkomsttagare: Option<Cow<'a, str>>,
     #[ku(name(b"Fornamn"), code("216"))]
@@ -112,24 +94,13 @@ pub struct InkomsttagareKU10<'a> {
 
 #[cfg(test)]
 mod tests {
-    use std::fs;
-    use crate::{Arendeinformation, Avsandare, Blankett, Blankettgemensamt, from_str, Kontaktperson, Kontrolluppgift, TekniskKontaktperson, to_string, Uppgiftslamnare};
-    use crate::KontrolluppgiftType::KU10;
-    use crate::ku10::{InkomsttagareKU10, KU10Type, UppgiftslamnareKU10};
+    use crate::{*};
+    use crate::KontrolluppgiftType::{KU13};
+    use crate::ku13::*;
 
     #[test]
-    fn ku10_is_read() {
-        let xml = fs::read_to_string("./EXEMPELFIL KONTROLLUPPGIFT FÖR ARBETSGIVARE MED SOCIALAVGIFTSAVTAL (KU10)_2022.xml").unwrap();
-
-        let parsed = from_str(&*xml).unwrap();
-        let unparsed = to_string(&parsed).unwrap();
-        let parsed2 = from_str(&*unparsed).unwrap();
-        assert_eq!(parsed, parsed2);
-    }
-
-    #[test]
-    fn ku10_is_parsed_to_and_back() {
-        let ku10 = Kontrolluppgift {
+    fn ku13_is_parsed_to_and_back() {
+        let ku13 = Kontrolluppgift {
             avsandare: Avsandare {
                 teknisk_kontaktperson: TekniskKontaktperson {
                     ..Default::default()
@@ -150,27 +121,17 @@ mod tests {
                     arendeinformation: Arendeinformation {
                         ..Default::default()
                     },
-                    blankettinnehall: KU10(KU10Type {
+                    blankettinnehall: KU13(KU13Type {
                         kontant_bruttolon_mm: Some(1),
                         forman_utom_bil_drivmedel: Some(2),
                         bilforman_utom_drivmedel: Some(3),
                         drivmedel_vid_bilforman: Some(4),
-                        andra_kostnadsers: Some(5),
-                        underlag_rutarbete: Some(6),
-                        underlag_rotarbete: Some(7),
-                        ers_m_egenavgifter: Some(8),
                         tjanstepension: Some(9),
                         ers_ej_soc_avg: Some(10),
-                        ers_ej_soc_avg_ej_jobbavd: Some(11),
-                        forsarskattenamnden: Some(12),
-                        vissa_avdrag: Some(13),
-                        hyresersattning: Some(14),
+                        ers_forman_bostad_mm_sink: Some(20),
                         bostad_smahus: Some(true),
                         bostad_ej_smahus: Some(false),
                         forman_har_justerats: Some(true),
-                        forman_som_pension: Some(false),
-                        bilersattning: Some(true),
-                        traktamente: Some(false),
                         personaloption_forvarv_andel: Some(true),
                         arbetsstallenummer: Some("12".into()),
                         delagare: Some(false),
@@ -179,8 +140,9 @@ mod tests {
                         borttag: Some(false),
 
                         specifikationsnummer: 5,
-                        inkomsttagare: InkomsttagareKU10 {
+                        inkomsttagare: InkomsttagareKU13 {
                             landskod_tin: Some("landskod tin".into()),
+                            landskod_medborgare: Some("SE".into()),
                             inkomsttagare: Some("202301062382".into()),
                             fornamn: Some("Test".into()),
                             efternamn: Some("Testsson".into()),
@@ -195,7 +157,7 @@ mod tests {
                             fri_adress: Some("Storgatan 3".into()),
                             tin: Some("Tin".into()),
                         },
-                        uppgiftslamnare: UppgiftslamnareKU10 {
+                        uppgiftslamnare: UppgiftslamnareKU13 {
                             uppgiftslamnar_id: "165599990602".into(),
                             namn_uppgiftslamnare: Some("Foretag 1".into()),
                         },
@@ -203,8 +165,8 @@ mod tests {
                 }
             ],
         };
-        let unparsed = to_string(&ku10).unwrap();
+        let unparsed = to_string(&ku13).unwrap();
         let re_parsed = from_str(&*unparsed).unwrap();
-        assert_eq!(ku10, re_parsed);
+        assert_eq!(ku13, re_parsed);
     }
 }

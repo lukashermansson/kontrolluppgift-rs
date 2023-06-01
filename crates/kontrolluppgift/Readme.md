@@ -14,7 +14,7 @@ This crate is still to be considered in early development, none of the types are
 the current status of implemtation of the "Kontrolluppgift" variants is:
 
 -  [x] KU10
--  [ ] KU13
+-  [x] KU13
 -  [ ] KU14
 -  [ ] KU16
 -  [ ] KU17
