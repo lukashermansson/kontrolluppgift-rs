@@ -60,9 +60,9 @@ pub struct KU10Type<'a> {
     pub borttag: Option<bool>,
     #[ku(name(b"Specifikationsnummer"), code("570"), required(true))]
     pub specifikationsnummer: i32,
-    #[ku(name(b"InkomsttagareKU10"), required(true))]
+    #[ku(name(b"InkomsttagareKU10"), required(true), inner_ty(true))]
     pub inkomsttagare: InkomsttagareKU10<'a>,
-    #[ku(name(b"UppgiftslamnareKU10"), required(true))]
+    #[ku(name(b"UppgiftslamnareKU10"), required(true), inner_ty(true))]
     pub uppgiftslamnare: UppgiftslamnareKU10<'a>,
 }
 

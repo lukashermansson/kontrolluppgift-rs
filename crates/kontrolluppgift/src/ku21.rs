@@ -34,9 +34,9 @@ pub struct KU21Type<'a> {
     #[ku(name(b"OkandVarde"), code("599"))]
     pub okand_varde: Option<bool>,
 
-    #[ku(name(b"InkomsttagareKU21"), required(true))]
+    #[ku(name(b"InkomsttagareKU21"), required(true), inner_ty(true))]
     pub inkomsttagare: InkomsttagareKU21<'a>,
-    #[ku(name(b"UppgiftslamnareKU21"), required(true))]
+    #[ku(name(b"UppgiftslamnareKU21"), required(true), inner_ty(true))]
     pub uppgiftslamnare: UppgiftslamnareKU21<'a>,
 }
 

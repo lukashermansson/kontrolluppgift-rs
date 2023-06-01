@@ -33,9 +33,9 @@ pub struct KU28Type<'a> {
     pub verksamhetsomrade: Option<Cow<'a, str>>,
     #[ku(name(b"Specifikationsnummer"), code("570"), required(true))]
     pub specifikationsnummer: i32,
-    #[ku(name(b"InkomsttagareKU28"), required(true))]
+    #[ku(name(b"InkomsttagareKU28"), required(true), inner_ty(true))]
     pub inkomsttagare: InkomsttagareKU28<'a>,
-    #[ku(name(b"UppgiftslamnareKU28"), required(true))]
+    #[ku(name(b"UppgiftslamnareKU28"), required(true), inner_ty(true))]
     pub uppgiftslamnare: UppgiftslamnareKU28<'a>,
 
 }

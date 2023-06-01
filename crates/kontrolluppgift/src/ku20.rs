@@ -23,9 +23,9 @@ pub struct KU20Type<'a> {
     pub annan_inkomst: Option<i32>,
     #[ku(name(b"Specifikationsnummer"), code("570"), required(true))]
     pub specifikationsnummer: i32,
-    #[ku(name(b"InkomsttagareKU20"), required(true))]
+    #[ku(name(b"InkomsttagareKU20"), required(true), inner_ty(true))]
     pub inkomsttagare: InkomsttagareKU20<'a>,
-    #[ku(name(b"UppgiftslamnareKU20"), required(true))]
+    #[ku(name(b"UppgiftslamnareKU20"), required(true), inner_ty(true))]
     pub uppgiftslamnare: UppgiftslamnareKU20<'a>,
 
 }

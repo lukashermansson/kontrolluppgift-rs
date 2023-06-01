@@ -25,7 +25,7 @@ pub fn read_macro(input: TokenStream) -> TokenStream {
             }).expect("Error");
         }
     };
-    let str_name = str_name.unwrap();
+    let str_name = str_name.expect("expected to have a name attribute on the struct");
 
     let fields = match ast.data {
         | Data::Enum(_)
@@ -39,10 +39,11 @@ pub fn read_macro(input: TokenStream) -> TokenStream {
     };
 
 
-    let field_name: Vec<(LitByteStr, Ident, Ident, Type, bool, Option<LitStr>)> = fields.named.into_iter().enumerate().map(|(index, field)| {
+    let field_name: Vec<(LitByteStr, Ident, Ident, Type, bool, Option<LitStr>, bool)> = fields.named.into_iter().enumerate().map(|(index, field)| {
         let mut name = None;
         let mut code = None;
         let mut required = false;
+        let mut is_inner_typ = false;
         for attr in &field.attrs {
             if attr.path().is_ident("ku") {
                 attr.parse_nested_meta(|meta| {
@@ -67,15 +68,22 @@ pub fn read_macro(input: TokenStream) -> TokenStream {
                         required = true;
                         return Ok(());
                     }
+                    if meta.path.is_ident("inner_ty") {
+                        let content;
+                        parenthesized!(content in meta.input);
+                        let _: LitBool = content.parse()?;
+                        is_inner_typ = true;
+                        return Ok(());
+                    }
                     Err(meta.error("unrecognized ku attrs"))
                 }).unwrap();
             }
         }
 
-        (name.unwrap(), Ident::new(&format!("f_{}", index), Span::call_site()), field.ident.unwrap(), field.ty, required, code)
+        (name.expect("Requires name"), Ident::new(&format!("f_{}", index), Span::call_site()), field.ident.expect("its not an ident"), field.ty, required, code, is_inner_typ)
     }).collect();
 
-    let struct_assignments: Vec<_> = field_name.iter().map(|(names, temp, ogs, _, req, _)| {
+    let struct_assignments: Vec<_> = field_name.iter().map(|(names, temp, ogs, _, req, _, _)| {
         if *req {
             let str = String::from_utf8(names.value()).unwrap();
             quote! {
@@ -87,21 +95,28 @@ pub fn read_macro(input: TokenStream) -> TokenStream {
            }
         }
     }).collect();
-    let match_brances: Vec<_> = field_name.iter().map(|(names, temp, _, typ, _, codes)| {
-        if codes.is_some() {
-            quote! {
-               #names => reader.read_node_into_with_code(element, #codes, &mut #temp)?,
-           }
-        } else {
+    let match_brances: Vec<_> = field_name.iter().map(|(names, temp, _, typ, _, codes, is_inner)| {
+        if *is_inner {
             let Type::Path(type_path) = typ.clone() else { panic!("expected path") };
             let t = &type_path.path.segments.last().unwrap().ident;
             quote! {
                #names => { #temp = Some(#t::read(reader, &element)?) },
            }
+        }else {
+            if codes.is_some() {
+                quote! {
+                    #names => reader.read_node_into_with_code(element, #codes, &mut #temp)?,
+                }
+            } else {
+                quote! {
+                    #names => reader.read_node_into(element, &mut #temp)?,
+                }
+            }
         }
+
     }).collect();
 
-    let variable_definitions: Vec<_> = field_name.iter().map(|(_, temp, _, _, _, _)| {
+    let variable_definitions: Vec<_> = field_name.iter().map(|(_, temp, _, _, _, _, _)| {
         quote! {
            let mut #temp = None;
       }
@@ -167,11 +182,10 @@ pub fn write_macro(input: TokenStream) -> TokenStream {
             }).expect("Error");
         }
     };
-    let str_name = str_name.unwrap();
+    let str_name = str_name.expect("expected to have a name attribute on the struct");
 
     let fields = match ast.data {
-        | Data::Enum(_)
-        | Data::Union(_) => {
+        | Data::Enum(_) | Data::Union(_) => {
             panic!("Only structs are suported")
         }
         | Data::Struct(DataStruct { fields: Fields::Named(it), .. }) => it,
@@ -181,9 +195,10 @@ pub fn write_macro(input: TokenStream) -> TokenStream {
     };
 
 
-    let field_name: Vec<(String, Ident, Option<LitStr>)> = fields.named.into_iter().map(|field| {
+    let field_name: Vec<(String, Ident, Option<LitStr>, bool)> = fields.named.into_iter().map(|field| {
         let mut name: Option<String> = None;
         let mut code = None;
+        let mut is_inner_type = false;
         for attr in &field.attrs {
             if attr.path().is_ident("ku") {
                 attr.parse_nested_meta(|meta| {
@@ -207,19 +222,32 @@ pub fn write_macro(input: TokenStream) -> TokenStream {
                         let _: LitBool = content.parse()?;
                         return Ok(());
                     }
+                    if meta.path.is_ident("inner_ty") {
+                        let content;
+                        parenthesized!(content in meta.input);
+                        let _: LitBool = content.parse()?;
+                        is_inner_type = true;
+                        return Ok(());
+                    }
                     Err(meta.error("unrecognized ku attribute"))
                 }).unwrap();
             }
         }
 
-        (name.unwrap(), field.ident.unwrap(), code)
+        (name.unwrap(), field.ident.unwrap(), code, is_inner_type)
     }).collect();
 
-    let write_operations: Vec<_> = field_name.iter().map(|(name, og, code)| {
+    let write_operations: Vec<_> = field_name.iter().map(|(name, og, code, is_inner_type)| {
         match code {
             None => {
-                quote! {
-                self.#og.write(w)?;
+                if *is_inner_type {
+                    quote! {
+                        self.#og.write(w)?;
+                    }
+                }else {
+                    quote! {
+                        w.write_node(#name, &self.#og)?;
+                    }
                 }
             }
             Some(code) => {

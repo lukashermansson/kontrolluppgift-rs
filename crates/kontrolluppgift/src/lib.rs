@@ -10,7 +10,7 @@ use std::borrow::Cow;
 use std::io::Cursor;
 use quick_xml::{NsReader, Writer};
 use quick_xml::events::{BytesStart, BytesText, Event};
-use quick_xml::name::QName;
+use kontrolluppgift_macro::{KontrolluppgiftRead, KontrolluppgiftWrite};
 use crate::error::Error;
 use crate::error::Error::MissingElement;
 use crate::KontrolluppgiftType::{KU10, KU20, KU21, KU25, KU26, KU28};
@@ -52,38 +52,20 @@ impl<'a> Kontrolluppgift<'a> {
     }
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, Default, PartialEq, KontrolluppgiftRead, KontrolluppgiftWrite)]
+#[ku(name("Blankettgemensamt"))]
 pub struct Blankettgemensamt<'a> {
+    #[ku(name(b"Uppgiftslamnare"), inner_ty(true), required(true))]
     pub uppgiftslamnare: Uppgiftslamnare<'a>,
 }
 
-impl<'a> Blankettgemensamt<'a> {
-    fn write<W: std::io::Write>(&self, w: &mut Writer<W>) -> Result<(), quick_xml::Error> {
-        w.create_element("Blankettgemensamt").write_inner_content(|w| {
-            self.uppgiftslamnare.write(w)?;
-            Ok(())
-        })?;
-
-        Ok(())
-    }
-}
-
-#[derive(Debug, PartialEq, Default)]
+#[derive(Debug, Default, PartialEq, KontrolluppgiftRead, KontrolluppgiftWrite)]
+#[ku(name("Uppgiftslamnare"))]
 pub struct Uppgiftslamnare<'a> {
+    #[ku(name(b"UppgiftslamnarePersOrgnr"), required(true))]
     pub uppgiftslamnare_pers_orgnr: Cow<'a, str>,
+    #[ku(name(b"Kontaktperson"), required(true), inner_ty(true))]
     pub kontaktperson: Kontaktperson<'a>,
-}
-
-impl<'a> Uppgiftslamnare<'a> {
-    fn write<W: std::io::Write>(&self, w: &mut Writer<W>) -> Result<(), quick_xml::Error> {
-        w.create_element("Uppgiftslamnare").write_inner_content(|w| {
-            w.write_node("UppgiftslamnarePersOrgnr", &self.uppgiftslamnare_pers_orgnr)?;
-            self.kontaktperson.write(w)?;
-            Ok(())
-        })?;
-
-        Ok(())
-    }
 }
 
 #[derive(Debug, PartialEq)]
@@ -146,100 +128,61 @@ impl<'a> KontrolluppgiftType<'a> {
     }
 }
 
-#[derive(Debug, PartialEq, Default)]
+#[derive(Debug, Default, PartialEq, KontrolluppgiftRead, KontrolluppgiftWrite)]
+#[ku(name("Arendeinformation"))]
 pub struct Arendeinformation<'a> {
+    #[ku(name(b"Arendeagare"), required(true))]
     pub arendeagare: Cow<'a, str>,
+    #[ku(name(b"Period"), required(true))]
     pub period: Cow<'a, str>,
+    #[ku(name(b"Arendenummer"))]
     pub arendenummer: Option<Cow<'a, str>>,
 }
 
-impl<'a> Arendeinformation<'a> {
-    fn write<W: std::io::Write>(&self, w: &mut Writer<W>) -> Result<(), quick_xml::Error> {
-        w.create_element("Arendeinformation").write_inner_content(|w| {
-            w.write_node("Arendeagare", &self.arendeagare)?;
-            w.write_node("Period", &self.period)?;
-            w.write_node("Arendenummer", &self.arendenummer)?;
-
-            Ok(())
-        })?;
-
-        Ok(())
-    }
-}
-
-#[derive(Debug, PartialEq, Default)]
+#[derive(Debug, Default, PartialEq, KontrolluppgiftRead, KontrolluppgiftWrite)]
+#[ku(name("Kontaktperson"))]
 pub struct Kontaktperson<'a> {
+    #[ku(name(b"Namn"), required(true))]
     pub namn: Cow<'a, str>,
+    #[ku(name(b"Telefon"), required(true))]
     pub telefon: Cow<'a, str>,
+    #[ku(name(b"Epostadress"), required(true))]
     pub epostadress: Cow<'a, str>,
+    #[ku(name(b"Sakomrade"))]
     pub sakomrade: Option<Cow<'a, str>>,
 }
 
-impl<'a> Kontaktperson<'a> {
-    fn write<W: std::io::Write>(&self, w: &mut Writer<W>) -> Result<(), quick_xml::Error> {
-        w.create_element("Kontaktperson").write_inner_content(|w| {
-            w.write_node("Namn", &self.namn)?;
-            w.write_node("Telefon", &self.telefon)?;
-            w.write_node("Epostadress", &self.epostadress)?;
-            w.write_node("Sakomrade", &self.sakomrade)?;
 
-            Ok(())
-        })?;
-
-        Ok(())
-    }
-}
-
-#[derive(Debug, PartialEq, Default)]
+#[derive(Debug, Default, PartialEq, KontrolluppgiftRead, KontrolluppgiftWrite)]
+#[ku(name("Avsandare"))]
 pub struct Avsandare<'a> {
+    #[ku(name(b"Programnamn"), required(true))]
     pub programnamn: Cow<'a, str>,
+    #[ku(name(b"Organisationsnummer"), required(true))]
     pub organisationsnummer: Cow<'a, str>,
+    #[ku(name(b"TekniskKontaktperson"), required(true), inner_ty(true))]
     pub teknisk_kontaktperson: TekniskKontaktperson<'a>,
+    #[ku(name(b"Skapad"), required(true))]
     pub skapad: Cow<'a, str>,
 }
 
-impl<'a> Avsandare<'a> {
-    fn write<W: std::io::Write>(&self, w: &mut Writer<W>) -> Result<(), quick_xml::Error> {
-        w.create_element("Avsandare").write_inner_content(|w| {
-            w.write_node("Programnamn", &self.programnamn)?;
-            w.write_node("Organisationsnummer", &self.organisationsnummer)?;
-            self.teknisk_kontaktperson.write(w)?;
-            w.write_node("Skapad", &self.skapad)?;
-            Ok(())
-        })?;
-
-
-        Ok(())
-    }
-}
-
-
-#[derive(Debug, PartialEq, Default)]
+#[derive(Debug, Default, PartialEq, KontrolluppgiftRead, KontrolluppgiftWrite)]
+#[ku(name("TekniskKontaktperson"))]
 pub struct TekniskKontaktperson<'a> {
+    #[ku(name(b"Namn"), required(true))]
     pub namn: Cow<'a, str>,
+    #[ku(name(b"Telefon"), required(true))]
     pub telefon: Cow<'a, str>,
+    #[ku(name(b"Epostadress"), required(true))]
     pub epostadress: Cow<'a, str>,
+    #[ku(name(b"Utdelningsadress1"))]
     pub utdelningsadress1: Option<Cow<'a, str>>,
+    #[ku(name(b"Utdelningsadress2"))]
     pub utdelningsadress2: Option<Cow<'a, str>>,
+    #[ku(name(b"Postnummer"))]
     pub postnummer: Option<Cow<'a, str>>,
+    #[ku(name(b"Postort"))]
     pub postort: Option<Cow<'a, str>>,
-}
-
-impl<'a> TekniskKontaktperson<'a> {
-    fn write<W: std::io::Write>(&self, w: &mut Writer<W>) -> Result<(), quick_xml::Error> {
-        w.create_element("TekniskKontaktperson").write_inner_content(|w| {
-            w.write_node("Namn", &self.namn)?;
-            w.write_node("Telefon", &self.telefon)?;
-            w.write_node("Epostadress", &self.epostadress)?;
-            w.write_node("Utdelningsadress1", &self.utdelningsadress1)?;
-            w.write_node("Utdelningsadress2", &self.utdelningsadress2)?;
-            w.write_node("Postnummer", &self.postnummer)?;
-            w.write_node("Postort", &self.postort)?;
-            Ok(())
-        })?;
-
-        Ok(())
-    }
 }
 
 /// Deserialize xml into rust types
@@ -258,10 +201,10 @@ pub fn from_str(str: &str) -> Result<Kontrolluppgift, Error> {
             Event::Start(element) => match element.local_name().as_ref() {
                 b"Skatteverket" => {}
                 b"Avsandare" => {
-                    g_avsandare = Some(Avsandare::read(&mut reader, element.name())?)
+                    g_avsandare = Some(Avsandare::read(&mut reader, &element)?)
                 }
                 b"Blankettgemensamt" => {
-                    blankettgemensamt = Some(Blankettgemensamt::read(&mut reader, element.name())?)
+                    blankettgemensamt = Some(Blankettgemensamt::read(&mut reader, &element)?)
                 }
                 b"Blankett" => {
                     blanketter.push(Blankett::read(&mut reader, &element)?)
@@ -361,193 +304,6 @@ impl<'a> Blankett<'a> {
                     }
                 }
                 Event::Eof => return Err(Error::UnexpectedEof("While reading Blankett".to_string())),
-                _ => {}
-            }
-        }
-    }
-}
-
-impl<'a> Arendeinformation<'a> {
-    fn read(reader: &mut NsReader<&'a [u8]>, tag: &BytesStart) -> Result<Self, Error> {
-        let mut arendeagare = None;
-        let mut period = None;
-        let mut arendenummer = None;
-        loop {
-            match reader.read_event()? {
-                Event::Start(element) => match element.local_name().as_ref() {
-                    b"Arendeagare" => reader.read_node_into(element, &mut arendeagare)?,
-                    b"Period" => reader.read_node_into(element, &mut period)?,
-                    b"Arendenummer" => reader.read_node_into(element, &mut arendenummer)?,
-                    &_ => unexpected_element(&element)?
-                }
-                Event::End(element) => {
-                    if element.name() == tag.name() {
-                        return Ok(Self {
-                            arendeagare: arendeagare.ok_or_else(|| MissingElement("Arendeagare".to_string()))?,
-                            period: period.ok_or_else(|| MissingElement("Period".to_string()))?,
-                            arendenummer,
-                        });
-                    }
-                }
-                Event::Eof => return Err(Error::UnexpectedEof("While reading Arendeinformation".to_string())),
-                _ => {}
-            }
-        }
-    }
-}
-
-impl<'a> Avsandare<'a> {
-    fn read(reader: &mut NsReader<&'a [u8]>, tag: QName) -> Result<Self, Error> {
-        let mut programnamn = None;
-        let mut organisationsnummer = None;
-        let mut skapad = None;
-        let mut tekninsk_kontaktperson = None;
-        loop {
-            match reader.read_event()? {
-                Event::Start(element) => match element.local_name().as_ref() {
-                    b"Programnamn" => reader.read_node_into(element, &mut programnamn)?,
-                    b"Organisationsnummer" => reader.read_node_into(element, &mut organisationsnummer)?,
-                    b"Skapad" => reader.read_node_into(element, &mut skapad)?,
-                    b"TekniskKontaktperson" => tekninsk_kontaktperson = Some(TekniskKontaktperson::read(reader, element.name())?),
-                    &_ => unexpected_element(&element)?
-                }
-                Event::End(element) => {
-                    if element.name() == tag {
-                        return Ok(Avsandare {
-                            programnamn: programnamn.ok_or_else(|| MissingElement("Programnamn".to_string()))?,
-                            organisationsnummer: organisationsnummer.ok_or_else(|| MissingElement("Organisationsnummer".to_string()))?,
-                            teknisk_kontaktperson: tekninsk_kontaktperson.ok_or_else(|| MissingElement("TekninskKontaktperson".to_string()))?,
-                            skapad: skapad.ok_or_else(|| MissingElement("Skapad".to_string()))?,
-                        });
-                    }
-                }
-                Event::Eof => return Err(Error::UnexpectedEof("While reading Avsandare".to_string())),
-                _ => {}
-            }
-        }
-    }
-}
-
-impl<'a> Blankettgemensamt<'a> {
-    fn read(reader: &mut NsReader<&'a [u8]>, tag: QName) -> Result<Self, Error> {
-        let mut uppgiftslamnare = None;
-        loop {
-            match reader.read_event()? {
-                Event::Start(element) => match element.local_name().as_ref() {
-                    b"Uppgiftslamnare" => {
-                        uppgiftslamnare = Some(Uppgiftslamnare::read(reader, element.name())?)
-                    }
-                    &_ => unexpected_element(&element)?
-                }
-                Event::End(element) => {
-                    if element.name() == tag {
-                        return Ok(Self {
-                            uppgiftslamnare: uppgiftslamnare.ok_or_else(|| MissingElement("Uppgiftslamnare".to_string()))?,
-                        });
-                    }
-                }
-                Event::Eof => return Err(Error::UnexpectedEof("While reading Blankettgemensamt".to_string())),
-                _ => {}
-            }
-        }
-    }
-}
-
-impl<'a> Uppgiftslamnare<'a> {
-    fn read(reader: &mut NsReader<&'a [u8]>, tag: QName) -> Result<Self, Error> {
-        let mut uppgiftslamnare_pers_orgnr = None;
-        let mut kontaktperson = None;
-        loop {
-            match reader.read_event()? {
-                Event::Start(element) => match element.local_name().as_ref() {
-                    b"UppgiftslamnarePersOrgnr" => reader.read_node_into(element, &mut uppgiftslamnare_pers_orgnr)?,
-                    b"Kontaktperson" => {
-                        kontaktperson = Some(Kontaktperson::read(reader, element.name())?)
-                    }
-                    &_ => unexpected_element(&element)?
-                }
-                Event::End(element) => {
-                    if element.name() == tag {
-                        return Ok(Self {
-                            uppgiftslamnare_pers_orgnr: uppgiftslamnare_pers_orgnr.ok_or_else(|| MissingElement("UppgiftslamnarePersOrgnr".to_string()))?,
-                            kontaktperson: kontaktperson.ok_or_else(|| MissingElement("Kontaktperson".to_string()))?,
-                        });
-                    }
-                }
-                Event::Eof => return Err(Error::UnexpectedEof("While reading Uppgiftslamnare".to_string())),
-                _ => {}
-            }
-        }
-    }
-}
-
-impl<'a> Kontaktperson<'a> {
-    fn read(reader: &mut NsReader<&'a [u8]>, tag: QName) -> Result<Self, Error> {
-        let mut namn = None;
-        let mut telefon = None;
-        let mut epostadress = None;
-        let mut sakomrade = None;
-        loop {
-            match reader.read_event()? {
-                Event::Start(element) => match element.local_name().as_ref() {
-                    b"Namn" => reader.read_node_into(element, &mut namn)?,
-                    b"Telefon" => reader.read_node_into(element, &mut telefon)?,
-                    b"Epostadress" => reader.read_node_into(element, &mut epostadress)?,
-                    b"Sakomrade" => reader.read_node_into(element, &mut sakomrade)?,
-                    &_ => unexpected_element(&element)?
-                }
-                Event::End(element) => {
-                    if element.name() == tag {
-                        return Ok(Self {
-                            namn: namn.ok_or_else(|| MissingElement("Namn".to_string()))?,
-                            telefon: telefon.ok_or_else(|| MissingElement("Telefon".to_string()))?,
-                            epostadress: epostadress.ok_or_else(|| MissingElement("Epostadress".to_string()))?,
-                            sakomrade,
-                        });
-                    }
-                }
-                Event::Eof => return Err(Error::UnexpectedEof("While reading Kontaktperson".to_string())),
-                _ => {}
-            }
-        }
-    }
-}
-
-impl<'a> TekniskKontaktperson<'a> {
-    fn read(reader: &mut NsReader<&'a [u8]>, tag: QName) -> Result<Self, Error> {
-        let mut namn = None;
-        let mut telefon = None;
-        let mut epostadress = None;
-        let mut utdelningsadress1 = None;
-        let mut utdelningsadress2 = None;
-        let mut postnummer = None;
-        let mut postort = None;
-        loop {
-            match reader.read_event()? {
-                Event::Start(element) => match element.local_name().as_ref() {
-                    b"Namn" => reader.read_node_into(element, &mut namn)?,
-                    b"Telefon" => reader.read_node_into(element, &mut telefon)?,
-                    b"Epostadress" => reader.read_node_into(element, &mut epostadress)?,
-                    b"Utdelningsadress1" => reader.read_node_into(element, &mut utdelningsadress1)?,
-                    b"Utdelningsadress2" => reader.read_node_into(element, &mut utdelningsadress2)?,
-                    b"Postnummer" => reader.read_node_into(element, &mut postnummer)?,
-                    b"Postort" => reader.read_node_into(element, &mut postort)?,
-                    &_ => unexpected_element(&element)?
-                }
-                Event::End(element) => {
-                    if element.name() == tag {
-                        return Ok(Self {
-                            namn: namn.ok_or_else(|| MissingElement("Namn".to_string()))?,
-                            telefon: telefon.ok_or_else(|| MissingElement("Telefon".to_string()))?,
-                            epostadress: epostadress.ok_or_else(|| MissingElement("Epostadress".to_string()))?,
-                            utdelningsadress1,
-                            utdelningsadress2,
-                            postnummer,
-                            postort,
-                        });
-                    }
-                }
-                Event::Eof => return Err(Error::UnexpectedEof("While reading TekniskKontaktperson".to_string())),
                 _ => {}
             }
         }

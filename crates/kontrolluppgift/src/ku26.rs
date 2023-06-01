@@ -14,9 +14,9 @@ pub struct KU26Type<'a> {
     pub fastighetsbeteckning: Option<Cow<'a, str>>,
     #[ku(name(b"Specifikationsnummer"), code("570"), required(true))]
     pub specifikationsnummer: i32,
-    #[ku(name(b"InkomsttagareKU26"), required(true))]
+    #[ku(name(b"InkomsttagareKU26"), required(true), inner_ty(true))]
     pub inkomsttagare: InkomsttagareKU26<'a>,
-    #[ku(name(b"UppgiftslamnareKU26"), required(true))]
+    #[ku(name(b"UppgiftslamnareKU26"), required(true), inner_ty(true))]
     pub uppgiftslamnare: UppgiftslamnareKU26<'a>,
 }
 
