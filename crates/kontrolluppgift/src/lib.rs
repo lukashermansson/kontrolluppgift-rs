@@ -10,7 +10,7 @@ use std::borrow::Cow;
 use std::io::Cursor;
 use quick_xml::{NsReader, Writer};
 use quick_xml::events::{BytesStart, BytesText, Event};
-use kontrolluppgift_macro::{KontrolluppgiftRead, KontrolluppgiftWrite};
+use kontrolluppgift_macros::{KontrolluppgiftRead, KontrolluppgiftWrite};
 use crate::error::Error;
 use crate::error::Error::MissingElement;
 use crate::KontrolluppgiftType::{KU10, KU20, KU21, KU25, KU26, KU28};

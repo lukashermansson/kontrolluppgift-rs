@@ -1,4 +1,4 @@
-use kontrolluppgift_macro::{KontrolluppgiftRead, KontrolluppgiftWrite};
+use kontrolluppgift_macros::{KontrolluppgiftRead, KontrolluppgiftWrite};
 use std::borrow::Cow;
 
 /// Kontrolluppgift 21

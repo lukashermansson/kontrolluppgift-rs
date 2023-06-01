@@ -1,6 +1,6 @@
 [package]
 name = "kontrolluppgift"
-version = "0.13.0"
+version = "0.13.1"
 edition = "2021"
 description = "A library for dealing with Skatteverkets data format for Kontrolluppgift"
 license= "MIT"
@@ -9,5 +9,5 @@ keywords = ["skatteverket", "deserialization"]
 
 [dependencies]
 quick-xml = { version = "0.28.0"}
-kontrolluppgift_macro = { path = "../kontrolluppgift_macro"}
+kontrolluppgift_macros = { path = "../kontrolluppgift_macros", version= "0.1.0"}
 

@@ -1,5 +1,5 @@
 use std::borrow::Cow;
-use kontrolluppgift_macro::{KontrolluppgiftRead, KontrolluppgiftWrite};
+use kontrolluppgift_macros::{KontrolluppgiftRead, KontrolluppgiftWrite};
 extern crate self as kontrolluppgift;
 
 /// Kontrolluppgift 10

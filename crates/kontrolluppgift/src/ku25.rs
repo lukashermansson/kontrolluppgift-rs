@@ -1,6 +1,6 @@
 use std::borrow::Cow;
 
-use kontrolluppgift_macro::{KontrolluppgiftRead, KontrolluppgiftWrite};
+use kontrolluppgift_macros::{KontrolluppgiftRead, KontrolluppgiftWrite};
 
 #[derive(Debug, PartialEq, KontrolluppgiftRead, KontrolluppgiftWrite)]
 #[ku(name("KU25"))]

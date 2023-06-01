@@ -4,14 +4,14 @@ version = 3
 
 [[package]]
 name = "kontrolluppgift"
-version = "0.13.0"
+version = "0.13.1"
 dependencies = [
- "kontrolluppgift_macro",
+ "kontrolluppgift_macros",
  "quick-xml",
 ]
 
 [[package]]
-name = "kontrolluppgift_macro"
+name = "kontrolluppgift_macros"
 version = "0.1.0"
 dependencies = [
  "quote",
