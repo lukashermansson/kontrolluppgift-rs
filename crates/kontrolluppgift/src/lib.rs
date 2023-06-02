@@ -220,14 +220,14 @@ pub fn from_str(str: &str) -> Result<Kontrolluppgift, Error> {
             Event::End(element) => {
                 if element.local_name().as_ref() == b"Skatteverket" {
                     return Ok(Kontrolluppgift {
-                        avsandare: g_avsandare.ok_or_else(|| MissingElement("Avsandare".to_string()))?,
-                        blankettgemensamt: blankettgemensamt.ok_or_else(|| MissingElement("Blankettgemensamt".to_string()))?,
+                        avsandare: g_avsandare.ok_or_else(|| MissingElement("Avsandare".into()))?,
+                        blankettgemensamt: blankettgemensamt.ok_or_else(|| MissingElement("Blankettgemensamt".into()))?,
                         blanketter,
                     });
                 }
             }
-            Event::Eof => return Err(Error::UnexpectedEof("While reading Skatteverket".to_string())),
-            _ => (),             // There are `Event` types not considered here
+            Event::Eof => return Err(Error::UnexpectedEof("While reading Skatteverket".into())),
+            _ => (),
         }
     }
 }
@@ -307,13 +307,16 @@ impl<'a> Blankett<'a> {
                 Event::End(element) => {
                     if element.name() == tag.name() {
                         return Ok(Self {
-                            nummer: nummer.ok_or_else(|| MissingElement("nummer".to_string()))?,
-                            arendeinformation: arendeinformation.ok_or_else(|| MissingElement("Arendeinformation".to_string()))?,
-                            blankettinnehall: blankettinnehall.ok_or_else(|| MissingElement("Blankettinnehall".to_string()))?,
+                            nummer: nummer
+                                .ok_or_else(|| MissingElement("nummer".into()))?,
+                            arendeinformation: arendeinformation
+                                .ok_or_else(|| MissingElement("Arendeinformation".into()))?,
+                            blankettinnehall: blankettinnehall
+                                .ok_or_else(|| MissingElement("Blankettinnehall".into()))?,
                         });
                     }
                 }
-                Event::Eof => return Err(Error::UnexpectedEof("While reading Blankett".to_string())),
+                Event::Eof => return Err(Error::UnexpectedEof("While reading Blankett".into())),
                 _ => {}
             }
         }
@@ -340,7 +343,8 @@ trait KontrolluppgiftWrite {
    fn write<W>(&self, w: &mut Writer<W>) -> Result<(), quick_xml::Error> where W: std::io::Write;
 }
 fn unexpected_element<E>(element: &BytesStart) -> Result<E, Error> {
-    Err(Error::UnexpectedToken(std::str::from_utf8(element.name().as_ref()).map_err(|e| Error::NonDecodable(Some(e)))?.to_string()))
+    Err(Error::UnexpectedToken(std::str::from_utf8(element.name().as_ref())
+        .map_err(|e| Error::NonDecodable(Some(e)))?.into()))
 }
 
 trait Write<'a, T> where T: Writable {
@@ -360,10 +364,14 @@ impl<'a, 'b : 'a, T: Readable<'a, 'b> + 'b> Reader<'a, 'b, T> for NsReader<&'b [
     }
 
     fn read_node_into_with_code(&mut self, element: BytesStart, code: &str, x: &mut Option<T>) -> Result<(), Error> {
-        let kod = element.try_get_attribute("faltkod")?.ok_or_else(|| MissingElement("faltkod".to_string()))?;
+        let kod = element.try_get_attribute("faltkod")?
+            .ok_or_else(|| MissingElement("faltkod".into()))?;
         let kod = kod.decode_and_unescape_value(self)?;
         if code != kod {
-            return Err(Error::UnexpectedToken(format!("Unexpected faltkod on {}, expected: {}, got: {}", std::str::from_utf8(element.name().as_ref()).unwrap(), code, kod)));
+            return Err(Error::UnexpectedToken(
+                format!("Unexpected faltkod on {}, expected: {}, got: {}",
+                        std::str::from_utf8(element.name().as_ref())
+                            .expect("Non utf-tag name encountered"), code, kod)));
         }
         *x = Some(T::get_str(self.read_text(element.name())?)?);
         Ok(())
@@ -414,20 +422,20 @@ impl<'a, 'b> Readable<'a, 'b> for bool {
         match data.as_ref() {
             "0" => Ok(false),
             "1" => Ok(true),
-            &_ => Err(Error::UnexpectedToken("expected KryssTyp, found: ".to_string() + &data))
+            &_ => Err(Error::UnexpectedToken(format!("expected KryssTyp, found: {}", &data)))
         }
     }
 }
 
 impl<'a, 'b> Readable<'a, 'b> for i32 {
     fn get_str(data: Cow<str>) -> Result<Self, Error> {
-        data.as_ref().parse().map_err(|_| Error::UnexpectedToken("expected number got: ".to_string() + data.as_ref()))
+        data.as_ref().parse().map_err(|_| Error::UnexpectedToken(format!("expected number got: {}", &data)))
     }
 }
 
 impl<'a, 'b> Readable<'a, 'b> for f32 {
     fn get_str(data: Cow<str>) -> Result<Self, Error> {
-        data.as_ref().parse().map_err(|_| Error::UnexpectedToken("expected fraction got: ".to_string() + data.as_ref()))
+        data.as_ref().parse().map_err(|_| Error::UnexpectedToken(format!("expected fraction got: {}", &data)))
     }
 }
 
@@ -473,8 +481,8 @@ impl Writable for &i32 {
 impl Writable for bool {
     fn get_str(&self) -> Option<String> {
         Some(match *self {
-            true => "1".to_string(),
-            false => "0".to_string()
+            true => "1".into(),
+            false => "0".into()
         })
     }
 }
