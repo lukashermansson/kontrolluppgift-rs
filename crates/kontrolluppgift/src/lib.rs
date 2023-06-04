@@ -13,7 +13,7 @@ use quick_xml::{NsReader, Writer};
 use quick_xml::events::{BytesStart, BytesText, Event};
 use kontrolluppgift_macros::{KontrolluppgiftRead, KontrolluppgiftWrite};
 use crate::error::Error;
-use crate::error::Error::MissingElement;
+use crate::error::Error::{MissingElement, NonDecodable};
 use crate::KontrolluppgiftType::{KU10, KU13, KU20, KU21, KU25, KU26, KU28};
 use crate::ku10::KU10Type;
 use crate::ku13::KU13Type;
@@ -205,7 +205,9 @@ pub fn from_str(str: &str) -> Result<Kontrolluppgift, Error> {
         let event = reader.read_event()?;
         match event {
             Event::Start(element) => match element.local_name().as_ref() {
-                b"Skatteverket" => {}
+                b"Skatteverket" => {
+                    //Noop just becuase of the way its structured
+                }
                 b"Avsandare" => {
                     g_avsandare = Some(Avsandare::read(&mut reader, &element)?)
                 }
@@ -220,8 +222,10 @@ pub fn from_str(str: &str) -> Result<Kontrolluppgift, Error> {
             Event::End(element) => {
                 if element.local_name().as_ref() == b"Skatteverket" {
                     return Ok(Kontrolluppgift {
-                        avsandare: g_avsandare.ok_or_else(|| MissingElement("Avsandare".into()))?,
-                        blankettgemensamt: blankettgemensamt.ok_or_else(|| MissingElement("Blankettgemensamt".into()))?,
+                        avsandare: g_avsandare
+                            .ok_or_else(|| MissingElement { missing: "Avsandare".into(), reading: "Skatteverket".into() })?,
+                        blankettgemensamt: blankettgemensamt
+                            .ok_or_else(|| MissingElement { missing: "Blankettgemensamt".into(), reading: "Skatteverket".into() })?,
                         blanketter,
                     });
                 }
@@ -231,7 +235,6 @@ pub fn from_str(str: &str) -> Result<Kontrolluppgift, Error> {
         }
     }
 }
-
 
 /// Turns a Kontrolluppgift into an owned string. Provides "faltkod" with the const values in the specification
 pub fn to_string(kontrolluppgift: &Kontrolluppgift) -> Result<String, Error> {
@@ -254,7 +257,7 @@ impl<'a> Blankett<'a> {
 
             if let b"nummer" = a.key.as_ref() {
                 nummer = Some(a.decode_and_unescape_value(reader)?
-                    .parse::<i64>().map_err(|_| MissingElement("nummer".to_string()))?)
+                    .parse::<i64>().map_err(|_| MissingElement { missing: "nummer".into(), reading: "Blankett".into() })?)
             }
         }
         loop {
@@ -308,11 +311,11 @@ impl<'a> Blankett<'a> {
                     if element.name() == tag.name() {
                         return Ok(Self {
                             nummer: nummer
-                                .ok_or_else(|| MissingElement("nummer".into()))?,
+                                .ok_or_else(|| MissingElement { missing: "nummer".into(), reading: "Blankett".into() })?,
                             arendeinformation: arendeinformation
-                                .ok_or_else(|| MissingElement("Arendeinformation".into()))?,
+                                .ok_or_else(|| MissingElement { missing: "Arendeinformation".into(), reading: "Blankett".into() })?,
                             blankettinnehall: blankettinnehall
-                                .ok_or_else(|| MissingElement("Blankettinnehall".into()))?,
+                                .ok_or_else(|| MissingElement { missing: "Blankettinnehall".into(), reading: "Blankett".into() })?,
                         });
                     }
                 }
@@ -344,7 +347,7 @@ trait KontrolluppgiftWrite {
 }
 fn unexpected_element<E>(element: &BytesStart) -> Result<E, Error> {
     Err(Error::UnexpectedToken(std::str::from_utf8(element.name().as_ref())
-        .map_err(|e| Error::NonDecodable(Some(e)))?.into()))
+        .map_err(|e| NonDecodable(Some(e)))?.into()))
 }
 
 trait Write<'a, T> where T: Writable {
@@ -364,14 +367,17 @@ impl<'a, 'b : 'a, T: Readable<'a, 'b> + 'b> Reader<'a, 'b, T> for NsReader<&'b [
     }
 
     fn read_node_into_with_code(&mut self, element: BytesStart, code: &str, x: &mut Option<T>) -> Result<(), Error> {
+        let element_name = element.name();
+        let element_name = std::str::from_utf8(element_name.as_ref())
+            .map_err(|e| NonDecodable(Some(e)) )?;
         let kod = element.try_get_attribute("faltkod")?
-            .ok_or_else(|| MissingElement("faltkod".into()))?;
+            .ok_or_else(|| MissingElement { missing: "faltkod".into(), reading: element_name.into() })?;
+
         let kod = kod.decode_and_unescape_value(self)?;
         if code != kod {
             return Err(Error::UnexpectedToken(
                 format!("Unexpected faltkod on {}, expected: {}, got: {}",
-                        std::str::from_utf8(element.name().as_ref())
-                            .expect("Non utf-tag name encountered"), code, kod)));
+                        element_name, code, kod)));
         }
         *x = Some(T::get_str(self.read_text(element.name())?)?);
         Ok(())

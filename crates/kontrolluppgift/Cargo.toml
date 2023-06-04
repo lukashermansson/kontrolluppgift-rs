@@ -9,5 +9,5 @@ keywords = ["skatteverket", "deserialization", "serialization"]
 
 [dependencies]
 quick-xml = { version = "0.28.0"}
-kontrolluppgift_macros = { path = "../kontrolluppgift_macros", version= "0.1.0"}
+kontrolluppgift_macros = { path = "../kontrolluppgift_macros", version= "0.2.0"}
 

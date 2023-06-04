@@ -23,7 +23,10 @@ pub enum Error {
     InvalidAttr(AttrError),
     EscapeError,
     UnknownPrefix(Vec<u8>),
-    MissingElement(String)
+    MissingElement {
+        missing: String,
+        reading: String
+    }
 }
 
 impl From<QXMLError> for Error {
@@ -82,9 +85,7 @@ impl fmt::Display for Error {
                 write_byte_string(f, prefix)?;
                 f.write_str("'")
             },
-            Error::MissingElement(p) => write!(f, "Missing element {}", p),
-
-
+            Error::MissingElement { missing, reading }  => write!(f, "Missing element {}, while reading {}", missing, reading),
         }
     }
 }
