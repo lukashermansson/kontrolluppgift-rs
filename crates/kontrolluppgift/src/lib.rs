@@ -5,7 +5,9 @@ pub mod ku25;
 pub mod ku28;
 pub mod ku21;
 pub mod error;
-mod ku26;
+pub mod ku26;
+pub mod ku14;
+pub mod ku16;
 
 use std::borrow::Cow;
 use std::io::Cursor;
@@ -14,9 +16,11 @@ use quick_xml::events::{BytesStart, BytesText, Event};
 use kontrolluppgift_macros::{KontrolluppgiftRead, KontrolluppgiftWrite};
 use crate::error::Error;
 use crate::error::Error::{MissingElement, NonDecodable};
-use crate::KontrolluppgiftType::{KU10, KU13, KU20, KU21, KU25, KU26, KU28};
+use crate::KontrolluppgiftType::{KU10, KU13, KU14, KU16, KU20, KU21, KU25, KU26, KU28};
 use crate::ku10::KU10Type;
 use crate::ku13::KU13Type;
+use crate::ku14::KU14Type;
+use crate::ku16::KU16Type;
 use crate::ku20::KU20Type;
 use crate::ku25::KU25Type;
 use crate::ku21::KU21Type;
@@ -97,6 +101,8 @@ impl<'a> Blankett<'a> {
 pub enum KontrolluppgiftType<'a> {
     KU10(KU10Type<'a>),
     KU13(KU13Type<'a>),
+    KU14(KU14Type<'a>),
+    KU16(KU16Type<'a>),
     KU20(KU20Type<'a>),
     KU21(KU21Type<'a>),
     KU25(KU25Type<'a>),
@@ -111,6 +117,12 @@ impl<'a> KontrolluppgiftType<'a> {
                 v.write(w)?;
             }
             KU13(v) => {
+                v.write(w)?;
+            }
+            KU14(v) => {
+                v.write(w)?;
+            }
+            KU16(v) => {
                 v.write(w)?;
             }
             KU20(v) => {
@@ -276,6 +288,14 @@ impl<'a> Blankett<'a> {
                                     }
                                     b"KU13" => {
                                         blankettinnehall = Some(KU13(KU13Type::read(reader, &element)?));
+                                        break;
+                                    }
+                                    b"KU14" => {
+                                        blankettinnehall = Some(KU14(KU14Type::read(reader, &element)?));
+                                        break;
+                                    }
+                                    b"KU16" => {
+                                        blankettinnehall = Some(KU16(KU16Type::read(reader, &element)?));
                                         break;
                                     }
                                     b"KU21" => {

@@ -12,7 +12,7 @@ pub struct KU10Type<'a> {
     pub forman_utom_bil_drivmedel: Option<i32>,
     #[ku(name(b"BilformanUtomDrivmedel"), code("013"))]
     pub bilforman_utom_drivmedel: Option<i32>,
-    #[ku(name(b"drivmedelvidbilforman"), code("018"))]
+    #[ku(name(b"DrivmedelVidBilforman"), code("018"))]
     pub drivmedel_vid_bilforman: Option<i32>,
     #[ku(name(b"AndraKostnadsers"), code("020"))]
     pub andra_kostnadsers: Option<i32>,

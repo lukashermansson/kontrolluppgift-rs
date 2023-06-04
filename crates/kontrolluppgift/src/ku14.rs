@@ -1,11 +1,13 @@
 use std::borrow::Cow;
 use kontrolluppgift_macros::{KontrolluppgiftRead, KontrolluppgiftWrite};
+use crate::{error, Readable, Writable};
+
 extern crate self as kontrolluppgift;
 
-/// Kontrolluppgift 13
+/// Kontrolluppgift 14
 #[derive(Debug, PartialEq, KontrolluppgiftRead, KontrolluppgiftWrite)]
-#[ku(name("KU13"))]
-pub struct KU13Type<'a> {
+#[ku(name("KU14"))]
+pub struct KU14Type<'a> {
     #[ku(name(b"KontantBruttolonMm"), code("011"))]
     pub kontant_bruttolon_mm: Option<i32>,
     #[ku(name(b"FormanUtomBilDrivmedel"), code("012"))]
@@ -14,24 +16,44 @@ pub struct KU13Type<'a> {
     pub bilforman_utom_drivmedel: Option<i32>,
     #[ku(name(b"DrivmedelVidBilforman"), code("018"))]
     pub drivmedel_vid_bilforman: Option<i32>,
+    #[ku(name(b"AndraKostnadsers"), code("020"))]
+    pub andra_kostnadsers: Option<i32>,
+    #[ku(name(b"UnderlagRutarbete"), code("021"))]
+    pub underlag_rutarbete: Option<i32>,
+    #[ku(name(b"UnderlagRotarbete"), code("022"))]
+    pub underlag_rotarbete: Option<i32>,
+    #[ku(name(b"ErsMEgenavgifter"), code("025"))]
+    pub ers_m_egenavgifter: Option<i32>,
     #[ku(name(b"Tjanstepension"), code("030"))]
     pub tjanstepension: Option<i32>,
     #[ku(name(b"ErsEjSocAvg"), code("031"))]
     pub ers_ej_soc_avg: Option<i32>,
-    #[ku(name(b"ErsFormanBostadMmSINK"), code("036"))]
-    pub ers_forman_bostad_mm_sink: Option<i32>,
+    #[ku(name(b"Forskarskattenamnden"), code("035"))]
+    pub forsarskattenamnden: Option<i32>,
     #[ku(name(b"BostadSmahus"), code("041"))]
     pub bostad_smahus: Option<bool>,
     #[ku(name(b"BostadEjSmahus"), code("043"))]
     pub bostad_ej_smahus: Option<bool>,
     #[ku(name(b"FormanHarJusterats"), code("048"))]
     pub forman_har_justerats: Option<bool>,
+    #[ku(name(b"FormanSomPension"), code("049"))]
+    pub forman_som_pension: Option<bool>,
+    #[ku(name(b"Bilersattning"), code("050"))]
+    pub bilersattning: Option<bool>,
+    #[ku(name(b"Traktamente"), code("051"))]
+    pub traktamente: Option<bool>,
     #[ku(name(b"PersonaloptionForvarvAndel"), code("059"))]
     pub personaloption_forvarv_andel: Option<bool>,
     #[ku(name(b"Arbetsstallenummer"), code("060"))]
     pub arbetsstallenummer: Option<Cow<'a, str>>,
     #[ku(name(b"Delagare"), code("061"))]
     pub delagare: Option<bool>,
+    #[ku(name(b"LandskodArbetsland"), code("090"))]
+    pub landskod_arbetsland: Option<Cow<'a, str>>,
+    #[ku(name(b"UtsandUnderTid"), code("091"))]
+    pub utsand_under_tid: Option<KU14UtsandUnderTid>,
+    #[ku(name(b"Kategori"), code("092"))]
+    pub kategori: Option<KU14Kategori>,
     #[ku(name(b"SocialAvgiftsAvtal"), code("093"))]
     pub social_avgifts_avtal: Option<bool>,
     #[ku(name(b"Inkomstar"), code("203"), required(true))]
@@ -40,16 +62,16 @@ pub struct KU13Type<'a> {
     pub borttag: Option<bool>,
     #[ku(name(b"Specifikationsnummer"), code("570"), required(true))]
     pub specifikationsnummer: i32,
-    #[ku(name(b"InkomsttagareKU13"), required(true), inner_ty(true))]
-    pub inkomsttagare: InkomsttagareKU13<'a>,
-    #[ku(name(b"UppgiftslamnareKU13"), required(true), inner_ty(true))]
-    pub uppgiftslamnare: UppgiftslamnareKU13<'a>,
+    #[ku(name(b"InkomsttagareKU14"), required(true), inner_ty(true))]
+    pub inkomsttagare: InkomsttagareKU14<'a>,
+    #[ku(name(b"UppgiftslamnareKU14"), required(true), inner_ty(true))]
+    pub uppgiftslamnare: UppgiftslamnareKU14<'a>,
 }
 
 
 #[derive(Debug, PartialEq, KontrolluppgiftRead, KontrolluppgiftWrite)]
-#[ku(name("UppgiftslamnareKU13"))]
-pub struct UppgiftslamnareKU13<'a> {
+#[ku(name("UppgiftslamnareKU14"))]
+pub struct UppgiftslamnareKU14<'a> {
     #[ku(name(b"UppgiftslamnarId"), code("201"), required(true))]
     pub uppgiftslamnar_id: Cow<'a, str>,
     #[ku(name(b"NamnUppgiftslamnare"), code("202"))]
@@ -57,8 +79,8 @@ pub struct UppgiftslamnareKU13<'a> {
 }
 
 #[derive(Debug, PartialEq, KontrolluppgiftRead, KontrolluppgiftWrite)]
-#[ku(name("InkomsttagareKU13"))]
-pub struct InkomsttagareKU13<'a> {
+#[ku(name("InkomsttagareKU14"))]
+pub struct InkomsttagareKU14<'a> {
     #[ku(name(b"LandskodTIN"), code("076"))]
     pub landskod_tin: Option<Cow<'a, str>>,
     #[ku(name(b"LandskodMedborgare"), code("081"))]
@@ -91,16 +113,79 @@ pub struct InkomsttagareKU13<'a> {
     pub tin: Option<Cow<'a, str>>,
 }
 
+#[derive(Debug, PartialEq)]
+pub enum KU14Kategori {
+    A,
+    B,
+    C,
+    D,
+    E,
+    F
+}
+
+impl<'a, 'b> Readable<'a, 'b> for KU14Kategori {
+    fn get_str(data: Cow<str>) -> Result<Self, error::Error> {
+        match data.as_ref() {
+            "A" => Ok(KU14Kategori::A),
+            "B" => Ok(KU14Kategori::B),
+            "C" => Ok(KU14Kategori::C),
+            "D" => Ok(KU14Kategori::D),
+            "E" => Ok(KU14Kategori::E),
+            "F" => Ok(KU14Kategori::F),
+            &_ => Err(error::Error::UnexpectedToken(format!("expected one of A-F got: {}", &data)))
+        }
+    }
+}
+
+impl Writable for KU14Kategori {
+    fn get_str(&self) -> Option<String> {
+        Some(match *self {
+            KU14Kategori::A => "A".to_string(),
+            KU14Kategori::B => "B".to_string(),
+            KU14Kategori::C => "C".to_string(),
+            KU14Kategori::D => "D".to_string(),
+            KU14Kategori::E => "E".to_string(),
+            KU14Kategori::F => "F".to_string(),
+        })
+    }
+}
+#[derive(Debug, PartialEq)]
+pub enum KU14UtsandUnderTid {
+    A,
+    B,
+    C,
+}
+
+
+impl<'a, 'b> Readable<'a, 'b> for KU14UtsandUnderTid {
+    fn get_str(data: Cow<str>) -> Result<Self, error::Error> {
+        match data.as_ref() {
+            "A" => Ok(KU14UtsandUnderTid::A),
+            "B" => Ok(KU14UtsandUnderTid::B),
+            "C" => Ok(KU14UtsandUnderTid::C),
+            &_ => Err(error::Error::UnexpectedToken(format!("expected one of A-C got: {}", &data)))
+        }
+    }
+}
+
+impl Writable for KU14UtsandUnderTid {
+    fn get_str(&self) -> Option<String> {
+        Some(match *self {
+            KU14UtsandUnderTid::A => "A".to_string(),
+            KU14UtsandUnderTid::B => "B".to_string(),
+            KU14UtsandUnderTid::C => "C".to_string(),
+        })
+    }
+}
 
 #[cfg(test)]
 mod tests {
     use crate::{*};
-    use crate::KontrolluppgiftType::{KU13};
-    use crate::ku13::*;
+    use crate::ku14::*;
 
     #[test]
-    fn ku13_is_parsed_to_and_back() {
-        let ku13 = Kontrolluppgift {
+    fn ku14_is_parsed_to_and_back() {
+        let ku14 = Kontrolluppgift {
             avsandare: Avsandare {
                 teknisk_kontaktperson: TekniskKontaktperson {
                     ..Default::default()
@@ -121,26 +206,36 @@ mod tests {
                     arendeinformation: Arendeinformation {
                         ..Default::default()
                     },
-                    blankettinnehall: KU13(KU13Type {
+                    blankettinnehall: KU14(KU14Type {
                         kontant_bruttolon_mm: Some(1),
                         forman_utom_bil_drivmedel: Some(2),
                         bilforman_utom_drivmedel: Some(3),
                         drivmedel_vid_bilforman: Some(4),
+                        andra_kostnadsers: Some(5),
+                        underlag_rutarbete: Some(6),
+                        underlag_rotarbete: Some(7),
+                        ers_m_egenavgifter: Some(8),
                         tjanstepension: Some(9),
                         ers_ej_soc_avg: Some(10),
-                        ers_forman_bostad_mm_sink: Some(20),
+                        forsarskattenamnden: None,
                         bostad_smahus: Some(true),
                         bostad_ej_smahus: Some(false),
                         forman_har_justerats: Some(true),
+                        forman_som_pension: Some(true),
+                        bilersattning:  Some(true),
+                        traktamente: Some(true),
                         personaloption_forvarv_andel: Some(true),
                         arbetsstallenummer: Some("12".into()),
                         delagare: Some(false),
+                        landskod_arbetsland: Some("FI".into()),
+                        utsand_under_tid: Some(KU14UtsandUnderTid::A),
+                        kategori: Some(KU14Kategori::B),
                         social_avgifts_avtal: Some(true),
                         inkomstar: "2022".into(),
                         borttag: Some(false),
 
                         specifikationsnummer: 5,
-                        inkomsttagare: InkomsttagareKU13 {
+                        inkomsttagare: InkomsttagareKU14 {
                             landskod_tin: Some("landskod tin".into()),
                             landskod_medborgare: Some("SE".into()),
                             inkomsttagare: Some("202301062382".into()),
@@ -157,7 +252,7 @@ mod tests {
                             fri_adress: Some("Storgatan 3".into()),
                             tin: Some("Tin".into()),
                         },
-                        uppgiftslamnare: UppgiftslamnareKU13 {
+                        uppgiftslamnare: UppgiftslamnareKU14 {
                             uppgiftslamnar_id: "165599990602".into(),
                             namn_uppgiftslamnare: Some("Foretag 1".into()),
                         },
@@ -165,8 +260,8 @@ mod tests {
                 }
             ],
         };
-        let unparsed = to_string(&ku13).unwrap();
+        let unparsed = to_string(&ku14).unwrap();
         let re_parsed = from_str(&*unparsed).unwrap();
-        assert_eq!(ku13, re_parsed);
+        assert_eq!(ku14, re_parsed);
     }
 }

@@ -10,13 +10,14 @@ The specification for this is maintained by Skatteverket
 We aim to target only the newest version of the specification 
 
 ## Development status
-This crate is still to be considered in early development, none of the types are stable, With this being said, 
-the current status of implemtation of the "Kontrolluppgift" variants is:
+This crate is still to be considered in early development. None of the types are to be considered stable. 
+Not a lot of utilities are provided. With all of that being said, 
+the current status of implementation of the "Kontrolluppgift" variants is:
 
 -  [x] KU10
 -  [x] KU13
--  [ ] KU14
--  [ ] KU16
+-  [x] KU14
+-  [x] KU16
 -  [ ] KU17
 -  [ ] KU18
 -  [ ] KU19
