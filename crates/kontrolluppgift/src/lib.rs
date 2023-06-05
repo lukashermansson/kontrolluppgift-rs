@@ -8,19 +8,21 @@ pub mod error;
 pub mod ku26;
 pub mod ku14;
 pub mod ku16;
+pub mod ku17;
 
 use std::borrow::Cow;
 use std::io::Cursor;
 use quick_xml::{NsReader, Writer};
 use quick_xml::events::{BytesStart, BytesText, Event};
-use kontrolluppgift_macros::{KontrolluppgiftRead, KontrolluppgiftWrite};
+use kontrolluppgift_macros::{KontrolluppgiftRead, KontrolluppgiftWrite, KUStringEnum};
 use crate::error::Error;
 use crate::error::Error::{MissingElement, NonDecodable};
-use crate::KontrolluppgiftType::{KU10, KU13, KU14, KU16, KU20, KU21, KU25, KU26, KU28};
+use crate::KontrolluppgiftType::{KU10, KU13, KU14, KU16, KU17, KU20, KU21, KU25, KU26, KU28};
 use crate::ku10::KU10Type;
 use crate::ku13::KU13Type;
 use crate::ku14::KU14Type;
 use crate::ku16::KU16Type;
+use crate::ku17::KU17Type;
 use crate::ku20::KU20Type;
 use crate::ku25::KU25Type;
 use crate::ku21::KU21Type;
@@ -103,6 +105,7 @@ pub enum KontrolluppgiftType<'a> {
     KU13(KU13Type<'a>),
     KU14(KU14Type<'a>),
     KU16(KU16Type<'a>),
+    KU17(KU17Type<'a>),
     KU20(KU20Type<'a>),
     KU21(KU21Type<'a>),
     KU25(KU25Type<'a>),
@@ -123,6 +126,9 @@ impl<'a> KontrolluppgiftType<'a> {
                 v.write(w)?;
             }
             KU16(v) => {
+                v.write(w)?;
+            }
+            KU17(v) => {
                 v.write(w)?;
             }
             KU20(v) => {
@@ -298,6 +304,10 @@ impl<'a> Blankett<'a> {
                                         blankettinnehall = Some(KU16(KU16Type::read(reader, &element)?));
                                         break;
                                     }
+                                    b"KU17" => {
+                                        blankettinnehall = Some(KU17(KU17Type::read(reader, &element)?));
+                                        break;
+                                    }
                                     b"KU21" => {
                                         blankettinnehall = Some(KU21(KU21Type::read(reader, &element)?));
                                         break;
@@ -363,8 +373,9 @@ trait KontrolluppgiftRead<'a> {
 }
 
 trait KontrolluppgiftWrite {
-   fn write<W>(&self, w: &mut Writer<W>) -> Result<(), quick_xml::Error> where W: std::io::Write;
+    fn write<W>(&self, w: &mut Writer<W>) -> Result<(), quick_xml::Error> where W: std::io::Write;
 }
+
 fn unexpected_element<E>(element: &BytesStart) -> Result<E, Error> {
     Err(Error::UnexpectedToken(std::str::from_utf8(element.name().as_ref())
         .map_err(|e| NonDecodable(Some(e)))?.into()))
@@ -389,7 +400,7 @@ impl<'a, 'b : 'a, T: Readable<'a, 'b> + 'b> Reader<'a, 'b, T> for NsReader<&'b [
     fn read_node_into_with_code(&mut self, element: BytesStart, code: &str, x: &mut Option<T>) -> Result<(), Error> {
         let element_name = element.name();
         let element_name = std::str::from_utf8(element_name.as_ref())
-            .map_err(|e| NonDecodable(Some(e)) )?;
+            .map_err(|e| NonDecodable(Some(e)))?;
         let kod = element.try_get_attribute("faltkod")?
             .ok_or_else(|| MissingElement { missing: "faltkod".into(), reading: element_name.into() })?;
 
@@ -437,7 +448,6 @@ impl<'a, T: Writable, W: std::io::Write> Write<'a, T> for Writer<W> {
 pub(crate) trait Writable {
     fn get_str(&self) -> Option<String>;
 }
-
 
 pub(crate) trait Readable<'a, 'b> {
     fn get_str(data: Cow<'a, str>) -> Result<Self, Error> where Self: Sized + 'b;
@@ -517,4 +527,265 @@ impl<'a> Writable for &Cow<'a, str> {
     fn get_str(&self) -> Option<String> {
         Some(self.to_string())
     }
+}
+
+#[derive(Debug, PartialEq, KUStringEnum)]
+pub enum NarfartFjarrfart {
+    N,
+    F,
+}
+
+#[derive(Debug, PartialEq, KUStringEnum)]
+pub enum Landskod {
+    AD,
+    AE,
+    AF,
+    AG,
+    AI,
+    AL,
+    AN,
+    AM,
+    AO,
+    AQ,
+    AR,
+    AS,
+    AT,
+    AU,
+    AW,
+    AX,
+    AZ,
+    BA,
+    BB,
+    BD,
+    BE,
+    BF,
+    BG,
+    BH,
+    BI,
+    BJ,
+    BL,
+    BM,
+    BN,
+    BO,
+    BQ,
+    BR,
+    BS,
+    BT,
+    BV,
+    BW,
+    BY,
+    BZ,
+    CA,
+    CC,
+    CD,
+    CF,
+    CG,
+    CH,
+    CI,
+    CK,
+    CL,
+    CM,
+    CN,
+    CO,
+    CR,
+    CU,
+    CV,
+    CW,
+    CX,
+    CY,
+    CZ,
+    DE,
+    DJ,
+    DK,
+    DM,
+    DO,
+    DZ,
+    EC,
+    EE,
+    EG,
+    EH,
+    ER,
+    ES,
+    ET,
+    FI,
+    FJ,
+    FK,
+    FM,
+    FO,
+    FR,
+    GA,
+    GB,
+    GD,
+    GE,
+    GF,
+    GG,
+    GH,
+    GI,
+    GL,
+    GM,
+    GN,
+    GP,
+    GQ,
+    GR,
+    GS,
+    GT,
+    GU,
+    GW,
+    GY,
+    HK,
+    HM,
+    HN,
+    HR,
+    HT,
+    HU,
+    ID,
+    IE,
+    IL,
+    IM,
+    IN,
+    IO,
+    IQ,
+    IR,
+    IS,
+    IT,
+    JE,
+    JM,
+    JO,
+    JP,
+    KE,
+    KG,
+    KH,
+    KI,
+    KM,
+    KN,
+    KP,
+    KR,
+    KW,
+    KY,
+    KZ,
+    LA,
+    LB,
+    LC,
+    LI,
+    LK,
+    LR,
+    LS,
+    LT,
+    LU,
+    LV,
+    LY,
+    MA,
+    MC,
+    MD,
+    ME,
+    MF,
+    MG,
+    MH,
+    MK,
+    ML,
+    MM,
+    MN,
+    MO,
+    MP,
+    MQ,
+    MR,
+    MS,
+    MT,
+    MU,
+    MV,
+    MW,
+    MX,
+    MY,
+    MZ,
+    NA,
+    NC,
+    NE,
+    NF,
+    NG,
+    NI,
+    NL,
+    NO,
+    NP,
+    NR,
+    NU,
+    NZ,
+    OM,
+    PA,
+    PE,
+    PF,
+    PG,
+    PH,
+    PK,
+    PL,
+    PM,
+    PN,
+    PR,
+    PS,
+    PT,
+    PW,
+    PY,
+    QA,
+    RE,
+    RO,
+    RS,
+    RU,
+    RW,
+    SA,
+    SB,
+    SC,
+    SD,
+    SE,
+    SG,
+    SH,
+    SI,
+    SJ,
+    SK,
+    SL,
+    SM,
+    SN,
+    SO,
+    SR,
+    SS,
+    ST,
+    SV,
+    SX,
+    SY,
+    SZ,
+    TC,
+    TD,
+    TF,
+    TG,
+    TH,
+    TJ,
+    TK,
+    TL,
+    TM,
+    TN,
+    TO,
+    TR,
+    TT,
+    TV,
+    TW,
+    TZ,
+    UA,
+    UG,
+    UM,
+    US,
+    UY,
+    UZ,
+    VA,
+    VC,
+    VE,
+    VG,
+    VI,
+    VN,
+    VU,
+    WF,
+    WS,
+    XK,
+    YE,
+    YT,
+    ZA,
+    ZM,
+    ZW,
 }

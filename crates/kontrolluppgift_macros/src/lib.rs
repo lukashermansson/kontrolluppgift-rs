@@ -1,5 +1,5 @@
 use proc_macro::{TokenStream};
-use syn::{Attribute, Data, DataStruct, DeriveInput, Error, Field, Fields, FieldsNamed, Ident, LitBool, LitByteStr, LitStr, parenthesized, parse_macro_input, Type};
+use syn::{Attribute, Data, DataEnum, DataStruct, DeriveInput, Error, Field, Fields, FieldsNamed, Ident, LitBool, LitByteStr, LitStr, parenthesized, parse_macro_input, Type, Variant};
 use quote::{quote};
 use syn::__private::Span;
 use syn::spanned::Spanned;
@@ -207,6 +207,16 @@ fn get_fields(data: Data) -> FieldsNamed {
     }
 }
 
+fn get_enum_fields(data: Data) -> Vec<Variant> {
+    match data {
+        | Data::Enum(DataEnum { variants: it, .. }) => it.into_iter().collect(),
+        | Data::Union(_) => {
+            panic!("Only enums are suported")
+        }
+        | Data::Struct(_) => panic!("Not a enum"),
+    }
+}
+
 fn parse_name_input(span: Span, attrs: Vec<Attribute>) -> Result<LitStr, Error> {
     let mut str_name: Option<LitStr> = None;
     for attr in attrs {
@@ -284,9 +294,64 @@ fn parse_field_attribute_data(field: &Field) -> Result<FieldAttributeData, Error
     })
 }
 
+
 struct FieldAttributeData {
     name: LitByteStr,
     code: Option<LitStr>,
     required: bool,
     is_inner_type: bool,
+}
+
+#[proc_macro_derive(KUStringEnum)]
+pub fn string_enum(input: TokenStream) -> TokenStream {
+    let ast = parse_macro_input!(input as DeriveInput);
+
+    let variants = get_enum_fields(ast.data);
+
+    let name = ast.ident;
+    let stuff: Vec<_> = variants.into_iter().map(|e| (e.ident.clone(), e.ident.to_string())).collect();
+    let strings: Vec<_> = stuff.iter().map(|e| &e.1).collect();
+    let idents: Vec<_> = stuff.iter().map(|e| &e.0).collect();
+
+    let expanded = quote! {
+
+        impl<'a, 'b> crate::Readable<'a, 'b> for #name {
+            fn get_str(data: Cow<str>) -> Result<Self, error::Error> {
+                match data.as_ref() {
+                            #(#strings => Ok(#name::#idents),)*
+                    &_ => Err(error::Error::UnexpectedToken(format!("expected enumerated value got: {}", &data)))
+                }
+            }
+        }
+
+        impl crate::Writable for #name {
+            fn get_str(&self) -> Option<String> {
+                Some(match *self {
+                    #(#name::#idents => #strings.to_string(),)*
+                })
+            }
+        }
+
+         impl std::convert::TryFrom<String> for #name {
+            type Error = ();
+
+            fn try_from(value: String) -> Result<Self, Self::Error> {
+              match value.as_ref() {
+                    #(#strings => Ok(#name::#idents),)*
+                    _ => Err(())
+                }
+            }
+        }
+        impl std::convert::TryFrom<&str> for #name {
+            type Error = ();
+
+            fn try_from(value: &str) -> Result<Self, Self::Error> {
+              match value {
+                    #(#strings => Ok(#name::#idents),)*
+                    _ => Err(())
+                }
+            }
+        }
+    };
+    TokenStream::from(expanded)
 }

@@ -1,6 +1,6 @@
 use std::borrow::Cow;
-use kontrolluppgift_macros::{KontrolluppgiftRead, KontrolluppgiftWrite};
-use crate::{error, Readable, Writable};
+use kontrolluppgift_macros::{KontrolluppgiftRead, KontrolluppgiftWrite, KUStringEnum};
+use crate::{error, Landskod};
 
 extern crate self as kontrolluppgift;
 
@@ -82,9 +82,9 @@ pub struct UppgiftslamnareKU14<'a> {
 #[ku(name("InkomsttagareKU14"))]
 pub struct InkomsttagareKU14<'a> {
     #[ku(name(b"LandskodTIN"), code("076"))]
-    pub landskod_tin: Option<Cow<'a, str>>,
+    pub landskod_tin: Option<Landskod>,
     #[ku(name(b"LandskodMedborgare"), code("081"))]
-    pub landskod_medborgare: Option<Cow<'a, str>>,
+    pub landskod_medborgare: Option<Landskod>,
     #[ku(name(b"Inkomsttagare"), code("215"))]
     pub inkomsttagare: Option<Cow<'a, str>>,
     #[ku(name(b"Fornamn"), code("216"))]
@@ -98,7 +98,7 @@ pub struct InkomsttagareKU14<'a> {
     #[ku(name(b"Postort"), code("220"))]
     pub postort: Option<Cow<'a, str>>,
     #[ku(name(b"LandskodPostort"), code("221"))]
-    pub landskod_postort: Option<Cow<'a, str>>,
+    pub landskod_postort: Option<Landskod>,
     #[ku(name(b"Fodelsetid"), code("222"))]
     pub fodelsetid: Option<Cow<'a, str>>,
     #[ku(name(b"AnnatIDNr"), code("224"))]
@@ -113,7 +113,7 @@ pub struct InkomsttagareKU14<'a> {
     pub tin: Option<Cow<'a, str>>,
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, KUStringEnum)]
 pub enum KU14Kategori {
     A,
     B,
@@ -123,59 +123,11 @@ pub enum KU14Kategori {
     F
 }
 
-impl<'a, 'b> Readable<'a, 'b> for KU14Kategori {
-    fn get_str(data: Cow<str>) -> Result<Self, error::Error> {
-        match data.as_ref() {
-            "A" => Ok(KU14Kategori::A),
-            "B" => Ok(KU14Kategori::B),
-            "C" => Ok(KU14Kategori::C),
-            "D" => Ok(KU14Kategori::D),
-            "E" => Ok(KU14Kategori::E),
-            "F" => Ok(KU14Kategori::F),
-            &_ => Err(error::Error::UnexpectedToken(format!("expected one of A-F got: {}", &data)))
-        }
-    }
-}
-
-impl Writable for KU14Kategori {
-    fn get_str(&self) -> Option<String> {
-        Some(match *self {
-            KU14Kategori::A => "A".to_string(),
-            KU14Kategori::B => "B".to_string(),
-            KU14Kategori::C => "C".to_string(),
-            KU14Kategori::D => "D".to_string(),
-            KU14Kategori::E => "E".to_string(),
-            KU14Kategori::F => "F".to_string(),
-        })
-    }
-}
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, KUStringEnum)]
 pub enum KU14UtsandUnderTid {
     A,
     B,
     C,
-}
-
-
-impl<'a, 'b> Readable<'a, 'b> for KU14UtsandUnderTid {
-    fn get_str(data: Cow<str>) -> Result<Self, error::Error> {
-        match data.as_ref() {
-            "A" => Ok(KU14UtsandUnderTid::A),
-            "B" => Ok(KU14UtsandUnderTid::B),
-            "C" => Ok(KU14UtsandUnderTid::C),
-            &_ => Err(error::Error::UnexpectedToken(format!("expected one of A-C got: {}", &data)))
-        }
-    }
-}
-
-impl Writable for KU14UtsandUnderTid {
-    fn get_str(&self) -> Option<String> {
-        Some(match *self {
-            KU14UtsandUnderTid::A => "A".to_string(),
-            KU14UtsandUnderTid::B => "B".to_string(),
-            KU14UtsandUnderTid::C => "C".to_string(),
-        })
-    }
 }
 
 #[cfg(test)]
@@ -236,15 +188,15 @@ mod tests {
 
                         specifikationsnummer: 5,
                         inkomsttagare: InkomsttagareKU14 {
-                            landskod_tin: Some("landskod tin".into()),
-                            landskod_medborgare: Some("SE".into()),
+                            landskod_tin: Some(Landskod::SE),
+                            landskod_medborgare: Some(Landskod::FI),
                             inkomsttagare: Some("202301062382".into()),
                             fornamn: Some("Test".into()),
                             efternamn: Some("Testsson".into()),
                             gatuadress: Some("Gata".into()),
                             postnummer: Some("7456".into()),
                             postort: Some("Postort".into()),
-                            landskod_postort: Some("FI".into()),
+                            landskod_postort: Some(Landskod::AF),
                             fodelsetid: Some("20230106".into()),
                             annat_id_nr: Some("202".into()),
                             org_namn: Some("Organization".into()),

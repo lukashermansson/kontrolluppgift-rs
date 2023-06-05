@@ -1,5 +1,6 @@
 use std::borrow::Cow;
 use kontrolluppgift_macros::{KontrolluppgiftRead, KontrolluppgiftWrite};
+use crate::Landskod;
 
 #[derive(Debug, PartialEq, KontrolluppgiftRead, KontrolluppgiftWrite)]
 #[ku(name("KU26"))]
@@ -36,7 +37,7 @@ pub struct InkomsttagareKU26<'a> {
     #[ku(name(b"Postort"), code("220"))]
     pub postort: Option<Cow<'a, str>>,
     #[ku(name(b"LandskodPostort"), code("221"))]
-    pub landskod_postort: Option<Cow<'a, str>>,
+    pub landskod_postort: Option<Landskod>,
     #[ku(name(b"Fodelsetid"), code("222"))]
     pub fodelsetid: Option<Cow<'a, str>>,
     #[ku(name(b"AnnatIDNr"), code("224"))]
@@ -62,7 +63,7 @@ pub struct UppgiftslamnareKU26<'a> {
 #[cfg(test)]
 mod tests {
     use std::fs;
-    use crate::{Arendeinformation, Avsandare, Blankett, Blankettgemensamt, from_str, Kontaktperson, Kontrolluppgift, TekniskKontaktperson, to_string, Uppgiftslamnare};
+    use crate::{Arendeinformation, Avsandare, Blankett, Blankettgemensamt, from_str, Kontaktperson, Kontrolluppgift, Landskod, TekniskKontaktperson, to_string, Uppgiftslamnare};
     use crate::KontrolluppgiftType::{ KU26};
     use crate::ku26::{InkomsttagareKU26, KU26Type, UppgiftslamnareKU26};
 
@@ -112,7 +113,7 @@ mod tests {
                             gatuadress: Some("Gata".into()),
                             postnummer: Some("7456".into()),
                             postort: Some("Postort".into()),
-                            landskod_postort: Some("FI".into()),
+                            landskod_postort: Some(Landskod::FI),
                             fodelsetid: Some("20230106".into()),
                             annat_id_nr: Some("202".into()),
                             org_namn: Some("Organization".into()),

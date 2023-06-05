@@ -1,5 +1,7 @@
 use std::borrow::Cow;
 use kontrolluppgift_macros::{KontrolluppgiftRead, KontrolluppgiftWrite};
+use crate::Landskod;
+
 extern crate self as kontrolluppgift;
 
 /// Kontrolluppgift 10
@@ -80,7 +82,7 @@ pub struct UppgiftslamnareKU10<'a> {
 #[ku(name("InkomsttagareKU10"))]
 pub struct InkomsttagareKU10<'a> {
     #[ku(name(b"LandskodTIN"), code("076"))]
-    pub landskod_tin: Option<Cow<'a, str>>,
+    pub landskod_tin: Option<Landskod>,
     #[ku(name(b"Inkomsttagare"), code("215"))]
     pub inkomsttagare: Option<Cow<'a, str>>,
     #[ku(name(b"Fornamn"), code("216"))]
@@ -94,7 +96,7 @@ pub struct InkomsttagareKU10<'a> {
     #[ku(name(b"Postort"), code("220"))]
     pub postort: Option<Cow<'a, str>>,
     #[ku(name(b"LandskodPostort"), code("221"))]
-    pub landskod_postort: Option<Cow<'a, str>>,
+    pub landskod_postort: Option<Landskod>,
     #[ku(name(b"Fodelsetid"), code("222"))]
     pub fodelsetid: Option<Cow<'a, str>>,
     #[ku(name(b"AnnatIDNr"), code("224"))]
@@ -113,7 +115,7 @@ pub struct InkomsttagareKU10<'a> {
 #[cfg(test)]
 mod tests {
     use std::fs;
-    use crate::{Arendeinformation, Avsandare, Blankett, Blankettgemensamt, from_str, Kontaktperson, Kontrolluppgift, TekniskKontaktperson, to_string, Uppgiftslamnare};
+    use crate::{Arendeinformation, Avsandare, Blankett, Blankettgemensamt, from_str, Kontaktperson, Kontrolluppgift, Landskod, TekniskKontaktperson, to_string, Uppgiftslamnare};
     use crate::KontrolluppgiftType::KU10;
     use crate::ku10::{InkomsttagareKU10, KU10Type, UppgiftslamnareKU10};
 
@@ -180,14 +182,14 @@ mod tests {
 
                         specifikationsnummer: 5,
                         inkomsttagare: InkomsttagareKU10 {
-                            landskod_tin: Some("landskod tin".into()),
+                            landskod_tin: Some(Landskod::SE),
                             inkomsttagare: Some("202301062382".into()),
                             fornamn: Some("Test".into()),
                             efternamn: Some("Testsson".into()),
                             gatuadress: Some("Gata".into()),
                             postnummer: Some("7456".into()),
                             postort: Some("Postort".into()),
-                            landskod_postort: Some("FI".into()),
+                            landskod_postort: Some(Landskod::FI),
                             fodelsetid: Some("20230106".into()),
                             annat_id_nr: Some("202".into()),
                             org_namn: Some("Organization".into()),

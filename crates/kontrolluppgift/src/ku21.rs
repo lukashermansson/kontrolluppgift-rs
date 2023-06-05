@@ -1,5 +1,6 @@
 use kontrolluppgift_macros::{KontrolluppgiftRead, KontrolluppgiftWrite};
 use std::borrow::Cow;
+use crate::Landskod;
 
 /// Kontrolluppgift 21
 #[derive(Debug, PartialEq, KontrolluppgiftRead, KontrolluppgiftWrite)]
@@ -44,11 +45,11 @@ pub struct KU21Type<'a> {
 #[ku(name("InkomsttagareKU21"))]
 pub struct InkomsttagareKU21<'a> {
     #[ku(name(b"LandskodTIN"), code("076"))]
-    pub landskod_tin: Option<Cow<'a, str>>,
+    pub landskod_tin: Option<Landskod>,
     #[ku(name(b"Fodelseort"), code("077"))]
     pub fodelseort: Option<Cow<'a, str>>,
     #[ku(name(b"LandskodFodelseort"), code("078"))]
-    pub landskod_fodelseort: Option<Cow<'a, str>>,
+    pub landskod_fodelseort: Option<Landskod>,
     #[ku(name(b"Inkomsttagare"), code("215"))]
     pub inkomsttagare: Option<Cow<'a, str>>,
     #[ku(name(b"Fornamn"), code("216"))]
@@ -62,7 +63,7 @@ pub struct InkomsttagareKU21<'a> {
     #[ku(name(b"Postort"), code("220"))]
     pub postort: Option<Cow<'a, str>>,
     #[ku(name(b"LandskodPostort"), code("221"))]
-    pub landskod_postort: Option<Cow<'a, str>>,
+    pub landskod_postort: Option<Landskod>,
     #[ku(name(b"Fodelsetid"), code("222"))]
     pub fodelsetid: Option<Cow<'a, str>>,
     #[ku(name(b"AnnatIDNr"), code("224"))]
@@ -90,10 +91,7 @@ pub struct UppgiftslamnareKU21<'a> {
 mod tests {
     use crate::ku21::{InkomsttagareKU21, KU21Type, UppgiftslamnareKU21};
     use crate::KontrolluppgiftType::KU21;
-    use crate::{
-        from_str, to_string, Arendeinformation, Avsandare, Blankett, Blankettgemensamt,
-        Kontaktperson, Kontrolluppgift, TekniskKontaktperson, Uppgiftslamnare,
-    };
+    use crate::{from_str, to_string, Arendeinformation, Avsandare, Blankett, Blankettgemensamt, Kontaktperson, Kontrolluppgift, TekniskKontaktperson, Uppgiftslamnare, Landskod};
     use std::fs;
 
     #[test]
@@ -147,16 +145,16 @@ mod tests {
                     avyttrad_till_isk: Some(false),
                     okand_varde: Some(true),
                     inkomsttagare: InkomsttagareKU21 {
-                        landskod_tin: Some("landskod tin".into()),
+                        landskod_tin: Some(Landskod::SE),
                         fodelseort: Some("Ort".into()),
-                        landskod_fodelseort: Some("SE".into()),
+                        landskod_fodelseort: Some(Landskod::SE),
                         inkomsttagare: Some("202301062382".into()),
                         fornamn: Some("Test".into()),
                         efternamn: Some("Testsson".into()),
                         gatuadress: Some("Gata".into()),
                         postnummer: Some("7456".into()),
                         postort: Some("Postort".into()),
-                        landskod_postort: Some("FI".into()),
+                        landskod_postort: Some(Landskod::FI),
                         fodelsetid: Some("20230106".into()),
                         annat_id_nr: Some("202".into()),
                         org_namn: Some("Organization".into()),
