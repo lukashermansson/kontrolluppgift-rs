@@ -9,11 +9,13 @@ pub mod ku26;
 pub mod ku14;
 pub mod ku16;
 pub mod ku17;
+pub mod ku18;
 
 use std::borrow::Cow;
 use std::io::Cursor;
 use quick_xml::{NsReader, Writer};
 use quick_xml::events::{BytesStart, BytesText, Event};
+use regex::Regex;
 use kontrolluppgift_macros::{KontrolluppgiftRead, KontrolluppgiftWrite, KUStringEnum};
 use crate::error::Error;
 use crate::error::Error::{MissingElement, NonDecodable};
@@ -788,4 +790,42 @@ pub enum Landskod {
     ZA,
     ZM,
     ZW,
+}
+
+#[derive(Debug, PartialEq)]
+pub struct IdentitetsbeteckningForPerson<'a>(Cow<'a, str>);
+
+impl<'a, 'b : 'a> Readable<'a, 'b> for IdentitetsbeteckningForPerson<'a> {
+    fn get_str(data: Cow<'b, str>) -> Result<Self, Error> {
+        data.as_ref().try_into().map_err(|e : &str| Error::UnexpectedToken(e.to_string()))
+    }
+}
+
+impl TryFrom<&str> for IdentitetsbeteckningForPerson<'_> {
+    type Error = &'static str;
+
+    fn try_from(value: &str) -> Result<Self, Self::Error> {
+        let person_nr_regex = Regex::new(r"((((18|19|20)[0-9][0-9])(((01|03|05|07|08|10|12)(0[1-9]|1[0-9]|2[0-9]|3[0-1]))|((04|06|09|11)(0[1-9]|1[0-9]|2[0-9]|30))|((02)(0[1-9]|1[0-9]|2[0-8]))))|(((18|19|20)(04|08|12|16|20|24|28|32|36|40|44|48|52|56|60|64|68|72|76|80|84|88|92|96)(0229))|(20000229)))(00[1-9]|0[1-9][0-9]|[1-9][0-9][0-9])[0-9]").expect("These are constructed and should be valid");
+        let samordnings_nr_regex = Regex::new(r"((((18|19|20)[0-9][0-9])(((01|03|05|07|08|10|12)(6[1-9]|7[0-9]|8[0-9]|9[0-1]))|((04|06|09|11)(6[1-9]|7[0-9]|8[0-9]|90))|((02)(6[1-9]|7[0-9]|8[0-8]))))|(((18|19|20)(04|08|12|16|20|24|28|32|36|40|44|48|52|56|60|64|68|72|76|80|84|88|92|96)(0289))|(20000289)))(00[1-9]|0[1-9][0-9]|[1-9][0-9][0-9])[0-9]").expect("These are constructed and should be valid");
+        let org_nr_regex = Regex::new(r"16\d{2}[2-9]\d{7}").expect("These are constructed and should be valid");
+
+        if person_nr_regex.is_match(value) ||
+            samordnings_nr_regex.is_match(value) ||
+            org_nr_regex.is_match(value) {
+            return Ok(IdentitetsbeteckningForPerson(Cow::Owned(value.to_string())));
+        }
+        return Err("Not valid Identitetsbeteckning");
+    }
+}
+
+impl From<&IdentitetsbeteckningForPerson<'_>> for String {
+    fn from(value: &IdentitetsbeteckningForPerson) -> Self {
+        value.0.to_string()
+    }
+}
+
+impl Writable for IdentitetsbeteckningForPerson<'_> {
+    fn get_str(&self) -> Option<String> {
+        Some(self.0.to_string())
+    }
 }

@@ -1,6 +1,6 @@
 use std::borrow::Cow;
 use kontrolluppgift_macros::{KontrolluppgiftRead, KontrolluppgiftWrite};
-use crate::Landskod;
+use crate::{IdentitetsbeteckningForPerson, Landskod};
 
 extern crate self as kontrolluppgift;
 
@@ -84,7 +84,7 @@ pub struct InkomsttagareKU10<'a> {
     #[ku(name(b"LandskodTIN"), code("076"))]
     pub landskod_tin: Option<Landskod>,
     #[ku(name(b"Inkomsttagare"), code("215"))]
-    pub inkomsttagare: Option<Cow<'a, str>>,
+    pub inkomsttagare: Option<IdentitetsbeteckningForPerson<'a>>,
     #[ku(name(b"Fornamn"), code("216"))]
     pub fornamn: Option<Cow<'a, str>>,
     #[ku(name(b"Efternamn"), code("217"))]
@@ -183,7 +183,7 @@ mod tests {
                         specifikationsnummer: 5,
                         inkomsttagare: InkomsttagareKU10 {
                             landskod_tin: Some(Landskod::SE),
-                            inkomsttagare: Some("202301062382".into()),
+                            inkomsttagare: Some("191612299279".try_into().unwrap()),
                             fornamn: Some("Test".into()),
                             efternamn: Some("Testsson".into()),
                             gatuadress: Some("Gata".into()),

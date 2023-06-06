@@ -18,8 +18,8 @@ the current status of implementation of the "Kontrolluppgift" variants is:
 -  [x] KU13
 -  [x] KU14
 -  [x] KU16
--  [ ] KU17
--  [ ] KU18
+-  [x] KU17
+-  [x] KU18
 -  [ ] KU19
 -  [x] KU20
 -  [x] KU21

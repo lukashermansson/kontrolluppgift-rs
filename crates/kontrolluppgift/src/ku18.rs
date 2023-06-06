@@ -2,48 +2,43 @@ use std::borrow::Cow;
 use kontrolluppgift_macros::{KontrolluppgiftRead, KontrolluppgiftWrite};
 use crate::{IdentitetsbeteckningForPerson, Landskod};
 
-/// Kontrolluppgift 28
+extern crate self as kontrolluppgift;
+
+/// Kontrolluppgift 18
 #[derive(Debug, PartialEq, KontrolluppgiftRead, KontrolluppgiftWrite)]
-#[ku(name("KU28"))]
-pub struct KU28Type<'a> {
-    #[ku(name(b"Delagare"), code("061"))]
-    pub delagare: Option<bool>,
+#[ku(name("KU18"))]
+pub struct KU18Type<'a> {
+    #[ku(name(b"AvdragenSkatt"), code("001"))]
+    pub avdragen_skatt: Option<i32>,
+    #[ku(name(b"Ersattningskod"), code("004"))]
+    pub ersattningskod: Option<Cow<'a, str>>, // this can be an enum
+    #[ku(name(b"ErsattningBelopp"), code("005"))]
+    pub ersattning_belopp: Option<i32>,
     #[ku(name(b"Inkomstar"), code("203"), required(true))]
     pub inkomstar: Cow<'a, str>,
     #[ku(name(b"Borttag"), code("205"))]
     pub borttag: Option<bool>,
-    #[ku(name(b"UnderlagForInvesteraravdrag"), code("528"))]
-    pub underlag_for_investeraravdrag: Option<i32>,
-    #[ku(name(b"TotUnderlagInvesteraravdrag"), code("529"))]
-    pub tot_underlag_investeraravdrag: Option<i32>,
-    #[ku(name(b"Betalningsar"), code("530"))]
-    pub betalningsar: Option<Cow<'a, str>>,
-    #[ku(name(b"AterforingAvyttring"), code("531"))]
-    pub aterforing_avyttring: Option<bool>,
-    #[ku(name(b"AterforingUtflyttning"), code("532"))]
-    pub aterforing_utflyttning: Option<bool>,
-    #[ku(name(b"AterforingHogVardeoverforing"), code("533"))]
-    pub aterforing_hog_vardeoverforing: Option<bool>,
-    #[ku(name(b"AterforingInternaForvarv"), code("534"))]
-    pub aterforing_interna_forvarv: Option<bool>,
-    #[ku(name(b"DatumForvarv"), code("535"))]
-    pub datum_forvarv: Option<Cow<'a, str>>,
-    #[ku(name(b"Region"), code("536"))]
-    pub region: Option<Cow<'a, str>>,
-    #[ku(name(b"Verksamhetsomrade"), code("537"))]
-    pub verksamhetsomrade: Option<Cow<'a, str>>,
     #[ku(name(b"Specifikationsnummer"), code("570"), required(true))]
     pub specifikationsnummer: i32,
-    #[ku(name(b"InkomsttagareKU28"), required(true), inner_ty(true))]
-    pub inkomsttagare: InkomsttagareKU28<'a>,
-    #[ku(name(b"UppgiftslamnareKU28"), required(true), inner_ty(true))]
-    pub uppgiftslamnare: UppgiftslamnareKU28<'a>,
+    #[ku(name(b"InkomsttagareKU17"), required(true), inner_ty(true))]
+    pub inkomsttagare: InkomsttagareKU18<'a>,
+    #[ku(name(b"UppgiftslamnareKU17"), required(true), inner_ty(true))]
+    pub uppgiftslamnare: UppgiftslamnareKU18<'a>,
+}
 
+
+#[derive(Debug, PartialEq, KontrolluppgiftRead, KontrolluppgiftWrite)]
+#[ku(name("UppgiftslamnareKU18"))]
+pub struct UppgiftslamnareKU18<'a> {
+    #[ku(name(b"UppgiftslamnarId"), code("201"), required(true))]
+    pub uppgiftslamnar_id: Cow<'a, str>,
+    #[ku(name(b"NamnUppgiftslamnare"), code("202"))]
+    pub namn_uppgiftslamnare: Option<Cow<'a, str>>,
 }
 
 #[derive(Debug, PartialEq, KontrolluppgiftRead, KontrolluppgiftWrite)]
-#[ku(name("InkomsttagareKU28"))]
-pub struct InkomsttagareKU28<'a> {
+#[ku(name("InkomsttagareKU18"))]
+pub struct InkomsttagareKU18<'a> {
     #[ku(name(b"LandskodTIN"), code("076"))]
     pub landskod_tin: Option<Landskod>,
     #[ku(name(b"Inkomsttagare"), code("215"))]
@@ -74,35 +69,14 @@ pub struct InkomsttagareKU28<'a> {
     pub tin: Option<Cow<'a, str>>,
 }
 
-#[derive(Debug, PartialEq, KontrolluppgiftRead, KontrolluppgiftWrite)]
-#[ku(name("UppgiftslamnareKU28"))]
-pub struct UppgiftslamnareKU28<'a> {
-    #[ku(name(b"UppgiftslamnarId"), code("201"), required(true))]
-    pub uppgiftslamnar_id: Cow<'a, str>,
-    #[ku(name(b"NamnUppgiftslamnare"), code("202"))]
-    pub namn_uppgiftslamnare: Option<Cow<'a, str>>,
-}
-
 #[cfg(test)]
 mod tests {
-    use std::fs;
-    use crate::{Arendeinformation, Avsandare, Blankett, Blankettgemensamt, from_str, Kontaktperson, Kontrolluppgift, Landskod, TekniskKontaktperson, to_string, Uppgiftslamnare};
-    use crate::KontrolluppgiftType::KU28;
-    use crate::ku28::{InkomsttagareKU28, KU28Type, UppgiftslamnareKU28};
+    use crate::{*};
+    use crate::ku17::*;
 
     #[test]
-    fn ku28_is_read() {
-        let xml = fs::read_to_string("./EXEMPELFIL KONTROLLUPPGIFT INVESTERARAVDRAG (KU28)_2022.xml").unwrap();
-
-        let parsed = from_str(&*xml).unwrap();
-        let unparsed = to_string(&parsed).unwrap();
-        let parsed2 = from_str(&*unparsed).unwrap();
-        assert_eq!(parsed, parsed2);
-    }
-
-    #[test]
-    fn ku28_is_parsed_to_and_back() {
-        let ku28 = Kontrolluppgift {
+    fn ku18_is_parsed_to_and_back() {
+        let ku18 = Kontrolluppgift {
             avsandare: Avsandare {
                 teknisk_kontaktperson: TekniskKontaktperson {
                     ..Default::default()
@@ -123,30 +97,30 @@ mod tests {
                     arendeinformation: Arendeinformation {
                         ..Default::default()
                     },
-                    blankettinnehall: KU28(KU28Type {
+                    blankettinnehall: KU17(KU17Type {
+                        kontant_bruttolon_mm: Some(1),
+                        forman_utom_bil_drivmedel: Some(2),
+                        fartygssignal: Some("TYPE".into()),
+                        antal_dagar_sjoinkomst: Some(8),
+                        narfart_fjarrfart: Some(NarfartFjarrfart::N),
+                        ers_ej_soc_avg: Some(10),
+                        arbetsstallenummer: Some("12".into()),
                         delagare: Some(false),
+                        social_avgifts_avtal: Some(true),
                         inkomstar: "2022".into(),
-                        borttag: Some(true),
-                        underlag_for_investeraravdrag: Some(1),
-                        tot_underlag_investeraravdrag: Some(2),
-                        betalningsar: Some("2023".into()),
-                        aterforing_avyttring: Some(true),
-                        aterforing_utflyttning: Some(false),
-                        aterforing_hog_vardeoverforing: Some(true),
-                        aterforing_interna_forvarv: Some(false),
-                        datum_forvarv: Some("2021-01-01".into()),
-                        region: Some("region".into()),
-                        verksamhetsomrade: Some("verksamhetsomrade".into()),
+                        borttag: Some(false),
+                        fartygets_namn: Some("Ship".into()),
                         specifikationsnummer: 5,
-                        inkomsttagare: InkomsttagareKU28 {
-                            landskod_tin: Some(Landskod::AF),
+                        inkomsttagare: InkomsttagareKU17 {
+                            landskod_tin: Some(Landskod::SE),
+                            landskod_medborgare: Some(Landskod::SE),
                             inkomsttagare: Some("191612299279".try_into().unwrap()),
                             fornamn: Some("Test".into()),
                             efternamn: Some("Testsson".into()),
                             gatuadress: Some("Gata".into()),
                             postnummer: Some("7456".into()),
                             postort: Some("Postort".into()),
-                            landskod_postort: Some(Landskod::AI),
+                            landskod_postort: Some(Landskod::FI),
                             fodelsetid: Some("20230106".into()),
                             annat_id_nr: Some("202".into()),
                             org_namn: Some("Organization".into()),
@@ -154,7 +128,7 @@ mod tests {
                             fri_adress: Some("Storgatan 3".into()),
                             tin: Some("Tin".into()),
                         },
-                        uppgiftslamnare: UppgiftslamnareKU28 {
+                        uppgiftslamnare: UppgiftslamnareKU17 {
                             uppgiftslamnar_id: "165599990602".into(),
                             namn_uppgiftslamnare: Some("Foretag 1".into()),
                         },
@@ -162,8 +136,8 @@ mod tests {
                 }
             ],
         };
-        let unparsed = to_string(&ku28).unwrap();
+        let unparsed = to_string(&ku18).unwrap();
         let re_parsed = from_str(&*unparsed).unwrap();
-        assert_eq!(ku28, re_parsed);
+        assert_eq!(ku18, re_parsed);
     }
 }
