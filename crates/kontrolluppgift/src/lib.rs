@@ -10,6 +10,7 @@ pub mod ku14;
 pub mod ku16;
 pub mod ku17;
 pub mod ku18;
+mod ku19;
 
 use std::borrow::Cow;
 use std::io::Cursor;
@@ -19,12 +20,14 @@ use regex::Regex;
 use kontrolluppgift_macros::{KontrolluppgiftRead, KontrolluppgiftWrite, KUStringEnum};
 use crate::error::Error;
 use crate::error::Error::{MissingElement, NonDecodable};
-use crate::KontrolluppgiftType::{KU10, KU13, KU14, KU16, KU17, KU20, KU21, KU25, KU26, KU28};
+use crate::KontrolluppgiftType::{KU10, KU13, KU14, KU16, KU17, KU18, KU19, KU20, KU21, KU25, KU26, KU28};
 use crate::ku10::KU10Type;
 use crate::ku13::KU13Type;
 use crate::ku14::KU14Type;
 use crate::ku16::KU16Type;
 use crate::ku17::KU17Type;
+use crate::ku18::KU18Type;
+use crate::ku19::KU19Type;
 use crate::ku20::KU20Type;
 use crate::ku25::KU25Type;
 use crate::ku21::KU21Type;
@@ -108,6 +111,8 @@ pub enum KontrolluppgiftType<'a> {
     KU14(KU14Type<'a>),
     KU16(KU16Type<'a>),
     KU17(KU17Type<'a>),
+    KU18(KU18Type<'a>),
+    KU19(KU19Type<'a>),
     KU20(KU20Type<'a>),
     KU21(KU21Type<'a>),
     KU25(KU25Type<'a>),
@@ -131,6 +136,12 @@ impl<'a> KontrolluppgiftType<'a> {
                 v.write(w)?;
             }
             KU17(v) => {
+                v.write(w)?;
+            }
+            KU18(v) => {
+                v.write(w)?;
+            }
+            KU19(v) => {
                 v.write(w)?;
             }
             KU20(v) => {
@@ -310,12 +321,20 @@ impl<'a> Blankett<'a> {
                                         blankettinnehall = Some(KU17(KU17Type::read(reader, &element)?));
                                         break;
                                     }
-                                    b"KU21" => {
-                                        blankettinnehall = Some(KU21(KU21Type::read(reader, &element)?));
+                                    b"KU18" => {
+                                        blankettinnehall = Some(KU18(KU18Type::read(reader, &element)?));
+                                        break;
+                                    }
+                                    b"KU19" => {
+                                        blankettinnehall = Some(KU19(KU19Type::read(reader, &element)?));
                                         break;
                                     }
                                     b"KU20" => {
                                         blankettinnehall = Some(KU20(KU20Type::read(reader, &element)?));
+                                        break;
+                                    }
+                                    b"KU21" => {
+                                        blankettinnehall = Some(KU21(KU21Type::read(reader, &element)?));
                                         break;
                                     }
                                     b"KU25" => {
