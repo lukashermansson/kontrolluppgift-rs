@@ -26,7 +26,8 @@ pub enum Error {
     MissingElement {
         missing: String,
         reading: String
-    }
+    },
+    EmptyDocType
 }
 
 impl From<QXMLError> for Error {
@@ -46,6 +47,7 @@ impl From<QXMLError> for Error {
           QXMLError::InvalidAttr(x) => Self::InvalidAttr(x),
           QXMLError::EscapeError(_) =>Self::EscapeError,
           QXMLError::UnknownPrefix(x) => Self::UnknownPrefix(x),
+          QXMLError::EmptyDocType => Self::EmptyDocType,
       }
     }
 }
@@ -86,6 +88,7 @@ impl fmt::Display for Error {
                 f.write_str("'")
             },
             Error::MissingElement { missing, reading }  => write!(f, "Missing element {}, while reading {}", missing, reading),
+            Error::EmptyDocType => write!(f, "DOCTYPE declaration must not be empty"),
         }
     }
 }
