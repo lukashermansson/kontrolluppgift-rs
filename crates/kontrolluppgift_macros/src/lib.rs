@@ -194,7 +194,6 @@ pub fn write_macro(input: TokenStream) -> TokenStream {
     }
 }
 
-
 fn get_fields(data: Data) -> FieldsNamed {
     match data {
         | Data::Enum(_) | Data::Union(_) => {
@@ -352,6 +351,59 @@ pub fn string_enum(input: TokenStream) -> TokenStream {
                 }
             }
         }
+    };
+    TokenStream::from(expanded)
+}
+
+#[proc_macro_derive(KUVariantsEnum)]
+pub fn variants_enum(input: TokenStream) -> TokenStream {
+    let ast = parse_macro_input!(input as DeriveInput);
+
+    let variants = get_enum_fields(ast.data);
+
+    let stuff: Vec<_> = variants.into_iter().map(|e| (e.ident.clone(), e.ident.to_string(), e.fields.into_iter().next().unwrap().ty)).collect();
+    let lits: Vec<_> = stuff.iter().map(|e| LitByteStr::new(&e.1.as_bytes(), Span::call_site())).collect();
+    let idents: Vec<_> = stuff.iter().map(|e| &e.0).collect();
+    let types: Vec<_> = stuff.iter().map(|e| match &e.2 {
+        Type::Path(t) => (t.path.clone()).segments.last().unwrap().clone().ident,
+        _ => panic!()
+    }).collect();
+
+    let expanded = quote! {
+
+        impl<'a> KontrolluppgiftType<'a> {
+            fn write<W: std::io::Write>(&self, w: &mut Writer<W>) -> Result<(), quick_xml::Error> {
+                match self {
+                    #(#idents(v) => {
+                        v.write(w)?;
+                    })*
+                }
+
+                Ok(())
+            }
+        }
+
+
+        impl<'a> KontrolluppgiftType<'a> {
+    fn read(reader: &mut NsReader<&'a [u8]>) -> Result<Option<Self>, Error> {
+        let mut blankettinnehall = None;
+
+        loop {
+            match reader.read_event()? {
+                Event::Start(element) => match element.local_name().as_ref() {
+                            #(#lits => {
+                                blankettinnehall = Some(#idents(#types::read(reader, &element)?));
+                                break
+                            })*
+                    &_ => unexpected_element(&element)?
+                },
+                Event::End(_) => break,
+                _ => {}
+            }
+        }
+        return Ok(blankettinnehall)
+    }
+}
     };
     TokenStream::from(expanded)
 }

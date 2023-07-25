@@ -4,20 +4,20 @@ pub mod ku10;
 pub mod ku25;
 pub mod ku28;
 pub mod ku21;
-pub mod error;
 pub mod ku26;
 pub mod ku14;
 pub mod ku16;
 pub mod ku17;
 pub mod ku18;
-mod ku19;
+pub mod ku19;
+pub mod error;
 
 use std::borrow::Cow;
 use std::io::Cursor;
 use quick_xml::{NsReader, Writer};
 use quick_xml::events::{BytesStart, BytesText, Event};
 use regex::Regex;
-use kontrolluppgift_macros::{KontrolluppgiftRead, KontrolluppgiftWrite, KUStringEnum};
+use kontrolluppgift_macros::{KontrolluppgiftRead, KontrolluppgiftWrite, KUStringEnum, KUVariantsEnum};
 use crate::error::Error;
 use crate::error::Error::{MissingElement, NonDecodable};
 use crate::KontrolluppgiftType::{KU10, KU13, KU14, KU16, KU17, KU18, KU19, KU20, KU21, KU25, KU26, KU28};
@@ -104,7 +104,7 @@ impl<'a> Blankett<'a> {
     }
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, KUVariantsEnum)]
 pub enum KontrolluppgiftType<'a> {
     KU10(KU10Type<'a>),
     KU13(KU13Type<'a>),
@@ -118,51 +118,6 @@ pub enum KontrolluppgiftType<'a> {
     KU25(KU25Type<'a>),
     KU26(KU26Type<'a>),
     KU28(KU28Type<'a>),
-}
-
-impl<'a> KontrolluppgiftType<'a> {
-    fn write<W: std::io::Write>(&self, w: &mut Writer<W>) -> Result<(), quick_xml::Error> {
-        match self {
-            KU10(v) => {
-                v.write(w)?;
-            }
-            KU13(v) => {
-                v.write(w)?;
-            }
-            KU14(v) => {
-                v.write(w)?;
-            }
-            KU16(v) => {
-                v.write(w)?;
-            }
-            KU17(v) => {
-                v.write(w)?;
-            }
-            KU18(v) => {
-                v.write(w)?;
-            }
-            KU19(v) => {
-                v.write(w)?;
-            }
-            KU20(v) => {
-                v.write(w)?;
-            }
-            KU21(v) => {
-                v.write(w)?;
-            }
-            KU25(v) => {
-                v.write(w)?;
-            }
-            KU26(v) => {
-                v.write(w)?;
-            }
-            KU28(v) => {
-                v.write(w)?;
-            }
-        }
-
-        Ok(())
-    }
 }
 
 #[derive(Debug, Default, PartialEq, KontrolluppgiftRead, KontrolluppgiftWrite)]
@@ -298,63 +253,7 @@ impl<'a> Blankett<'a> {
                         arendeinformation = Some(Arendeinformation::read(reader, &element)?)
                     }
                     b"Blankettinnehall" => {
-                        loop {
-                            match reader.read_event()? {
-                                Event::Start(element) => match element.local_name().as_ref() {
-                                    b"KU10" => {
-                                        blankettinnehall = Some(KU10(KU10Type::read(reader, &element)?));
-                                        break;
-                                    }
-                                    b"KU13" => {
-                                        blankettinnehall = Some(KU13(KU13Type::read(reader, &element)?));
-                                        break;
-                                    }
-                                    b"KU14" => {
-                                        blankettinnehall = Some(KU14(KU14Type::read(reader, &element)?));
-                                        break;
-                                    }
-                                    b"KU16" => {
-                                        blankettinnehall = Some(KU16(KU16Type::read(reader, &element)?));
-                                        break;
-                                    }
-                                    b"KU17" => {
-                                        blankettinnehall = Some(KU17(KU17Type::read(reader, &element)?));
-                                        break;
-                                    }
-                                    b"KU18" => {
-                                        blankettinnehall = Some(KU18(KU18Type::read(reader, &element)?));
-                                        break;
-                                    }
-                                    b"KU19" => {
-                                        blankettinnehall = Some(KU19(KU19Type::read(reader, &element)?));
-                                        break;
-                                    }
-                                    b"KU20" => {
-                                        blankettinnehall = Some(KU20(KU20Type::read(reader, &element)?));
-                                        break;
-                                    }
-                                    b"KU21" => {
-                                        blankettinnehall = Some(KU21(KU21Type::read(reader, &element)?));
-                                        break;
-                                    }
-                                    b"KU25" => {
-                                        blankettinnehall = Some(KU25(KU25Type::read(reader, &element)?));
-                                        break;
-                                    }
-                                    b"KU26" => {
-                                        blankettinnehall = Some(KU26(KU26Type::read(reader, &element)?));
-                                        break;
-                                    }
-                                    b"KU28" => {
-                                        blankettinnehall = Some(KU28(KU28Type::read(reader, &element)?));
-                                        break;
-                                    }
-                                    &_ => unexpected_element(&element)?
-                                },
-                                Event::End(_) => break,
-                                _ => {}
-                            }
-                        }
+                        blankettinnehall = KontrolluppgiftType::read(reader)?;
                     }
                     &_ => unexpected_element(&element)?
                 }
