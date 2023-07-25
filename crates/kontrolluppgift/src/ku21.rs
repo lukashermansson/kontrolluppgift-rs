@@ -1,6 +1,6 @@
+use crate::{IdentitetsbeteckningForPerson, Landskod};
 use kontrolluppgift_macros::{KontrolluppgiftRead, KontrolluppgiftWrite};
 use std::borrow::Cow;
-use crate::{IdentitetsbeteckningForPerson, Landskod};
 
 /// Kontrolluppgift 21
 #[derive(Debug, PartialEq, KontrolluppgiftRead, KontrolluppgiftWrite)]
@@ -89,9 +89,12 @@ pub struct UppgiftslamnareKU21<'a> {
 
 #[cfg(test)]
 mod tests {
-    use crate::ku21::{InkomsttagareKU21, KU21Type, UppgiftslamnareKU21};
+    use super::*;
     use crate::KontrolluppgiftType::KU21;
-    use crate::{from_str, to_string, Arendeinformation, Avsandare, Blankett, Blankettgemensamt, Kontaktperson, Kontrolluppgift, TekniskKontaktperson, Uppgiftslamnare, Landskod};
+    use crate::{
+        from_str, to_string, Arendeinformation, Avsandare, Blankett, Blankettgemensamt,
+        Kontaktperson, Kontrolluppgift, Landskod, TekniskKontaktperson, Uppgiftslamnare,
+    };
     use std::fs;
 
     #[test]

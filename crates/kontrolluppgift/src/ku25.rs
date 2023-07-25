@@ -1,7 +1,7 @@
 use std::borrow::Cow;
 
-use kontrolluppgift_macros::{KontrolluppgiftRead, KontrolluppgiftWrite};
 use crate::{IdentitetsbeteckningForPerson, Landskod};
+use kontrolluppgift_macros::{KontrolluppgiftRead, KontrolluppgiftWrite};
 
 #[derive(Debug, PartialEq, KontrolluppgiftRead, KontrolluppgiftWrite)]
 #[ku(name("KU25"))]
@@ -68,14 +68,20 @@ pub struct UppgiftslamnareKU25<'a> {
 
 #[cfg(test)]
 mod tests {
-    use std::fs;
-    use crate::{Arendeinformation, Avsandare, Blankett, Blankettgemensamt, from_str, Kontaktperson, Kontrolluppgift, Landskod, TekniskKontaktperson, to_string, Uppgiftslamnare};
+    use super::*;
     use crate::KontrolluppgiftType::KU25;
-    use crate::ku25::{InkomsttagareKU25, KU25Type, UppgiftslamnareKU25};
+    use crate::{
+        from_str, to_string, Arendeinformation, Avsandare, Blankett, Blankettgemensamt,
+        Kontaktperson, Kontrolluppgift, Landskod, TekniskKontaktperson, Uppgiftslamnare,
+    };
+    use std::fs;
 
     #[test]
     fn ku25_is_read() {
-        let xml = fs::read_to_string("./EXEMPELFIL KONTROLLUPPGIFTER RÄNTA, UTDELNING M.M. KU25 FÖR_2022.xml").unwrap();
+        let xml = fs::read_to_string(
+            "./EXEMPELFIL KONTROLLUPPGIFTER RÄNTA, UTDELNING M.M. KU25 FÖR_2022.xml",
+        )
+        .unwrap();
 
         let parsed = from_str(&*xml).unwrap();
         let unparsed = to_string(&parsed).unwrap();
@@ -98,44 +104,42 @@ mod tests {
                         ..Default::default()
                     },
                     ..Default::default()
-                }
+                },
             },
-            blanketter: vec![
-                Blankett {
-                    nummer: 0,
-                    arendeinformation: Arendeinformation {
-                        ..Default::default()
+            blanketter: vec![Blankett {
+                nummer: 0,
+                arendeinformation: Arendeinformation {
+                    ..Default::default()
+                },
+                blankettinnehall: KU25(KU25Type {
+                    delagare: Some(false),
+                    inkomstar: "2022".into(),
+                    borttag: Some(true),
+                    avdragsgill_ranta: Some(1),
+                    totalt_inbetald_ranta: Some(2),
+                    betald_rantekompensation: Some(3),
+                    gemensamt_lan: Some(false),
+                    specifikationsnummer: 5,
+                    inkomsttagare: InkomsttagareKU25 {
+                        inkomsttagare: Some("191612299279".try_into().unwrap()),
+                        fornamn: Some("Test".into()),
+                        efternamn: Some("Testsson".into()),
+                        gatuadress: Some("Gata".into()),
+                        postnummer: Some("7456".into()),
+                        postort: Some("Postort".into()),
+                        landskod_postort: Some(Landskod::SE),
+                        fodelsetid: Some("20230106".into()),
+                        annat_id_nr: Some("202".into()),
+                        org_namn: Some("Organization".into()),
+                        gatuadress2: Some("Gata2".into()),
+                        fri_adress: Some("Storgatan 3".into()),
                     },
-                    blankettinnehall: KU25(KU25Type {
-                        delagare: Some(false),
-                        inkomstar: "2022".into(),
-                        borttag: Some(true),
-                        avdragsgill_ranta: Some(1),
-                        totalt_inbetald_ranta: Some(2),
-                        betald_rantekompensation: Some(3),
-                        gemensamt_lan: Some(false),
-                        specifikationsnummer: 5,
-                        inkomsttagare: InkomsttagareKU25 {
-                            inkomsttagare: Some("191612299279".try_into().unwrap()),
-                            fornamn: Some("Test".into()),
-                            efternamn: Some("Testsson".into()),
-                            gatuadress: Some("Gata".into()),
-                            postnummer: Some("7456".into()),
-                            postort: Some("Postort".into()),
-                            landskod_postort: Some(Landskod::SE),
-                            fodelsetid: Some("20230106".into()),
-                            annat_id_nr: Some("202".into()),
-                            org_namn: Some("Organization".into()),
-                            gatuadress2: Some("Gata2".into()),
-                            fri_adress: Some("Storgatan 3".into()),
-                        },
-                        uppgiftslamnare: UppgiftslamnareKU25 {
-                            uppgiftslamnar_id: "165599990602".into(),
-                            namn_uppgiftslamnare: Some("Foretag 1".into()),
-                        },
-                    }),
-                }
-            ],
+                    uppgiftslamnare: UppgiftslamnareKU25 {
+                        uppgiftslamnar_id: "165599990602".into(),
+                        namn_uppgiftslamnare: Some("Foretag 1".into()),
+                    },
+                }),
+            }],
         };
         let unparsed = to_string(&ku25).unwrap();
         let re_parsed = from_str(&*unparsed).unwrap();

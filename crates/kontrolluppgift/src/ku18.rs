@@ -1,6 +1,6 @@
-use std::borrow::Cow;
-use kontrolluppgift_macros::{KontrolluppgiftRead, KontrolluppgiftWrite};
 use crate::{IdentitetsbeteckningForPerson, Landskod};
+use kontrolluppgift_macros::{KontrolluppgiftRead, KontrolluppgiftWrite};
+use std::borrow::Cow;
 
 extern crate self as kontrolluppgift;
 
@@ -71,8 +71,12 @@ pub struct InkomsttagareKU18<'a> {
 
 #[cfg(test)]
 mod tests {
-    use crate::{*};
     use super::*;
+    use crate::KontrolluppgiftType::KU18;
+    use crate::{
+        from_str, to_string, Arendeinformation, Avsandare, Blankett, Blankettgemensamt,
+        Kontaktperson, Kontrolluppgift, TekniskKontaktperson, Uppgiftslamnare,
+    };
 
     #[test]
     fn ku18_is_parsed_to_and_back() {
@@ -89,44 +93,42 @@ mod tests {
                         ..Default::default()
                     },
                     ..Default::default()
-                }
+                },
             },
-            blanketter: vec![
-                Blankett {
-                    nummer: 0,
-                    arendeinformation: Arendeinformation {
-                        ..Default::default()
+            blanketter: vec![Blankett {
+                nummer: 0,
+                arendeinformation: Arendeinformation {
+                    ..Default::default()
+                },
+                blankettinnehall: KU18(KU18Type {
+                    avdragen_skatt: Some(1),
+                    ersattningskod: Some("405".into()),
+                    ersattning_belopp: Some(19),
+                    inkomstar: "2022".into(),
+                    borttag: Some(false),
+                    specifikationsnummer: 5,
+                    inkomsttagare: InkomsttagareKU18 {
+                        landskod_tin: Some(Landskod::SE),
+                        inkomsttagare: Some("191612299279".try_into().unwrap()),
+                        fornamn: Some("Test".into()),
+                        efternamn: Some("Testsson".into()),
+                        gatuadress: Some("Gata".into()),
+                        postnummer: Some("7456".into()),
+                        postort: Some("Postort".into()),
+                        landskod_postort: Some(Landskod::FI),
+                        fodelsetid: Some("20230106".into()),
+                        annat_id_nr: Some("202".into()),
+                        org_namn: Some("Organization".into()),
+                        gatuadress2: Some("Gata2".into()),
+                        fri_adress: Some("Storgatan 3".into()),
+                        tin: Some("Tin".into()),
                     },
-                    blankettinnehall: KU18(KU18Type {
-                        avdragen_skatt: Some(1),
-                        ersattningskod: Some("405".into()),
-                        ersattning_belopp: Some(19),
-                        inkomstar: "2022".into(),
-                        borttag: Some(false),
-                        specifikationsnummer: 5,
-                        inkomsttagare: InkomsttagareKU18 {
-                            landskod_tin: Some(Landskod::SE),
-                            inkomsttagare: Some("191612299279".try_into().unwrap()),
-                            fornamn: Some("Test".into()),
-                            efternamn: Some("Testsson".into()),
-                            gatuadress: Some("Gata".into()),
-                            postnummer: Some("7456".into()),
-                            postort: Some("Postort".into()),
-                            landskod_postort: Some(Landskod::FI),
-                            fodelsetid: Some("20230106".into()),
-                            annat_id_nr: Some("202".into()),
-                            org_namn: Some("Organization".into()),
-                            gatuadress2: Some("Gata2".into()),
-                            fri_adress: Some("Storgatan 3".into()),
-                            tin: Some("Tin".into()),
-                        },
-                        uppgiftslamnare: UppgiftslamnareKU18 {
-                            uppgiftslamnar_id: "165599990602".into(),
-                            namn_uppgiftslamnare: Some("Foretag 1".into()),
-                        },
-                    }),
-                }
-            ],
+                    uppgiftslamnare: UppgiftslamnareKU18 {
+                        uppgiftslamnar_id: "165599990602".into(),
+                        namn_uppgiftslamnare: Some("Foretag 1".into()),
+                    },
+                }),
+            }],
         };
         let unparsed = to_string(&ku18).unwrap();
         let re_parsed = from_str(&*unparsed).unwrap();

@@ -1,6 +1,6 @@
-use std::borrow::Cow;
-use kontrolluppgift_macros::{KontrolluppgiftRead, KontrolluppgiftWrite, KUStringEnum};
 use crate::{error, IdentitetsbeteckningForPerson, Landskod};
+use kontrolluppgift_macros::{KUStringEnum, KontrolluppgiftRead, KontrolluppgiftWrite};
+use std::borrow::Cow;
 
 extern crate self as kontrolluppgift;
 
@@ -68,7 +68,6 @@ pub struct KU14Type<'a> {
     pub uppgiftslamnare: UppgiftslamnareKU14<'a>,
 }
 
-
 #[derive(Debug, PartialEq, KontrolluppgiftRead, KontrolluppgiftWrite)]
 #[ku(name("UppgiftslamnareKU14"))]
 pub struct UppgiftslamnareKU14<'a> {
@@ -120,7 +119,7 @@ pub enum KU14Kategori {
     C,
     D,
     E,
-    F
+    F,
 }
 
 #[derive(Debug, PartialEq, KUStringEnum)]
@@ -132,8 +131,12 @@ pub enum KU14UtsandUnderTid {
 
 #[cfg(test)]
 mod tests {
-    use crate::{*};
-    use crate::ku14::*;
+    use super::*;
+    use crate::KontrolluppgiftType::KU14;
+    use crate::{
+        from_str, to_string, Arendeinformation, Avsandare, Blankett, Blankettgemensamt,
+        Kontaktperson, Kontrolluppgift, TekniskKontaktperson, Uppgiftslamnare,
+    };
 
     #[test]
     fn ku14_is_parsed_to_and_back() {
@@ -150,67 +153,65 @@ mod tests {
                         ..Default::default()
                     },
                     ..Default::default()
-                }
+                },
             },
-            blanketter: vec![
-                Blankett {
-                    nummer: 0,
-                    arendeinformation: Arendeinformation {
-                        ..Default::default()
-                    },
-                    blankettinnehall: KU14(KU14Type {
-                        kontant_bruttolon_mm: Some(1),
-                        forman_utom_bil_drivmedel: Some(2),
-                        bilforman_utom_drivmedel: Some(3),
-                        drivmedel_vid_bilforman: Some(4),
-                        andra_kostnadsers: Some(5),
-                        underlag_rutarbete: Some(6),
-                        underlag_rotarbete: Some(7),
-                        ers_m_egenavgifter: Some(8),
-                        tjanstepension: Some(9),
-                        ers_ej_soc_avg: Some(10),
-                        forsarskattenamnden: None,
-                        bostad_smahus: Some(true),
-                        bostad_ej_smahus: Some(false),
-                        forman_har_justerats: Some(true),
-                        forman_som_pension: Some(true),
-                        bilersattning:  Some(true),
-                        traktamente: Some(true),
-                        personaloption_forvarv_andel: Some(true),
-                        arbetsstallenummer: Some("12".into()),
-                        delagare: Some(false),
-                        landskod_arbetsland: Some("FI".into()),
-                        utsand_under_tid: Some(KU14UtsandUnderTid::A),
-                        kategori: Some(KU14Kategori::B),
-                        social_avgifts_avtal: Some(true),
-                        inkomstar: "2022".into(),
-                        borttag: Some(false),
+            blanketter: vec![Blankett {
+                nummer: 0,
+                arendeinformation: Arendeinformation {
+                    ..Default::default()
+                },
+                blankettinnehall: KU14(KU14Type {
+                    kontant_bruttolon_mm: Some(1),
+                    forman_utom_bil_drivmedel: Some(2),
+                    bilforman_utom_drivmedel: Some(3),
+                    drivmedel_vid_bilforman: Some(4),
+                    andra_kostnadsers: Some(5),
+                    underlag_rutarbete: Some(6),
+                    underlag_rotarbete: Some(7),
+                    ers_m_egenavgifter: Some(8),
+                    tjanstepension: Some(9),
+                    ers_ej_soc_avg: Some(10),
+                    forsarskattenamnden: None,
+                    bostad_smahus: Some(true),
+                    bostad_ej_smahus: Some(false),
+                    forman_har_justerats: Some(true),
+                    forman_som_pension: Some(true),
+                    bilersattning: Some(true),
+                    traktamente: Some(true),
+                    personaloption_forvarv_andel: Some(true),
+                    arbetsstallenummer: Some("12".into()),
+                    delagare: Some(false),
+                    landskod_arbetsland: Some("FI".into()),
+                    utsand_under_tid: Some(KU14UtsandUnderTid::A),
+                    kategori: Some(KU14Kategori::B),
+                    social_avgifts_avtal: Some(true),
+                    inkomstar: "2022".into(),
+                    borttag: Some(false),
 
-                        specifikationsnummer: 5,
-                        inkomsttagare: InkomsttagareKU14 {
-                            landskod_tin: Some(Landskod::SE),
-                            landskod_medborgare: Some(Landskod::FI),
-                            inkomsttagare: Some("191612299279".try_into().unwrap()),
-                            fornamn: Some("Test".into()),
-                            efternamn: Some("Testsson".into()),
-                            gatuadress: Some("Gata".into()),
-                            postnummer: Some("7456".into()),
-                            postort: Some("Postort".into()),
-                            landskod_postort: Some(Landskod::AF),
-                            fodelsetid: Some("20230106".into()),
-                            annat_id_nr: Some("202".into()),
-                            org_namn: Some("Organization".into()),
-                            gatuadress2: Some("Gata2".into()),
-                            fri_adress: Some("Storgatan 3".into()),
-                            tin: Some("Tin".into()),
-                        },
-                        uppgiftslamnare: UppgiftslamnareKU14 {
-                            uppgiftslamnar_id: "165599990602".into(),
-                            namn_uppgiftslamnare: Some("Foretag 1".into()),
-                        },
-                    }),
-                }
-            ],
+                    specifikationsnummer: 5,
+                    inkomsttagare: InkomsttagareKU14 {
+                        landskod_tin: Some(Landskod::SE),
+                        landskod_medborgare: Some(Landskod::FI),
+                        inkomsttagare: Some("191612299279".try_into().unwrap()),
+                        fornamn: Some("Test".into()),
+                        efternamn: Some("Testsson".into()),
+                        gatuadress: Some("Gata".into()),
+                        postnummer: Some("7456".into()),
+                        postort: Some("Postort".into()),
+                        landskod_postort: Some(Landskod::AF),
+                        fodelsetid: Some("20230106".into()),
+                        annat_id_nr: Some("202".into()),
+                        org_namn: Some("Organization".into()),
+                        gatuadress2: Some("Gata2".into()),
+                        fri_adress: Some("Storgatan 3".into()),
+                        tin: Some("Tin".into()),
+                    },
+                    uppgiftslamnare: UppgiftslamnareKU14 {
+                        uppgiftslamnar_id: "165599990602".into(),
+                        namn_uppgiftslamnare: Some("Foretag 1".into()),
+                    },
+                }),
+            }],
         };
         let unparsed = to_string(&ku14).unwrap();
         let re_parsed = from_str(&*unparsed).unwrap();

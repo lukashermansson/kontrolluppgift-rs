@@ -1,6 +1,6 @@
-use std::borrow::Cow;
-use kontrolluppgift_macros::{KontrolluppgiftRead, KontrolluppgiftWrite};
 use crate::{IdentitetsbeteckningForPerson, Landskod, NarfartFjarrfart};
+use kontrolluppgift_macros::{KontrolluppgiftRead, KontrolluppgiftWrite};
+use std::borrow::Cow;
 
 extern crate self as kontrolluppgift;
 
@@ -39,7 +39,6 @@ pub struct KU17Type<'a> {
     #[ku(name(b"UppgiftslamnareKU17"), required(true), inner_ty(true))]
     pub uppgiftslamnare: UppgiftslamnareKU17<'a>,
 }
-
 
 #[derive(Debug, PartialEq, KontrolluppgiftRead, KontrolluppgiftWrite)]
 #[ku(name("UppgiftslamnareKU17"))]
@@ -85,11 +84,14 @@ pub struct InkomsttagareKU17<'a> {
     pub tin: Option<Cow<'a, str>>,
 }
 
-
 #[cfg(test)]
 mod tests {
-    use crate::{*};
-    use crate::ku17::*;
+    use super::*;
+    use crate::KontrolluppgiftType::KU17;
+    use crate::{
+        from_str, to_string, Arendeinformation, Avsandare, Blankett, Blankettgemensamt,
+        Kontaktperson, Kontrolluppgift, TekniskKontaktperson, Uppgiftslamnare,
+    };
 
     #[test]
     fn ku17_is_parsed_to_and_back() {
@@ -106,52 +108,50 @@ mod tests {
                         ..Default::default()
                     },
                     ..Default::default()
-                }
+                },
             },
-            blanketter: vec![
-                Blankett {
-                    nummer: 0,
-                    arendeinformation: Arendeinformation {
-                        ..Default::default()
+            blanketter: vec![Blankett {
+                nummer: 0,
+                arendeinformation: Arendeinformation {
+                    ..Default::default()
+                },
+                blankettinnehall: KU17(KU17Type {
+                    kontant_bruttolon_mm: Some(1),
+                    forman_utom_bil_drivmedel: Some(2),
+                    fartygssignal: Some("TYPE".into()),
+                    antal_dagar_sjoinkomst: Some(8),
+                    narfart_fjarrfart: Some(NarfartFjarrfart::N),
+                    ers_ej_soc_avg: Some(10),
+                    arbetsstallenummer: Some("12".into()),
+                    delagare: Some(false),
+                    social_avgifts_avtal: Some(true),
+                    inkomstar: "2022".into(),
+                    borttag: Some(false),
+                    fartygets_namn: Some("Ship".into()),
+                    specifikationsnummer: 5,
+                    inkomsttagare: InkomsttagareKU17 {
+                        landskod_tin: Some(Landskod::SE),
+                        landskod_medborgare: Some(Landskod::SE),
+                        inkomsttagare: Some("191612299279".try_into().unwrap()),
+                        fornamn: Some("Test".into()),
+                        efternamn: Some("Testsson".into()),
+                        gatuadress: Some("Gata".into()),
+                        postnummer: Some("7456".into()),
+                        postort: Some("Postort".into()),
+                        landskod_postort: Some(Landskod::FI),
+                        fodelsetid: Some("20230106".into()),
+                        annat_id_nr: Some("202".into()),
+                        org_namn: Some("Organization".into()),
+                        gatuadress2: Some("Gata2".into()),
+                        fri_adress: Some("Storgatan 3".into()),
+                        tin: Some("Tin".into()),
                     },
-                    blankettinnehall: KU17(KU17Type {
-                        kontant_bruttolon_mm: Some(1),
-                        forman_utom_bil_drivmedel: Some(2),
-                        fartygssignal: Some("TYPE".into()),
-                        antal_dagar_sjoinkomst: Some(8),
-                        narfart_fjarrfart: Some(NarfartFjarrfart::N),
-                        ers_ej_soc_avg: Some(10),
-                        arbetsstallenummer: Some("12".into()),
-                        delagare: Some(false),
-                        social_avgifts_avtal: Some(true),
-                        inkomstar: "2022".into(),
-                        borttag: Some(false),
-                        fartygets_namn: Some("Ship".into()),
-                        specifikationsnummer: 5,
-                        inkomsttagare: InkomsttagareKU17 {
-                            landskod_tin: Some(Landskod::SE),
-                            landskod_medborgare: Some(Landskod::SE),
-                            inkomsttagare: Some("191612299279".try_into().unwrap()),
-                            fornamn: Some("Test".into()),
-                            efternamn: Some("Testsson".into()),
-                            gatuadress: Some("Gata".into()),
-                            postnummer: Some("7456".into()),
-                            postort: Some("Postort".into()),
-                            landskod_postort: Some(Landskod::FI),
-                            fodelsetid: Some("20230106".into()),
-                            annat_id_nr: Some("202".into()),
-                            org_namn: Some("Organization".into()),
-                            gatuadress2: Some("Gata2".into()),
-                            fri_adress: Some("Storgatan 3".into()),
-                            tin: Some("Tin".into()),
-                        },
-                        uppgiftslamnare: UppgiftslamnareKU17 {
-                            uppgiftslamnar_id: "165599990602".into(),
-                            namn_uppgiftslamnare: Some("Foretag 1".into()),
-                        },
-                    }),
-                }
-            ],
+                    uppgiftslamnare: UppgiftslamnareKU17 {
+                        uppgiftslamnar_id: "165599990602".into(),
+                        namn_uppgiftslamnare: Some("Foretag 1".into()),
+                    },
+                }),
+            }],
         };
         let unparsed = to_string(&ku17).unwrap();
         let re_parsed = from_str(&*unparsed).unwrap();

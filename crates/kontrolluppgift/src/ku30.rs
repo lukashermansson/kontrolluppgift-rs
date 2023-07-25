@@ -2,49 +2,31 @@ use crate::{IdentitetsbeteckningForPerson, Landskod};
 use kontrolluppgift_macros::{KontrolluppgiftRead, KontrolluppgiftWrite};
 use std::borrow::Cow;
 
-/// Kontrolluppgift 28
+/// Kontrolluppgift 30
 #[derive(Debug, PartialEq, KontrolluppgiftRead, KontrolluppgiftWrite)]
-#[ku(name("KU28"))]
-pub struct KU28Type<'a> {
-    #[ku(name(b"Delagare"), code("061"))]
-    pub delagare: Option<bool>,
+#[ku(name("KU30"))]
+pub struct KU30Type<'a> {
+    #[ku(name(b"AvdragenUtlandskSkatt"), code("002"))]
+    pub avdragen_utlandsk_skatt: Option<i32>,
     #[ku(name(b"Inkomstar"), code("203"), required(true))]
     pub inkomstar: Cow<'a, str>,
     #[ku(name(b"Borttag"), code("205"))]
     pub borttag: Option<bool>,
-    #[ku(name(b"UnderlagForInvesteraravdrag"), code("528"))]
-    pub underlag_for_investeraravdrag: Option<i32>,
-    #[ku(name(b"TotUnderlagInvesteraravdrag"), code("529"))]
-    pub tot_underlag_investeraravdrag: Option<i32>,
-    #[ku(name(b"Betalningsar"), code("530"))]
-    pub betalningsar: Option<Cow<'a, str>>,
-    #[ku(name(b"AterforingAvyttring"), code("531"))]
-    pub aterforing_avyttring: Option<bool>,
-    #[ku(name(b"AterforingUtflyttning"), code("532"))]
-    pub aterforing_utflyttning: Option<bool>,
-    #[ku(name(b"AterforingHogVardeoverforing"), code("533"))]
-    pub aterforing_hog_vardeoverforing: Option<bool>,
-    #[ku(name(b"AterforingInternaForvarv"), code("534"))]
-    pub aterforing_interna_forvarv: Option<bool>,
-    #[ku(name(b"DatumForvarv"), code("535"))]
-    pub datum_forvarv: Option<Cow<'a, str>>,
-    #[ku(name(b"Region"), code("536"))]
-    pub region: Option<Cow<'a, str>>,
-    #[ku(name(b"Verksamhetsomrade"), code("537"))]
-    pub verksamhetsomrade: Option<Cow<'a, str>>,
     #[ku(name(b"Specifikationsnummer"), code("570"), required(true))]
     pub specifikationsnummer: i32,
-    #[ku(name(b"InkomsttagareKU28"), required(true), inner_ty(true))]
-    pub inkomsttagare: InkomsttagareKU28<'a>,
-    #[ku(name(b"UppgiftslamnareKU28"), required(true), inner_ty(true))]
-    pub uppgiftslamnare: UppgiftslamnareKU28<'a>,
+    #[ku(name(b"Schablonintakt"), code("815"))]
+    pub schablonintakt: Option<i32>,
+    #[ku(name(b"Kontonummer"), code("817"))]
+    pub kontonummer: Option<Cow<'a, str>>,
+    #[ku(name(b"InkomsttagareKU30"), required(true), inner_ty(true))]
+    pub inkomsttagare: InkomsttagareKU30<'a>,
+    #[ku(name(b"UppgiftslamnareKU30"), required(true), inner_ty(true))]
+    pub uppgiftslamnare: UppgiftslamnareKU30<'a>,
 }
 
 #[derive(Debug, PartialEq, KontrolluppgiftRead, KontrolluppgiftWrite)]
-#[ku(name("InkomsttagareKU28"))]
-pub struct InkomsttagareKU28<'a> {
-    #[ku(name(b"LandskodTIN"), code("076"))]
-    pub landskod_tin: Option<Landskod>,
+#[ku(name("InkomsttagareKU30"))]
+pub struct InkomsttagareKU30<'a> {
     #[ku(name(b"Inkomsttagare"), code("215"))]
     pub inkomsttagare: Option<IdentitetsbeteckningForPerson<'a>>,
     #[ku(name(b"Fornamn"), code("216"))]
@@ -69,13 +51,11 @@ pub struct InkomsttagareKU28<'a> {
     pub gatuadress2: Option<Cow<'a, str>>,
     #[ku(name(b"FriAdress"), code("230"))]
     pub fri_adress: Option<Cow<'a, str>>,
-    #[ku(name(b"TIN"), code("252"))]
-    pub tin: Option<Cow<'a, str>>,
 }
 
 #[derive(Debug, PartialEq, KontrolluppgiftRead, KontrolluppgiftWrite)]
-#[ku(name("UppgiftslamnareKU28"))]
-pub struct UppgiftslamnareKU28<'a> {
+#[ku(name("UppgiftslamnareKU30"))]
+pub struct UppgiftslamnareKU30<'a> {
     #[ku(name(b"UppgiftslamnarId"), code("201"), required(true))]
     pub uppgiftslamnar_id: Cow<'a, str>,
     #[ku(name(b"NamnUppgiftslamnare"), code("202"))]
@@ -85,28 +65,15 @@ pub struct UppgiftslamnareKU28<'a> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::KontrolluppgiftType::KU28;
+    use crate::KontrolluppgiftType::KU30;
     use crate::{
         from_str, to_string, Arendeinformation, Avsandare, Blankett, Blankettgemensamt,
         Kontaktperson, Kontrolluppgift, Landskod, TekniskKontaktperson, Uppgiftslamnare,
     };
-    use std::fs;
 
     #[test]
-    fn ku28_is_read() {
-        let xml =
-            fs::read_to_string("./EXEMPELFIL KONTROLLUPPGIFT INVESTERARAVDRAG (KU28)_2022.xml")
-                .unwrap();
-
-        let parsed = from_str(&*xml).unwrap();
-        let unparsed = to_string(&parsed).unwrap();
-        let parsed2 = from_str(&*unparsed).unwrap();
-        assert_eq!(parsed, parsed2);
-    }
-
-    #[test]
-    fn ku28_is_parsed_to_and_back() {
-        let ku28 = Kontrolluppgift {
+    fn ku30_is_parsed_to_and_back() {
+        let ku30 = Kontrolluppgift {
             avsandare: Avsandare {
                 teknisk_kontaktperson: TekniskKontaktperson {
                     ..Default::default()
@@ -126,23 +93,14 @@ mod tests {
                 arendeinformation: Arendeinformation {
                     ..Default::default()
                 },
-                blankettinnehall: KU28(KU28Type {
-                    delagare: Some(false),
+                blankettinnehall: KU30(KU30Type {
+                    avdragen_utlandsk_skatt: Some(0),
                     inkomstar: "2022".into(),
                     borttag: Some(true),
-                    underlag_for_investeraravdrag: Some(1),
-                    tot_underlag_investeraravdrag: Some(2),
-                    betalningsar: Some("2023".into()),
-                    aterforing_avyttring: Some(true),
-                    aterforing_utflyttning: Some(false),
-                    aterforing_hog_vardeoverforing: Some(true),
-                    aterforing_interna_forvarv: Some(false),
-                    datum_forvarv: Some("2021-01-01".into()),
-                    region: Some("region".into()),
-                    verksamhetsomrade: Some("verksamhetsomrade".into()),
                     specifikationsnummer: 5,
-                    inkomsttagare: InkomsttagareKU28 {
-                        landskod_tin: Some(Landskod::AF),
+                    schablonintakt: Some(4),
+                    kontonummer: Some("5345345".into()),
+                    inkomsttagare: InkomsttagareKU30 {
                         inkomsttagare: Some("191612299279".try_into().unwrap()),
                         fornamn: Some("Test".into()),
                         efternamn: Some("Testsson".into()),
@@ -155,17 +113,16 @@ mod tests {
                         org_namn: Some("Organization".into()),
                         gatuadress2: Some("Gata2".into()),
                         fri_adress: Some("Storgatan 3".into()),
-                        tin: Some("Tin".into()),
                     },
-                    uppgiftslamnare: UppgiftslamnareKU28 {
+                    uppgiftslamnare: UppgiftslamnareKU30 {
                         uppgiftslamnar_id: "165599990602".into(),
                         namn_uppgiftslamnare: Some("Foretag 1".into()),
                     },
                 }),
             }],
         };
-        let unparsed = to_string(&ku28).unwrap();
+        let unparsed = to_string(&ku30).unwrap();
         let re_parsed = from_str(&*unparsed).unwrap();
-        assert_eq!(ku28, re_parsed);
+        assert_eq!(ku30, re_parsed);
     }
 }

@@ -1,21 +1,18 @@
+use quick_xml::events::attributes::AttrError;
+use quick_xml::utils::write_byte_string;
+use quick_xml::Error as QXMLError;
 use std::fmt;
 use std::fmt::{Debug, Formatter};
-use std::str::{Utf8Error};
-use std::sync::Arc;
 use std::io::Error as IoError;
-use quick_xml::events::attributes::AttrError;
-use quick_xml::{Error as QXMLError};
-use quick_xml::utils::write_byte_string;
+use std::str::Utf8Error;
+use std::sync::Arc;
 
 #[derive(Clone, Debug)]
 pub enum Error {
     Io(Arc<IoError>),
     NonDecodable(Option<Utf8Error>),
     UnexpectedEof(String),
-    EndEventMismatch {
-        expected: String,
-        found: String,
-    },
+    EndEventMismatch { expected: String, found: String },
     UnexpectedToken(String),
     UnexpectedBang(u8),
     TextNotFound,
@@ -23,38 +20,34 @@ pub enum Error {
     InvalidAttr(AttrError),
     EscapeError,
     UnknownPrefix(Vec<u8>),
-    MissingElement {
-        missing: String,
-        reading: String
-    },
-    EmptyDocType
+    MissingElement { missing: String, reading: String },
+    EmptyDocType,
 }
 
 impl From<QXMLError> for Error {
     fn from(value: QXMLError) -> Self {
-      match value {
-          QXMLError::Io(x) => Self::Io(x),
-          QXMLError::NonDecodable(x) => Self::NonDecodable(x),
-          QXMLError::UnexpectedEof(x) => Self::UnexpectedEof(x),
-          QXMLError::EndEventMismatch { expected, found} => Self::EndEventMismatch {
-              expected,
-              found,
-          },
-          QXMLError::UnexpectedToken(x) => Self::UnexpectedToken(x),
-          QXMLError::UnexpectedBang(x) => Self::UnexpectedBang(x),
-          QXMLError::TextNotFound => Self::TextNotFound,
-          QXMLError::XmlDeclWithoutVersion(x) => Self::XmlDeclWithoutVersion(x),
-          QXMLError::InvalidAttr(x) => Self::InvalidAttr(x),
-          QXMLError::EscapeError(_) =>Self::EscapeError,
-          QXMLError::UnknownPrefix(x) => Self::UnknownPrefix(x),
-          QXMLError::EmptyDocType => Self::EmptyDocType,
-      }
+        match value {
+            QXMLError::Io(x) => Self::Io(x),
+            QXMLError::NonDecodable(x) => Self::NonDecodable(x),
+            QXMLError::UnexpectedEof(x) => Self::UnexpectedEof(x),
+            QXMLError::EndEventMismatch { expected, found } => {
+                Self::EndEventMismatch { expected, found }
+            }
+            QXMLError::UnexpectedToken(x) => Self::UnexpectedToken(x),
+            QXMLError::UnexpectedBang(x) => Self::UnexpectedBang(x),
+            QXMLError::TextNotFound => Self::TextNotFound,
+            QXMLError::XmlDeclWithoutVersion(x) => Self::XmlDeclWithoutVersion(x),
+            QXMLError::InvalidAttr(x) => Self::InvalidAttr(x),
+            QXMLError::EscapeError(_) => Self::EscapeError,
+            QXMLError::UnknownPrefix(x) => Self::UnknownPrefix(x),
+            QXMLError::EmptyDocType => Self::EmptyDocType,
+        }
     }
 }
 
 impl From<AttrError> for Error {
     fn from(value: AttrError) -> Self {
-       Self::InvalidAttr(value)
+        Self::InvalidAttr(value)
     }
 }
 

@@ -1,8 +1,11 @@
-use proc_macro::{TokenStream};
-use syn::{Attribute, Data, DataEnum, DataStruct, DeriveInput, Error, Field, Fields, FieldsNamed, Ident, LitBool, LitByteStr, LitStr, parenthesized, parse_macro_input, Type, Variant};
-use quote::{quote};
+use proc_macro::TokenStream;
+use quote::quote;
 use syn::__private::Span;
 use syn::spanned::Spanned;
+use syn::{
+    parenthesized, parse_macro_input, Attribute, Data, DataEnum, DataStruct, DeriveInput, Error,
+    Field, Fields, FieldsNamed, Ident, LitBool, LitByteStr, LitStr, Type, Variant,
+};
 
 #[proc_macro_derive(KontrolluppgiftRead, attributes(ku))]
 pub fn read_macro(input: TokenStream) -> TokenStream {
@@ -10,9 +13,7 @@ pub fn read_macro(input: TokenStream) -> TokenStream {
 
     let name = ast.ident;
     let str_name = match parse_name_input(name.span(), ast.attrs) {
-        Ok(n) => {
-            n
-        }
+        Ok(n) => n,
         Err(e) => {
             return e.into_compile_error().into();
         }
@@ -20,23 +21,34 @@ pub fn read_macro(input: TokenStream) -> TokenStream {
 
     let fields = get_fields(ast.data);
 
-    let field_data: Result<Vec<(LitByteStr, Ident, Ident, Type, bool, Option<LitStr>, bool)>, Error> = fields.named.into_iter().enumerate().map(|(index, field)| {
-        let ret = parse_field_attribute_data(&field)?;
+    let field_data: Result<
+        Vec<(LitByteStr, Ident, Ident, Type, bool, Option<LitStr>, bool)>,
+        Error,
+    > = fields
+        .named
+        .into_iter()
+        .enumerate()
+        .map(|(index, field)| {
+            let ret = parse_field_attribute_data(&field)?;
 
-        let ident = field.ident.clone().ok_or_else(|| Error::new(field.span(), "Expected a named identifier"))?;
-        Ok((ret.name,
-            Ident::new(&format!("g_field_{}", index), ident.span()),
-            ident,
-            field.ty,
-            ret.required,
-            ret.code,
-            ret.is_inner_type))
-    }).collect();
+            let ident = field
+                .ident
+                .clone()
+                .ok_or_else(|| Error::new(field.span(), "Expected a named identifier"))?;
+            Ok((
+                ret.name,
+                Ident::new(&format!("g_field_{}", index), ident.span()),
+                ident,
+                field.ty,
+                ret.required,
+                ret.code,
+                ret.is_inner_type,
+            ))
+        })
+        .collect();
 
     match field_data {
-        Err(err) => {
-            err.to_compile_error().into()
-        }
+        Err(err) => err.to_compile_error().into(),
         Ok(field) => {
             let struct_assignments: Result<Vec<_>, Error> = field.iter().map(|(name, temp, og, _, req, _, _)| {
                 if *req {
@@ -55,34 +67,43 @@ pub fn read_macro(input: TokenStream) -> TokenStream {
 
             let struct_assignments = match struct_assignments {
                 Ok(res) => res,
-                Err(e) => return e.to_compile_error().into()
+                Err(e) => return e.to_compile_error().into(),
             };
 
-            let match_branches: Vec<_> = field.iter().map(|(name, temp, _, typ, _, code, is_inner)| {
-                if *is_inner {
-                    let Type::Path(type_path) = typ.clone() else { panic!("expected path") };
-                    let type_name = &type_path.path.segments.last().expect("Path should always be at least one element").ident;
-                    quote! {
-                        #name => { #temp = Some(#type_name::read(reader, &element)?) },
+            let match_branches: Vec<_> = field
+                .iter()
+                .map(|(name, temp, _, typ, _, code, is_inner)| {
+                    if *is_inner {
+                        let Type::Path(type_path) = typ.clone() else { panic!("expected path") };
+                        let type_name = &type_path
+                            .path
+                            .segments
+                            .last()
+                            .expect("Path should always be at least one element")
+                            .ident;
+                        quote! {
+                            #name => { #temp = Some(#type_name::read(reader, &element)?) },
+                        }
+                    } else if code.is_some() {
+                        quote! {
+                            #name => reader.read_node_into_with_code(element, #code, &mut #temp)?,
+                        }
+                    } else {
+                        quote! {
+                            #name => reader.read_node_into(element, &mut #temp)?,
+                        }
                     }
-                } else if code.is_some() {
+                })
+                .collect();
+
+            let variable_definitions: Vec<_> = field
+                .iter()
+                .map(|(_, temp, _, _, _, _, _)| {
                     quote! {
-                        #name => reader.read_node_into_with_code(element, #code, &mut #temp)?,
+                        let mut #temp = None;
                     }
-                } else {
-                    quote! {
-                        #name => reader.read_node_into(element, &mut #temp)?,
-                    }
-                }
-            }).collect();
-
-
-            let variable_definitions: Vec<_> = field.iter().map(|(_, temp, _, _, _, _, _)| {
-                quote! {
-                    let mut #temp = None;
-                }
-            }).collect();
-
+                })
+                .collect();
 
             // Build the output, possibly using quasi-quotation
             let expanded = quote! {
@@ -128,9 +149,7 @@ pub fn write_macro(input: TokenStream) -> TokenStream {
     let name = ast.ident;
 
     let str_name = match parse_name_input(name.span(), ast.attrs) {
-        Ok(n) => {
-            n
-        }
+        Ok(n) => n,
         Err(e) => {
             return e.into_compile_error().into();
         }
@@ -138,23 +157,30 @@ pub fn write_macro(input: TokenStream) -> TokenStream {
 
     let fields = get_fields(ast.data);
 
-    let field_data: Result<Vec<(String, Ident, Option<LitStr>, bool)>, Error> = fields.named.into_iter().map(|field| {
-        let ret = parse_field_attribute_data(&field)?;
+    let field_data: Result<Vec<(String, Ident, Option<LitStr>, bool)>, Error> = fields
+        .named
+        .into_iter()
+        .map(|field| {
+            let ret = parse_field_attribute_data(&field)?;
 
-        let ident = field.ident.clone().ok_or_else(|| Error::new(field.span(), "Expected a named field"))?;
+            let ident = field
+                .ident
+                .clone()
+                .ok_or_else(|| Error::new(field.span(), "Expected a named field"))?;
 
-        let name_str = String::from_utf8(ret.name.value()).map_err(|_| Error::new(field.span(), "the name is required to be valid utf-8"))?;
+            let name_str = String::from_utf8(ret.name.value())
+                .map_err(|_| Error::new(field.span(), "the name is required to be valid utf-8"))?;
 
-        Ok((name_str, ident, ret.code, ret.is_inner_type))
-    }).collect();
+            Ok((name_str, ident, ret.code, ret.is_inner_type))
+        })
+        .collect();
 
     match field_data {
-        Err(err) => {
-            err.to_compile_error().into()
-        }
+        Err(err) => err.to_compile_error().into(),
         Ok(field) => {
-            let write_operations: Vec<_> = field.iter().map(|(name, og, code, is_inner_type)| {
-                match code {
+            let write_operations: Vec<_> = field
+                .iter()
+                .map(|(name, og, code, is_inner_type)| match code {
                     None => {
                         if *is_inner_type {
                             quote! {
@@ -171,8 +197,8 @@ pub fn write_macro(input: TokenStream) -> TokenStream {
                             w.write_node_with_code(#name, #code, &self.#og)?;
                         }
                     }
-                }
-            }).collect();
+                })
+                .collect();
 
             let expanded = quote! {
                 impl<'a> crate::KontrolluppgiftWrite for #name<'a> {
@@ -196,11 +222,14 @@ pub fn write_macro(input: TokenStream) -> TokenStream {
 
 fn get_fields(data: Data) -> FieldsNamed {
     match data {
-        | Data::Enum(_) | Data::Union(_) => {
+        Data::Enum(_) | Data::Union(_) => {
             panic!("Only structs are suported")
         }
-        | Data::Struct(DataStruct { fields: Fields::Named(it), .. }) => it,
-        | Data::Struct(_) => {
+        Data::Struct(DataStruct {
+            fields: Fields::Named(it),
+            ..
+        }) => it,
+        Data::Struct(_) => {
             panic!("Not a named struct")
         }
     }
@@ -208,11 +237,11 @@ fn get_fields(data: Data) -> FieldsNamed {
 
 fn get_enum_fields(data: Data) -> Vec<Variant> {
     match data {
-        | Data::Enum(DataEnum { variants: it, .. }) => it.into_iter().collect(),
-        | Data::Union(_) => {
+        Data::Enum(DataEnum { variants: it, .. }) => it.into_iter().collect(),
+        Data::Union(_) => {
             panic!("Only enums are suported")
         }
-        | Data::Struct(_) => panic!("Not a enum"),
+        Data::Struct(_) => panic!("Not a enum"),
     }
 }
 
@@ -232,14 +261,13 @@ fn parse_name_input(span: Span, attrs: Vec<Attribute>) -> Result<LitStr, Error> 
                 Err(meta.error("Expected a name attribute on the struct #[ku(name(\"...\"))]"))
             })?;
         }
-    };
+    }
     match str_name {
-        None => {
-            Err(Error::new(span, "Expected a name attribute on the struct #[ku(name(\"...\"))]"))
-        }
-        Some(str_name) => {
-            Ok(str_name)
-        }
+        None => Err(Error::new(
+            span,
+            "Expected a name attribute on the struct #[ku(name(\"...\"))]",
+        )),
+        Some(str_name) => Ok(str_name),
     }
 }
 
@@ -284,7 +312,8 @@ fn parse_field_attribute_data(field: &Field) -> Result<FieldAttributeData, Error
         }
     }
 
-    let name = name.ok_or_else(|| Error::new(field.span(), "must have a name ku(name(b\"...\"))"))?;
+    let name =
+        name.ok_or_else(|| Error::new(field.span(), "must have a name ku(name(b\"...\"))"))?;
     Ok(FieldAttributeData {
         name,
         code,
@@ -292,7 +321,6 @@ fn parse_field_attribute_data(field: &Field) -> Result<FieldAttributeData, Error
         is_inner_type: is_inner_typ,
     })
 }
-
 
 struct FieldAttributeData {
     name: LitByteStr,
@@ -308,7 +336,10 @@ pub fn string_enum(input: TokenStream) -> TokenStream {
     let variants = get_enum_fields(ast.data);
 
     let name = ast.ident;
-    let stuff: Vec<_> = variants.into_iter().map(|e| (e.ident.clone(), e.ident.to_string())).collect();
+    let stuff: Vec<_> = variants
+        .into_iter()
+        .map(|e| (e.ident.clone(), e.ident.to_string()))
+        .collect();
     let strings: Vec<_> = stuff.iter().map(|e| &e.1).collect();
     let idents: Vec<_> = stuff.iter().map(|e| &e.0).collect();
 
@@ -361,16 +392,30 @@ pub fn variants_enum(input: TokenStream) -> TokenStream {
 
     let variants = get_enum_fields(ast.data);
 
-    let stuff: Vec<_> = variants.into_iter().map(|e| (e.ident.clone(), e.ident.to_string(), e.fields.into_iter().next().unwrap().ty)).collect();
-    let lits: Vec<_> = stuff.iter().map(|e| LitByteStr::new(&e.1.as_bytes(), Span::call_site())).collect();
+    let stuff: Vec<_> = variants
+        .into_iter()
+        .map(|e| {
+            (
+                e.ident.clone(),
+                e.ident.to_string(),
+                e.fields.into_iter().next().unwrap().ty,
+            )
+        })
+        .collect();
+    let lits: Vec<_> = stuff
+        .iter()
+        .map(|e| LitByteStr::new(&e.1.as_bytes(), Span::call_site()))
+        .collect();
     let idents: Vec<_> = stuff.iter().map(|e| &e.0).collect();
-    let types: Vec<_> = stuff.iter().map(|e| match &e.2 {
-        Type::Path(t) => (t.path.clone()).segments.last().unwrap().clone().ident,
-        _ => panic!()
-    }).collect();
+    let types: Vec<_> = stuff
+        .iter()
+        .map(|e| match &e.2 {
+            Type::Path(t) => (t.path.clone()).segments.last().unwrap().clone().ident,
+            _ => panic!(),
+        })
+        .collect();
 
     let expanded = quote! {
-
         impl<'a> KontrolluppgiftType<'a> {
             fn write<W: std::io::Write>(&self, w: &mut Writer<W>) -> Result<(), quick_xml::Error> {
                 match self {
@@ -383,27 +428,27 @@ pub fn variants_enum(input: TokenStream) -> TokenStream {
             }
         }
 
-
         impl<'a> KontrolluppgiftType<'a> {
-    fn read(reader: &mut NsReader<&'a [u8]>) -> Result<Option<Self>, Error> {
-        let mut blankettinnehall = None;
 
-        loop {
-            match reader.read_event()? {
-                Event::Start(element) => match element.local_name().as_ref() {
+            fn read(reader: &mut NsReader<&'a [u8]>) -> Result<Option<Self>, Error> {
+                let mut blankettinnehall = None;
+
+                loop {
+                    match reader.read_event()? {
+                        Event::Start(element) => match element.local_name().as_ref() {
                             #(#lits => {
-                                blankettinnehall = Some(#idents(#types::read(reader, &element)?));
-                                break
+                                blankettinnehall = Some(crate::KontrolluppgiftType::#idents(#types::read(reader, &element)?));
+                                break;
                             })*
-                    &_ => unexpected_element(&element)?
-                },
-                Event::End(_) => break,
-                _ => {}
+                            &_ => unexpected_element(&element)?
+                        },
+                        Event::End(_) => break,
+                        _ => {}
+                    }
+                }
+                return Ok(blankettinnehall)
             }
         }
-        return Ok(blankettinnehall)
-    }
-}
     };
     TokenStream::from(expanded)
 }

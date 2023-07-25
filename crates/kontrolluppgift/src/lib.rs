@@ -1,26 +1,20 @@
-pub mod ku20;
-pub mod ku13;
+pub mod error;
 pub mod ku10;
-pub mod ku25;
-pub mod ku28;
-pub mod ku21;
-pub mod ku26;
+pub mod ku13;
 pub mod ku14;
 pub mod ku16;
 pub mod ku17;
 pub mod ku18;
 pub mod ku19;
-pub mod error;
+pub mod ku20;
+pub mod ku21;
+pub mod ku25;
+pub mod ku26;
+pub mod ku28;
+pub mod ku30;
 
-use std::borrow::Cow;
-use std::io::Cursor;
-use quick_xml::{NsReader, Writer};
-use quick_xml::events::{BytesStart, BytesText, Event};
-use regex::Regex;
-use kontrolluppgift_macros::{KontrolluppgiftRead, KontrolluppgiftWrite, KUStringEnum, KUVariantsEnum};
 use crate::error::Error;
 use crate::error::Error::{MissingElement, NonDecodable};
-use crate::KontrolluppgiftType::{KU10, KU13, KU14, KU16, KU17, KU18, KU19, KU20, KU21, KU25, KU26, KU28};
 use crate::ku10::KU10Type;
 use crate::ku13::KU13Type;
 use crate::ku14::KU14Type;
@@ -29,11 +23,20 @@ use crate::ku17::KU17Type;
 use crate::ku18::KU18Type;
 use crate::ku19::KU19Type;
 use crate::ku20::KU20Type;
-use crate::ku25::KU25Type;
 use crate::ku21::KU21Type;
+use crate::ku25::KU25Type;
 use crate::ku26::KU26Type;
 use crate::ku28::KU28Type;
-
+use crate::ku30::KU30Type;
+use crate::KontrolluppgiftType::*;
+use kontrolluppgift_macros::{
+    KUStringEnum, KUVariantsEnum, KontrolluppgiftRead, KontrolluppgiftWrite,
+};
+use quick_xml::events::{BytesStart, BytesText, Event};
+use quick_xml::{NsReader, Writer};
+use regex::Regex;
+use std::borrow::Cow;
+use std::io::Cursor;
 
 #[derive(Debug, PartialEq)]
 pub struct Kontrolluppgift<'a> {
@@ -44,7 +47,9 @@ pub struct Kontrolluppgift<'a> {
 
 impl<'a> Kontrolluppgift<'a> {
     fn write<W: std::io::Write>(&self, w: &mut Writer<W>) -> Result<(), quick_xml::Error> {
-        w.write_event(Event::PI(BytesText::from_escaped("xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"")))?;
+        w.write_event(Event::PI(BytesText::from_escaped(
+            "xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"",
+        )))?;
         w.create_element("i:Skatteverket")
             .with_attribute(("xmlns:i", "http://xmls.skatteverket.se/se/skatteverket/ai/instans/infoForBeskattning/8.0"))
             .with_attribute(("xmlns", "http://xmls.skatteverket.se/se/skatteverket/ai/komponent/infoForBeskattning/8.0"))
@@ -94,10 +99,11 @@ impl<'a> Blankett<'a> {
             .with_attribute(("nummer", self.nummer.to_string().as_ref()))
             .write_inner_content(|w| {
                 self.arendeinformation.write(w)?;
-                w.create_element("Blankettinnehall").write_inner_content(|w| {
-                    self.blankettinnehall.write(w)?;
-                    Ok(())
-                })?;
+                w.create_element("Blankettinnehall")
+                    .write_inner_content(|w| {
+                        self.blankettinnehall.write(w)?;
+                        Ok(())
+                    })?;
                 Ok(())
             })?;
         Ok(())
@@ -118,6 +124,7 @@ pub enum KontrolluppgiftType<'a> {
     KU25(KU25Type<'a>),
     KU26(KU26Type<'a>),
     KU28(KU28Type<'a>),
+    KU30(KU30Type<'a>),
 }
 
 #[derive(Debug, Default, PartialEq, KontrolluppgiftRead, KontrolluppgiftWrite)]
@@ -143,7 +150,6 @@ pub struct Kontaktperson<'a> {
     #[ku(name(b"Sakomrade"))]
     pub sakomrade: Option<Cow<'a, str>>,
 }
-
 
 #[derive(Debug, Default, PartialEq, KontrolluppgiftRead, KontrolluppgiftWrite)]
 #[ku(name("Avsandare"))]
@@ -194,24 +200,24 @@ pub fn from_str(str: &str) -> Result<Kontrolluppgift, Error> {
                 b"Skatteverket" => {
                     //Noop just becuase of the way its structured
                 }
-                b"Avsandare" => {
-                    g_avsandare = Some(Avsandare::read(&mut reader, &element)?)
-                }
+                b"Avsandare" => g_avsandare = Some(Avsandare::read(&mut reader, &element)?),
                 b"Blankettgemensamt" => {
                     blankettgemensamt = Some(Blankettgemensamt::read(&mut reader, &element)?)
                 }
-                b"Blankett" => {
-                    blanketter.push(Blankett::read(&mut reader, &element)?)
-                }
-                _ => unexpected_element(&element)?
+                b"Blankett" => blanketter.push(Blankett::read(&mut reader, &element)?),
+                _ => unexpected_element(&element)?,
             },
             Event::End(element) => {
                 if element.local_name().as_ref() == b"Skatteverket" {
                     return Ok(Kontrolluppgift {
-                        avsandare: g_avsandare
-                            .ok_or_else(|| MissingElement { missing: "Avsandare".into(), reading: "Skatteverket".into() })?,
-                        blankettgemensamt: blankettgemensamt
-                            .ok_or_else(|| MissingElement { missing: "Blankettgemensamt".into(), reading: "Skatteverket".into() })?,
+                        avsandare: g_avsandare.ok_or_else(|| MissingElement {
+                            missing: "Avsandare".into(),
+                            reading: "Skatteverket".into(),
+                        })?,
+                        blankettgemensamt: blankettgemensamt.ok_or_else(|| MissingElement {
+                            missing: "Blankettgemensamt".into(),
+                            reading: "Skatteverket".into(),
+                        })?,
                         blanketter,
                     });
                 }
@@ -242,8 +248,14 @@ impl<'a> Blankett<'a> {
             let a = attr_result?;
 
             if let b"nummer" = a.key.as_ref() {
-                nummer = Some(a.decode_and_unescape_value(reader)?
-                    .parse::<i64>().map_err(|_| MissingElement { missing: "nummer".into(), reading: "Blankett".into() })?)
+                nummer = Some(
+                    a.decode_and_unescape_value(reader)?
+                        .parse::<i64>()
+                        .map_err(|_| MissingElement {
+                            missing: "nummer".into(),
+                            reading: "Blankett".into(),
+                        })?,
+                )
             }
         }
         loop {
@@ -255,17 +267,23 @@ impl<'a> Blankett<'a> {
                     b"Blankettinnehall" => {
                         blankettinnehall = KontrolluppgiftType::read(reader)?;
                     }
-                    &_ => unexpected_element(&element)?
-                }
+                    &_ => unexpected_element(&element)?,
+                },
                 Event::End(element) => {
                     if element.name() == tag.name() {
                         return Ok(Self {
-                            nummer: nummer
-                                .ok_or_else(|| MissingElement { missing: "nummer".into(), reading: "Blankett".into() })?,
-                            arendeinformation: arendeinformation
-                                .ok_or_else(|| MissingElement { missing: "Arendeinformation".into(), reading: "Blankett".into() })?,
-                            blankettinnehall: blankettinnehall
-                                .ok_or_else(|| MissingElement { missing: "Blankettinnehall".into(), reading: "Blankett".into() })?,
+                            nummer: nummer.ok_or_else(|| MissingElement {
+                                missing: "nummer".into(),
+                                reading: "Blankett".into(),
+                            })?,
+                            arendeinformation: arendeinformation.ok_or_else(|| MissingElement {
+                                missing: "Arendeinformation".into(),
+                                reading: "Blankett".into(),
+                            })?,
+                            blankettinnehall: blankettinnehall.ok_or_else(|| MissingElement {
+                                missing: "Blankettinnehall".into(),
+                                reading: "Blankett".into(),
+                            })?,
                         });
                     }
                 }
@@ -289,46 +307,79 @@ pub enum DeError {
 }
 
 trait KontrolluppgiftRead<'a> {
-    fn read(reader: &mut NsReader<&'a [u8]>, tag: &BytesStart) -> Result<Self, Error> where Self: Sized;
+    fn read(reader: &mut NsReader<&'a [u8]>, tag: &BytesStart) -> Result<Self, Error>
+    where
+        Self: Sized;
 }
 
 trait KontrolluppgiftWrite {
-    fn write<W>(&self, w: &mut Writer<W>) -> Result<(), quick_xml::Error> where W: std::io::Write;
+    fn write<W>(&self, w: &mut Writer<W>) -> Result<(), quick_xml::Error>
+    where
+        W: std::io::Write;
 }
 
 fn unexpected_element<E>(element: &BytesStart) -> Result<E, Error> {
-    Err(Error::UnexpectedToken(std::str::from_utf8(element.name().as_ref())
-        .map_err(|e| NonDecodable(Some(e)))?.into()))
+    Err(Error::UnexpectedToken(
+        std::str::from_utf8(element.name().as_ref())
+            .map_err(|e| NonDecodable(Some(e)))?
+            .into(),
+    ))
 }
 
-trait Write<'a, T> where T: Writable {
+trait Write<'a, T>
+where
+    T: Writable,
+{
     fn write_node(&mut self, name: &str, data: T) -> Result<(), quick_xml::Error>;
-    fn write_node_with_code(&mut self, name: &str, code: &str, data: T) -> Result<(), quick_xml::Error>;
+    fn write_node_with_code(
+        &mut self,
+        name: &str,
+        code: &str,
+        data: T,
+    ) -> Result<(), quick_xml::Error>;
 }
 
-trait Reader<'a, 'b, T> where T: Readable<'a, 'b> {
+trait Reader<'a, 'b, T>
+where
+    T: Readable<'a, 'b>,
+{
     fn read_node_into(&mut self, element: BytesStart, x: &mut Option<T>) -> Result<(), Error>;
-    fn read_node_into_with_code(&mut self, element: BytesStart, code: &str, x: &mut Option<T>) -> Result<(), Error>;
+    fn read_node_into_with_code(
+        &mut self,
+        element: BytesStart,
+        code: &str,
+        x: &mut Option<T>,
+    ) -> Result<(), Error>;
 }
 
-impl<'a, 'b : 'a, T: Readable<'a, 'b> + 'b> Reader<'a, 'b, T> for NsReader<&'b [u8]> {
+impl<'a, 'b: 'a, T: Readable<'a, 'b> + 'b> Reader<'a, 'b, T> for NsReader<&'b [u8]> {
     fn read_node_into(&mut self, element: BytesStart, x: &mut Option<T>) -> Result<(), Error> {
         *x = Some(T::get_str(self.read_text(element.name())?)?);
         Ok(())
     }
 
-    fn read_node_into_with_code(&mut self, element: BytesStart, code: &str, x: &mut Option<T>) -> Result<(), Error> {
+    fn read_node_into_with_code(
+        &mut self,
+        element: BytesStart,
+        code: &str,
+        x: &mut Option<T>,
+    ) -> Result<(), Error> {
         let element_name = element.name();
-        let element_name = std::str::from_utf8(element_name.as_ref())
-            .map_err(|e| NonDecodable(Some(e)))?;
-        let kod = element.try_get_attribute("faltkod")?
-            .ok_or_else(|| MissingElement { missing: "faltkod".into(), reading: element_name.into() })?;
+        let element_name =
+            std::str::from_utf8(element_name.as_ref()).map_err(|e| NonDecodable(Some(e)))?;
+        let kod = element
+            .try_get_attribute("faltkod")?
+            .ok_or_else(|| MissingElement {
+                missing: "faltkod".into(),
+                reading: element_name.into(),
+            })?;
 
         let kod = kod.decode_and_unescape_value(self)?;
         if code != kod {
-            return Err(Error::UnexpectedToken(
-                format!("Unexpected faltkod on {}, expected: {}, got: {}",
-                        element_name, code, kod)));
+            return Err(Error::UnexpectedToken(format!(
+                "Unexpected faltkod on {}, expected: {}, got: {}",
+                element_name, code, kod
+            )));
         }
         *x = Some(T::get_str(self.read_text(element.name())?)?);
         Ok(())
@@ -339,21 +390,23 @@ impl<'a, T: Writable, W: std::io::Write> Write<'a, T> for Writer<W> {
     fn write_node(&mut self, name: &str, data: T) -> Result<(), quick_xml::Error> {
         let str = data.get_str();
         match str {
-            None => {
-                Ok(())
-            }
+            None => Ok(()),
             Some(data) => {
-                self.create_element(name).write_text_content(BytesText::new(&data))?;
+                self.create_element(name)
+                    .write_text_content(BytesText::new(&data))?;
                 Ok(())
             }
         }
     }
-    fn write_node_with_code(&mut self, name: &str, code: &str, data: T) -> Result<(), quick_xml::Error> {
+    fn write_node_with_code(
+        &mut self,
+        name: &str,
+        code: &str,
+        data: T,
+    ) -> Result<(), quick_xml::Error> {
         let str = data.get_str();
         match str {
-            None => {
-                Ok(())
-            }
+            None => Ok(()),
             Some(data) => {
                 self.create_element(name)
                     .with_attribute(("faltkod", code))
@@ -364,13 +417,14 @@ impl<'a, T: Writable, W: std::io::Write> Write<'a, T> for Writer<W> {
     }
 }
 
-
 pub(crate) trait Writable {
     fn get_str(&self) -> Option<String>;
 }
 
 pub(crate) trait Readable<'a, 'b> {
-    fn get_str(data: Cow<'a, str>) -> Result<Self, Error> where Self: Sized + 'b;
+    fn get_str(data: Cow<'a, str>) -> Result<Self, Error>
+    where
+        Self: Sized + 'b;
 }
 
 impl<'a, 'b> Readable<'a, 'b> for bool {
@@ -378,34 +432,44 @@ impl<'a, 'b> Readable<'a, 'b> for bool {
         match data.as_ref() {
             "0" => Ok(false),
             "1" => Ok(true),
-            &_ => Err(Error::UnexpectedToken(format!("expected KryssTyp, found: {}", &data)))
+            &_ => Err(Error::UnexpectedToken(format!(
+                "expected KryssTyp, found: {}",
+                &data
+            ))),
         }
     }
 }
 
 impl<'a, 'b> Readable<'a, 'b> for i32 {
     fn get_str(data: Cow<str>) -> Result<Self, Error> {
-        data.as_ref().parse().map_err(|_| Error::UnexpectedToken(format!("expected number got: {}", &data)))
+        data.as_ref()
+            .parse()
+            .map_err(|_| Error::UnexpectedToken(format!("expected number got: {}", &data)))
     }
 }
 
 impl<'a, 'b> Readable<'a, 'b> for f32 {
     fn get_str(data: Cow<str>) -> Result<Self, Error> {
-        data.as_ref().parse().map_err(|_| Error::UnexpectedToken(format!("expected fraction got: {}", &data)))
+        data.as_ref()
+            .parse()
+            .map_err(|_| Error::UnexpectedToken(format!("expected fraction got: {}", &data)))
     }
 }
 
-impl<'a, 'b : 'a> Readable<'a, 'b> for Cow<'a, str> {
+impl<'a, 'b: 'a> Readable<'a, 'b> for Cow<'a, str> {
     fn get_str(data: Cow<'b, str>) -> Result<Self, Error> {
         Ok(data)
     }
 }
 
-impl<T> Writable for &Option<T> where T: Writable {
+impl<T> Writable for &Option<T>
+where
+    T: Writable,
+{
     fn get_str(&self) -> Option<String> {
         match self {
             None => None,
-            Some(v) => v.get_str()
+            Some(v) => v.get_str(),
         }
     }
 }
@@ -438,7 +502,7 @@ impl Writable for bool {
     fn get_str(&self) -> Option<String> {
         Some(match *self {
             true => "1".into(),
-            false => "0".into()
+            false => "0".into(),
         })
     }
 }
@@ -713,9 +777,11 @@ pub enum Landskod {
 #[derive(Debug, PartialEq)]
 pub struct IdentitetsbeteckningForPerson<'a>(Cow<'a, str>);
 
-impl<'a, 'b : 'a> Readable<'a, 'b> for IdentitetsbeteckningForPerson<'a> {
+impl<'a, 'b: 'a> Readable<'a, 'b> for IdentitetsbeteckningForPerson<'a> {
     fn get_str(data: Cow<'b, str>) -> Result<Self, Error> {
-        data.as_ref().try_into().map_err(|e : &str| Error::UnexpectedToken(e.to_string()))
+        data.as_ref()
+            .try_into()
+            .map_err(|e: &str| Error::UnexpectedToken(e.to_string()))
     }
 }
 
@@ -725,11 +791,13 @@ impl TryFrom<&str> for IdentitetsbeteckningForPerson<'_> {
     fn try_from(value: &str) -> Result<Self, Self::Error> {
         let person_nr_regex = Regex::new(r"((((18|19|20)[0-9][0-9])(((01|03|05|07|08|10|12)(0[1-9]|1[0-9]|2[0-9]|3[0-1]))|((04|06|09|11)(0[1-9]|1[0-9]|2[0-9]|30))|((02)(0[1-9]|1[0-9]|2[0-8]))))|(((18|19|20)(04|08|12|16|20|24|28|32|36|40|44|48|52|56|60|64|68|72|76|80|84|88|92|96)(0229))|(20000229)))(00[1-9]|0[1-9][0-9]|[1-9][0-9][0-9])[0-9]").expect("These are constructed and should be valid");
         let samordnings_nr_regex = Regex::new(r"((((18|19|20)[0-9][0-9])(((01|03|05|07|08|10|12)(6[1-9]|7[0-9]|8[0-9]|9[0-1]))|((04|06|09|11)(6[1-9]|7[0-9]|8[0-9]|90))|((02)(6[1-9]|7[0-9]|8[0-8]))))|(((18|19|20)(04|08|12|16|20|24|28|32|36|40|44|48|52|56|60|64|68|72|76|80|84|88|92|96)(0289))|(20000289)))(00[1-9]|0[1-9][0-9]|[1-9][0-9][0-9])[0-9]").expect("These are constructed and should be valid");
-        let org_nr_regex = Regex::new(r"16\d{2}[2-9]\d{7}").expect("These are constructed and should be valid");
+        let org_nr_regex =
+            Regex::new(r"16\d{2}[2-9]\d{7}").expect("These are constructed and should be valid");
 
-        if person_nr_regex.is_match(value) ||
-            samordnings_nr_regex.is_match(value) ||
-            org_nr_regex.is_match(value) {
+        if person_nr_regex.is_match(value)
+            || samordnings_nr_regex.is_match(value)
+            || org_nr_regex.is_match(value)
+        {
             return Ok(IdentitetsbeteckningForPerson(Cow::Owned(value.to_string())));
         }
         return Err("Not valid Identitetsbeteckning");

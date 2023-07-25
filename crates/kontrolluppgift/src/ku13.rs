@@ -1,6 +1,6 @@
-use std::borrow::Cow;
-use kontrolluppgift_macros::{KontrolluppgiftRead, KontrolluppgiftWrite};
 use crate::{IdentitetsbeteckningForPerson, Landskod};
+use kontrolluppgift_macros::{KontrolluppgiftRead, KontrolluppgiftWrite};
+use std::borrow::Cow;
 
 extern crate self as kontrolluppgift;
 
@@ -48,7 +48,6 @@ pub struct KU13Type<'a> {
     pub uppgiftslamnare: UppgiftslamnareKU13<'a>,
 }
 
-
 #[derive(Debug, PartialEq, KontrolluppgiftRead, KontrolluppgiftWrite)]
 #[ku(name("UppgiftslamnareKU13"))]
 pub struct UppgiftslamnareKU13<'a> {
@@ -93,12 +92,14 @@ pub struct InkomsttagareKU13<'a> {
     pub tin: Option<Cow<'a, str>>,
 }
 
-
 #[cfg(test)]
 mod tests {
-    use crate::{*};
-    use crate::KontrolluppgiftType::{KU13};
-    use crate::ku13::*;
+    use super::*;
+    use crate::KontrolluppgiftType::KU13;
+    use crate::{
+        from_str, to_string, Arendeinformation, Avsandare, Blankett, Blankettgemensamt,
+        Kontaktperson, Kontrolluppgift, TekniskKontaktperson, Uppgiftslamnare,
+    };
 
     #[test]
     fn ku13_is_parsed_to_and_back() {
@@ -115,57 +116,55 @@ mod tests {
                         ..Default::default()
                     },
                     ..Default::default()
-                }
+                },
             },
-            blanketter: vec![
-                Blankett {
-                    nummer: 0,
-                    arendeinformation: Arendeinformation {
-                        ..Default::default()
-                    },
-                    blankettinnehall: KU13(KU13Type {
-                        kontant_bruttolon_mm: Some(1),
-                        forman_utom_bil_drivmedel: Some(2),
-                        bilforman_utom_drivmedel: Some(3),
-                        drivmedel_vid_bilforman: Some(4),
-                        tjanstepension: Some(9),
-                        ers_ej_soc_avg: Some(10),
-                        ers_forman_bostad_mm_sink: Some(20),
-                        bostad_smahus: Some(true),
-                        bostad_ej_smahus: Some(false),
-                        forman_har_justerats: Some(true),
-                        personaloption_forvarv_andel: Some(true),
-                        arbetsstallenummer: Some("12".into()),
-                        delagare: Some(false),
-                        social_avgifts_avtal: Some(true),
-                        inkomstar: "2022".into(),
-                        borttag: Some(false),
+            blanketter: vec![Blankett {
+                nummer: 0,
+                arendeinformation: Arendeinformation {
+                    ..Default::default()
+                },
+                blankettinnehall: KU13(KU13Type {
+                    kontant_bruttolon_mm: Some(1),
+                    forman_utom_bil_drivmedel: Some(2),
+                    bilforman_utom_drivmedel: Some(3),
+                    drivmedel_vid_bilforman: Some(4),
+                    tjanstepension: Some(9),
+                    ers_ej_soc_avg: Some(10),
+                    ers_forman_bostad_mm_sink: Some(20),
+                    bostad_smahus: Some(true),
+                    bostad_ej_smahus: Some(false),
+                    forman_har_justerats: Some(true),
+                    personaloption_forvarv_andel: Some(true),
+                    arbetsstallenummer: Some("12".into()),
+                    delagare: Some(false),
+                    social_avgifts_avtal: Some(true),
+                    inkomstar: "2022".into(),
+                    borttag: Some(false),
 
-                        specifikationsnummer: 5,
-                        inkomsttagare: InkomsttagareKU13 {
-                            landskod_tin: Some(Landskod::SE),
-                            landskod_medborgare: Some(Landskod::SE),
-                            inkomsttagare: Some("191612299279".try_into().unwrap()),
-                            fornamn: Some("Test".into()),
-                            efternamn: Some("Testsson".into()),
-                            gatuadress: Some("Gata".into()),
-                            postnummer: Some("7456".into()),
-                            postort: Some("Postort".into()),
-                            landskod_postort: Some(Landskod::FI),
-                            fodelsetid: Some("20230106".into()),
-                            annat_id_nr: Some("202".into()),
-                            org_namn: Some("Organization".into()),
-                            gatuadress2: Some("Gata2".into()),
-                            fri_adress: Some("Storgatan 3".into()),
-                            tin: Some("Tin".into()),
-                        },
-                        uppgiftslamnare: UppgiftslamnareKU13 {
-                            uppgiftslamnar_id: "165599990602".into(),
-                            namn_uppgiftslamnare: Some("Foretag 1".into()),
-                        },
-                    }),
-                }
-            ],
+                    specifikationsnummer: 5,
+                    inkomsttagare: InkomsttagareKU13 {
+                        landskod_tin: Some(Landskod::SE),
+                        landskod_medborgare: Some(Landskod::SE),
+                        inkomsttagare: Some("191612299279".try_into().unwrap()),
+                        fornamn: Some("Test".into()),
+                        efternamn: Some("Testsson".into()),
+                        gatuadress: Some("Gata".into()),
+                        postnummer: Some("7456".into()),
+                        postort: Some("Postort".into()),
+                        landskod_postort: Some(Landskod::FI),
+                        fodelsetid: Some("20230106".into()),
+                        annat_id_nr: Some("202".into()),
+                        org_namn: Some("Organization".into()),
+                        gatuadress2: Some("Gata2".into()),
+                        fri_adress: Some("Storgatan 3".into()),
+                        tin: Some("Tin".into()),
+                    },
+                    uppgiftslamnare: UppgiftslamnareKU13 {
+                        uppgiftslamnar_id: "165599990602".into(),
+                        namn_uppgiftslamnare: Some("Foretag 1".into()),
+                    },
+                }),
+            }],
         };
         let unparsed = to_string(&ku13).unwrap();
         let re_parsed = from_str(&*unparsed).unwrap();
