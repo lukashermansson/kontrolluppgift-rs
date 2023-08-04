@@ -12,6 +12,7 @@ pub mod ku25;
 pub mod ku26;
 pub mod ku28;
 pub mod ku30;
+pub mod ku31;
 
 use crate::error::Error;
 use crate::error::Error::{MissingElement, NonDecodable};
@@ -36,7 +37,13 @@ use quick_xml::events::{BytesStart, BytesText, Event};
 use quick_xml::{NsReader, Writer};
 use regex::Regex;
 use std::borrow::Cow;
+use std::fmt;
+use std::fmt::{Display, Formatter};
 use std::io::Cursor;
+use std::str::FromStr;
+use time::{Date, format_description};
+use time::error::Parse;
+use crate::ku31::KU31Type;
 
 #[derive(Debug, PartialEq)]
 pub struct Kontrolluppgift<'a> {
@@ -125,6 +132,7 @@ pub enum KontrolluppgiftType<'a> {
     KU26(KU26Type<'a>),
     KU28(KU28Type<'a>),
     KU30(KU30Type<'a>),
+    KU31(KU31Type<'a>),
 }
 
 #[derive(Debug, Default, PartialEq, KontrolluppgiftRead, KontrolluppgiftWrite)]
@@ -448,6 +456,14 @@ impl<'a, 'b> Readable<'a, 'b> for i32 {
     }
 }
 
+impl<'a, 'b> Readable<'a, 'b> for KUDate {
+    fn get_str(data: Cow<str>) -> Result<Self, Error> {
+        data.as_ref()
+            .parse()
+            .map_err(|e| Error::UnexpectedToken(format!("expected date got: {}", &e)))
+    }
+}
+
 impl<'a, 'b> Readable<'a, 'b> for f32 {
     fn get_str(data: Cow<str>) -> Result<Self, Error> {
         data.as_ref()
@@ -512,6 +528,67 @@ impl<'a> Writable for &Cow<'a, str> {
         Some(self.to_string())
     }
 }
+impl Writable for KUDate {
+    fn get_str(&self) -> Option<String> {
+
+        Some(self.to_string())
+    }
+}
+
+// based on regex: ((19|20)[0-9][0-9](((01|03|05|07|08|10|12)(0[1-9]|1[0-9]|2[0-9]|3[0-1]))|((04|06|09|11)(0[1-9]|1[0-9]|2[0-9]|30))|((02)(0[1-9]|1[0-9]|2[0-8]))))|((19|20)(04|08|12|16|20|24|28|32|36|40|44|48|52|56|60|64|68|72|76|80|84|88|92|96)(0229))|(20000229)
+#[derive(Debug, Clone, PartialEq)]
+pub struct KUDate(Date);
+
+impl Display for KUDate {
+    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
+        let format = format_description::parse("[year][month][day]").expect("this pattern should be valid");
+        f.write_str(&*self.0.format(&format).unwrap())
+    }
+}
+
+impl FromStr for KUDate {
+    type Err = KUDateError;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        let format = format_description::parse("[year][month][day]").expect("this format is supposed to be valid");
+        let date = Date::parse(s, &format).map_err(|p| KUDateError::CouldNotBeParsed(p))?;
+        KUDate::from_date(date).map_err(|e| KUDateError::YearOutOfRange(e))
+    }
+}
+
+#[derive(Debug)]
+pub enum KUDateError {
+    CouldNotBeParsed(Parse),
+    YearOutOfRange(YearOutOfRangeError)
+}
+
+impl KUDate {
+    pub fn from_date(date: Date) -> Result<Self, YearOutOfRangeError>{
+        return if let 1900..=2099 = date.year()  {
+            Ok(KUDate(date))
+        } else {
+            Err(YearOutOfRangeError(date.year()))
+        }
+    }
+}
+#[derive(Debug, Clone)]
+pub struct YearOutOfRangeError(i32);
+
+impl Display for YearOutOfRangeError {
+    fn fmt(&self, f: &mut Formatter) -> fmt::Result {
+        write!(f, "year out of range to be represented in a kontrolluppgift {}, available years: 1900-2099", self.0)
+    }
+}
+
+impl Display for KUDateError {
+    fn fmt(&self, f: &mut Formatter) -> fmt::Result {
+        match self {
+            KUDateError::CouldNotBeParsed(e) => write!(f, "{}", e),
+            KUDateError::YearOutOfRange(e) => write!(f, "{}", e)
+        }
+    }
+}
+
 
 #[derive(Debug, PartialEq, KUStringEnum)]
 pub enum NarfartFjarrfart {
