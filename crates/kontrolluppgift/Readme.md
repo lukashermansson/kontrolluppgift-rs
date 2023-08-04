@@ -27,7 +27,7 @@ the current status of implementation of the "Kontrolluppgift" variants is:
 -  [X] KU26
 -  [x] KU28
 -  [x] KU30
--  [ ] KU31
+-  [x] KU31
 -  [ ] KU32
 -  [ ] KU34
 -  [ ] KU35
