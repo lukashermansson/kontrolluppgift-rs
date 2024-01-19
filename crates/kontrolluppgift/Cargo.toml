@@ -8,7 +8,8 @@ repository = "https://github.com/lukashermansson/kontrolluppgift"
 keywords = ["skatteverket", "deserialization", "serialization"]
 
 [dependencies]
-quick-xml = { version = "0.30.0"}
+quick-xml = { version = "0.31.0"}
 kontrolluppgift_macros = { path = "../kontrolluppgift_macros", version= "0.4.0"}
 regex = "1.8.4"
 time = { version = "0.3.25", features = ["parsing", "formatting"] }
+chrono = { version = "0.4"}

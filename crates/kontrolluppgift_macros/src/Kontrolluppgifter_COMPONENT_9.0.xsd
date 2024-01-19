@@ -1,0 +1,4330 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" 
+    xmlns="http://xmls.skatteverket.se/se/skatteverket/ai/komponent/infoForBeskattning/9.0" 
+    targetNamespace="http://xmls.skatteverket.se/se/skatteverket/ai/komponent/infoForBeskattning/9.0" 
+    xmlns:gm="http://xmls.skatteverket.se/se/skatteverket/ai/gemensamt/infoForBeskattning/9.0" 
+    elementFormDefault="qualified" attributeFormDefault="unqualified" version="9.0">
+    
+  <xs:import namespace="http://xmls.skatteverket.se/se/skatteverket/ai/gemensamt/infoForBeskattning/9.0" 
+        schemaLocation="gemensamt/SKV_COMMON_9.0.xsd"/>
+
+ <xs:element name="Avsandare">
+   <xs:complexType>
+     <xs:sequence>
+       <xs:element name="Programnamn" minOccurs="1" maxOccurs="1" type="gm:ProgramNamnTYPE" />
+	   <xs:element name="Organisationsnummer" minOccurs="1" maxOccurs="1" type="gm:IdentitetsbeteckningForPersonTYPE" />
+       <xs:element ref="TekniskKontaktperson" minOccurs="1" maxOccurs="1" />
+       <xs:element name="Skapad" minOccurs="1" maxOccurs="1" type="SkapadTYPE" />
+     </xs:sequence>
+   </xs:complexType>
+ </xs:element>
+ 
+ <xs:element name="Blankettgemensamt">
+   <xs:complexType>
+     <xs:sequence>
+		<xs:element minOccurs="1" maxOccurs="unbounded" ref="Uppgiftslamnare"/>
+     </xs:sequence>
+   </xs:complexType>
+ </xs:element>
+
+ <xs:element name="Uppgiftslamnare">
+   <xs:complexType>
+     <xs:sequence>
+       <xs:element name="UppgiftslamnarePersOrgnr" type="gm:IdentitetsbeteckningForPersonTYPE" />
+       <xs:element minOccurs="1" maxOccurs="unbounded" ref="Kontaktperson"/>
+     </xs:sequence>
+   </xs:complexType>
+ </xs:element>
+
+ <xs:element name="Kontaktperson">
+   <xs:complexType>
+     <xs:all>
+       <xs:element name="Namn" minOccurs="1" maxOccurs="1" type="gm:NamnTYPE" />
+       <xs:element name="Telefon" minOccurs="1" maxOccurs="1" type="gm:TelefonTYPE" />
+       <xs:element name="Epostadress" minOccurs="1" maxOccurs="1" type="gm:EpostadressTYPE" />
+       <xs:element name="Sakomrade" minOccurs="0" maxOccurs="1" type="gm:NamnTYPE" />
+     </xs:all>
+   </xs:complexType>
+ </xs:element>
+ 
+  <xs:element name="TekniskKontaktperson">
+   <xs:complexType>
+     <xs:all>
+       <xs:element name="Namn" minOccurs="1" maxOccurs="1" type="gm:NamnTYPE" />
+       <xs:element name="Telefon" minOccurs="1" maxOccurs="1" type="gm:TelefonTYPE" />
+       <xs:element name="Epostadress" minOccurs="1" maxOccurs="1" type="gm:EpostadressTYPE" />
+	   <xs:element name="Utdelningsadress1" minOccurs="0" maxOccurs="1" type="gm:Utdelningsadress1TYPE" />
+	   <xs:element name="Utdelningsadress2" minOccurs="0" maxOccurs="1" type="gm:Utdelningsadress2TYPE" />
+	   <xs:element name="Postnummer" minOccurs="0" maxOccurs="1" type="gm:PostNrTYPE" />
+	   <xs:element name="Postort" minOccurs="0" maxOccurs="1" type="gm:PostortTYPE" />
+     </xs:all>
+   </xs:complexType>
+ </xs:element>
+
+  <xs:element name="Blankett">
+    <xs:complexType>
+      <xs:sequence>
+		<xs:element ref="Arendeinformation" minOccurs="1" maxOccurs="1"/>
+        <xs:element ref="Blankettinnehall" minOccurs="1" maxOccurs="1"/>
+      </xs:sequence>
+	  <xs:attribute name="nummer" type="xs:string" use="required"/>
+    </xs:complexType>
+  </xs:element>
+  
+ <xs:element name="Arendeinformation">
+   <xs:complexType>
+     <xs:all>
+       <xs:element name="Arendeagare" minOccurs="1" maxOccurs="1" type="gm:IdentitetsbeteckningForPersonTYPE" />
+       <xs:element name="Period" minOccurs="1" maxOccurs="1" type="gm:PeriodTYPE" />
+       <xs:element name="Arendenummer" minOccurs="0" maxOccurs="1" type="gm:ArendenummerTYPE" />
+     </xs:all>
+   </xs:complexType>
+ </xs:element>
+ 
+   <xs:element name="Blankettinnehall">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="Kontrolluppgift" minOccurs="1" maxOccurs="1"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="Kontrolluppgift" abstract="true" type="KontrolluppgiftsTYPE" />
+  <xs:complexType name="KontrolluppgiftsTYPE" />
+  
+  <xs:element name="KU81" type="KU81TYPE" substitutionGroup="Kontrolluppgift" />
+  <xs:complexType name="KU81TYPE">
+    <xs:complexContent>
+      <xs:extension base="KontrolluppgiftsTYPE">
+      <xs:all>
+        <xs:element ref="UppgiftslamnareKU81" />
+        <xs:element ref="Inkomstar" minOccurs="1" maxOccurs="1"/>
+        <xs:element ref="Borttag" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="Specifikationsnummer" minOccurs="1" maxOccurs="1"/>
+        <xs:element ref="Belopp" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="Betalningskod" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="LandskodBetalning" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="Betalningsdatum" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="Valutakod" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="NamnBetalningsmottagare" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="InkomsttagareKU81" />
+      </xs:all>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  
+  <xs:element name="UppgiftslamnareKU81" type="UppgiftslamnareKU81TYPE" />
+  <xs:complexType name="UppgiftslamnareKU81TYPE">
+    <xs:all>
+      <xs:element ref="UppgiftslamnarId" minOccurs="1" maxOccurs="1" />
+      <xs:element ref="NamnUppgiftslamnare" minOccurs="0" maxOccurs="1" />
+    </xs:all>
+  </xs:complexType>
+  
+  <xs:element name="InkomsttagareKU81" type="InkomsttagareKU81TYPE" />
+  <xs:complexType name="InkomsttagareKU81TYPE">
+    <xs:all>
+      <xs:element ref="Inkomsttagare" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="Fornamn" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="Efternamn" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="Gatuadress" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="Postnummer" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="Postort" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="LandskodPostort" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="Fodelsetid" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="OrgNamn" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="Gatuadress2" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="FriAdress" minOccurs="0" maxOccurs="1" />
+    </xs:all>
+  </xs:complexType>
+  
+  <xs:element name="KU80" type="KU80TYPE" substitutionGroup="Kontrolluppgift" />
+  <xs:complexType name="KU80TYPE">
+    <xs:complexContent>
+      <xs:extension base="KontrolluppgiftsTYPE">
+      <xs:all>
+        <xs:element ref="UppgiftslamnareKU80" />
+        <xs:element ref="Inkomstar" minOccurs="1" maxOccurs="1"/>
+        <xs:element ref="Borttag" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="Specifikationsnummer" minOccurs="1" maxOccurs="1"/>
+        <xs:element ref="Belopp" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="LandskodBetalning" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="Betalningsdatum" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="Valutakod" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="InkomsttagareKU80" />
+      </xs:all>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  
+  <xs:element name="UppgiftslamnareKU80" type="UppgiftslamnareKU80TYPE" />
+  <xs:complexType name="UppgiftslamnareKU80TYPE">
+    <xs:all>
+      <xs:element ref="UppgiftslamnarId" minOccurs="1" maxOccurs="1" />
+      <xs:element ref="NamnUppgiftslamnare" minOccurs="0" maxOccurs="1" />
+    </xs:all>
+  </xs:complexType>
+  
+  <xs:element name="InkomsttagareKU80" type="InkomsttagareKU80TYPE" />
+  <xs:complexType name="InkomsttagareKU80TYPE">
+    <xs:all>
+      <xs:element ref="Inkomsttagare" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="Fornamn" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="Efternamn" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="Gatuadress" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="Postnummer" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="Postort" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="LandskodPostort" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="Fodelsetid" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="OrgNamn" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="Gatuadress2" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="FriAdress" minOccurs="0" maxOccurs="1" />
+    </xs:all>
+  </xs:complexType>
+  
+  <xs:element name="KU41" type="KU41TYPE" substitutionGroup="Kontrolluppgift" />
+  <xs:complexType name="KU41TYPE">
+    <xs:complexContent>
+      <xs:extension base="KontrolluppgiftsTYPE">
+      <xs:all>
+        <xs:element ref="InkomsttagareKU41" />
+        <xs:element ref="UppgiftslamnareKU41" />
+        <xs:element ref="Inkomstar" minOccurs="1" maxOccurs="1"/>
+        <xs:element ref="Borttag" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="Specifikationsnummer" minOccurs="1" maxOccurs="1"/>
+        <xs:element ref="VPNamn" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="ISIN" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="Schablonintakt" minOccurs="0" maxOccurs="1"/>
+      </xs:all>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  
+  <xs:element name="InkomsttagareKU41" type="InkomsttagareKU41TYPE" />
+  <xs:complexType name="InkomsttagareKU41TYPE">
+    <xs:all>
+      <xs:element ref="LandskodTIN" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="Fodelseort" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="LandskodFodelseort" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="Inkomsttagare" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="Fornamn" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="Efternamn" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="Gatuadress" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="Postnummer" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="Postort" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="LandskodPostort" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="Fodelsetid" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="AnnatIDNr" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="OrgNamn" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="Gatuadress2" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="FriAdress" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="TIN" minOccurs="0" maxOccurs="1" />
+    </xs:all>
+  </xs:complexType>
+  
+  <xs:element name="UppgiftslamnareKU41" type="UppgiftslamnareKU41TYPE" />
+  <xs:complexType name="UppgiftslamnareKU41TYPE">
+    <xs:all>
+      <xs:element ref="UppgiftslamnarId" minOccurs="1" maxOccurs="1" />
+      <xs:element ref="NamnUppgiftslamnare" minOccurs="0" maxOccurs="1" />
+    </xs:all>
+  </xs:complexType>
+  
+  <xs:element name="KU40" type="KU40TYPE" substitutionGroup="Kontrolluppgift" />
+  <xs:complexType name="KU40TYPE">
+    <xs:complexContent>
+      <xs:extension base="KontrolluppgiftsTYPE">
+      <xs:all>
+        <xs:element ref="InkomsttagareKU40" />
+        <xs:element ref="UppgiftslamnareKU40" />
+        <xs:element ref="Inkomstar" minOccurs="1" maxOccurs="1"/>
+        <xs:element ref="Borttag" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="Specifikationsnummer" minOccurs="1" maxOccurs="1"/>
+        <xs:element ref="VPNamn" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="ISIN" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="AvyttradTillISK" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="Kapitalvinst" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="Kapitalforlust" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="FondInteMarknadsnoterad" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="Rantefond" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="ErhallenErsattning" minOccurs="0" maxOccurs="1"/>
+      </xs:all>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  
+  <xs:element name="InkomsttagareKU40" type="InkomsttagareKU40TYPE" />
+  <xs:complexType name="InkomsttagareKU40TYPE">
+    <xs:all>
+      <xs:element ref="LandskodTIN" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="Fodelseort" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="LandskodFodelseort" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="Inkomsttagare" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="Fornamn" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="Efternamn" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="Gatuadress" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="Postnummer" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="Postort" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="LandskodPostort" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="Fodelsetid" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="AnnatIDNr" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="OrgNamn" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="Gatuadress2" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="FriAdress" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="TIN" minOccurs="0" maxOccurs="1" />
+    </xs:all>
+  </xs:complexType>
+  
+  <xs:element name="UppgiftslamnareKU40" type="UppgiftslamnareKU40TYPE" />
+  <xs:complexType name="UppgiftslamnareKU40TYPE">
+    <xs:all>
+      <xs:element ref="UppgiftslamnarId" minOccurs="1" maxOccurs="1" />
+      <xs:element ref="NamnUppgiftslamnare" minOccurs="0" maxOccurs="1" />
+    </xs:all>
+  </xs:complexType>
+  
+  <xs:element name="KU66" type="KU66TYPE" substitutionGroup="Kontrolluppgift" />
+  <xs:complexType name="KU66TYPE">
+    <xs:complexContent>
+      <xs:extension base="KontrolluppgiftsTYPE">
+      <xs:all>
+        <xs:element ref="InkomsttagareKU66" />
+        <xs:element ref="UppgiftslamnareKU66" />
+        <xs:element ref="Inkomstar" minOccurs="1" maxOccurs="1"/>
+        <xs:element ref="Borttag" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="KWhMatatsIn" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="KWhTagitsUt" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="AnlaggningsID" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="AndelIAnslPunkt" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="Specifikationsnummer" minOccurs="1" maxOccurs="1"/>
+      </xs:all>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  
+  <xs:element name="InkomsttagareKU66" type="InkomsttagareKU66TYPE" />
+  <xs:complexType name="InkomsttagareKU66TYPE">
+    <xs:all>
+      <xs:element ref="LandskodTIN" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="Inkomsttagare" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="Fornamn" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="Efternamn" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="Gatuadress" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="Postnummer" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="Postort" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="LandskodPostort" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="Fodelsetid" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="AnnatIDNr" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="OrgNamn" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="Gatuadress2" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="FriAdress" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="TIN" minOccurs="0" maxOccurs="1" />
+    </xs:all>
+  </xs:complexType>
+  
+  <xs:element name="UppgiftslamnareKU66" type="UppgiftslamnareKU66TYPE" />
+  <xs:complexType name="UppgiftslamnareKU66TYPE">
+    <xs:all>
+      <xs:element ref="UppgiftslamnarId" minOccurs="1" maxOccurs="1" />
+      <xs:element ref="NamnUppgiftslamnare" minOccurs="0" maxOccurs="1" />
+    </xs:all>
+  </xs:complexType>
+  
+  <xs:element name="KU21" type="KU21TYPE" substitutionGroup="Kontrolluppgift" />
+  <xs:complexType name="KU21TYPE">
+    <xs:complexContent>
+      <xs:extension base="KontrolluppgiftsTYPE">
+      <xs:all>
+        <xs:element ref="AvdragenSkatt" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="Inkomstar" minOccurs="1" maxOccurs="1"/>
+        <xs:element ref="Borttag" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="AnnanInkomst" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="RantaFordringsratter" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="UtbetaltIVissaFall" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="Depanummer" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="AndelAvDepan" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="ErhallenRantekompensation" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="Specifikationsnummer" minOccurs="1" maxOccurs="1"/>
+        <xs:element ref="VPNamn" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="ISIN" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="AvyttradTillISK" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="OkandVarde" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="InkomsttagareKU21" />
+        <xs:element ref="UppgiftslamnareKU21" />
+      </xs:all>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  
+  <xs:element name="InkomsttagareKU21" type="InkomsttagareKU21TYPE" />
+  <xs:complexType name="InkomsttagareKU21TYPE">
+    <xs:all>
+      <xs:element ref="LandskodTIN" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="Fodelseort" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="LandskodFodelseort" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="Inkomsttagare" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="Fornamn" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="Efternamn" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="Gatuadress" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="Postnummer" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="Postort" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="LandskodPostort" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="Fodelsetid" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="AnnatIDNr" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="OrgNamn" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="Gatuadress2" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="FriAdress" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="TIN" minOccurs="0" maxOccurs="1" />
+    </xs:all>
+  </xs:complexType>
+  
+  <xs:element name="UppgiftslamnareKU21" type="UppgiftslamnareKU21TYPE" />
+  <xs:complexType name="UppgiftslamnareKU21TYPE">
+    <xs:all>
+      <xs:element ref="UppgiftslamnarId" minOccurs="1" maxOccurs="1" />
+      <xs:element ref="NamnUppgiftslamnare" minOccurs="0" maxOccurs="1" />
+    </xs:all>
+  </xs:complexType>
+  
+  <xs:element name="KU65" type="KU65TYPE" substitutionGroup="Kontrolluppgift" />
+  <xs:complexType name="KU65TYPE">
+    <xs:complexContent>
+      <xs:extension base="KontrolluppgiftsTYPE">
+      <xs:all>
+        <xs:element ref="UppgiftslamnareKU65" />
+        <xs:element ref="Inkomstar" minOccurs="1" maxOccurs="1"/>
+        <xs:element ref="Borttag" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="Specifikationsnummer" minOccurs="1" maxOccurs="1"/>
+        <xs:element ref="MottagetGavobelopp" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="InkomsttagareKU65" />
+      </xs:all>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  
+  <xs:element name="UppgiftslamnareKU65" type="UppgiftslamnareKU65TYPE" />
+  <xs:complexType name="UppgiftslamnareKU65TYPE">
+    <xs:all>
+      <xs:element ref="UppgiftslamnarId" minOccurs="1" maxOccurs="1" />
+      <xs:element ref="NamnUppgiftslamnare" minOccurs="0" maxOccurs="1" />
+    </xs:all>
+  </xs:complexType>
+  
+  <xs:element name="InkomsttagareKU65" type="InkomsttagareKU65TYPE" />
+  <xs:complexType name="InkomsttagareKU65TYPE">
+    <xs:all>
+      <xs:element ref="Inkomsttagare" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="Fornamn" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="Efternamn" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="Gatuadress" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="Postnummer" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="Postort" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="LandskodPostort" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="Fodelsetid" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="AnnatIDNr" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="OrgNamn" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="Gatuadress2" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="FriAdress" minOccurs="0" maxOccurs="1" />
+    </xs:all>
+  </xs:complexType>
+  
+  <xs:element name="KU20" type="KU20TYPE" substitutionGroup="Kontrolluppgift" />
+  <xs:complexType name="KU20TYPE">
+    <xs:complexContent>
+      <xs:extension base="KontrolluppgiftsTYPE">
+      <xs:all>
+        <xs:element ref="AvdragenSkatt" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="Delagare" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="Inkomstar" minOccurs="1" maxOccurs="1"/>
+        <xs:element ref="Borttag" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="Ranteinkomst" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="Forfogarkonto" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="RanteinkomstEjKonto" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="AnnanInkomst" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="Specifikationsnummer" minOccurs="1" maxOccurs="1"/>
+        <xs:element ref="InkomsttagareKU20" />
+        <xs:element ref="UppgiftslamnareKU20" />
+      </xs:all>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  
+  <xs:element name="InkomsttagareKU20" type="InkomsttagareKU20TYPE" />
+  <xs:complexType name="InkomsttagareKU20TYPE">
+    <xs:all>
+      <xs:element ref="LandskodTIN" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="Fodelseort" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="LandskodFodelseort" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="Inkomsttagare" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="Fornamn" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="Efternamn" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="Gatuadress" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="Postnummer" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="Postort" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="LandskodPostort" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="Fodelsetid" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="AnnatIDNr" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="OrgNamn" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="Gatuadress2" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="FriAdress" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="TIN" minOccurs="0" maxOccurs="1" />
+    </xs:all>
+  </xs:complexType>
+  
+  <xs:element name="UppgiftslamnareKU20" type="UppgiftslamnareKU20TYPE" />
+  <xs:complexType name="UppgiftslamnareKU20TYPE">
+    <xs:all>
+      <xs:element ref="UppgiftslamnarId" minOccurs="1" maxOccurs="1" />
+      <xs:element ref="NamnUppgiftslamnare" minOccurs="0" maxOccurs="1" />
+    </xs:all>
+  </xs:complexType>
+  
+  <xs:element name="KU26" type="KU26TYPE" substitutionGroup="Kontrolluppgift" />
+  <xs:complexType name="KU26TYPE">
+    <xs:complexContent>
+      <xs:extension base="KontrolluppgiftsTYPE">
+      <xs:all>
+        <xs:element ref="UppgiftslamnareKU26" />
+        <xs:element ref="Inkomstar" minOccurs="1" maxOccurs="1"/>
+        <xs:element ref="Borttag" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="BetaldTomtrattsavgald" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="Fastighetsbeteckning" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="Specifikationsnummer" minOccurs="1" maxOccurs="1"/>
+        <xs:element ref="InkomsttagareKU26" />
+      </xs:all>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  
+  <xs:element name="UppgiftslamnareKU26" type="UppgiftslamnareKU26TYPE" />
+  <xs:complexType name="UppgiftslamnareKU26TYPE">
+    <xs:all>
+      <xs:element ref="UppgiftslamnarId" minOccurs="1" maxOccurs="1" />
+      <xs:element ref="NamnUppgiftslamnare" minOccurs="0" maxOccurs="1" />
+    </xs:all>
+  </xs:complexType>
+  
+  <xs:element name="InkomsttagareKU26" type="InkomsttagareKU26TYPE" />
+  <xs:complexType name="InkomsttagareKU26TYPE">
+    <xs:all>
+      <xs:element ref="Inkomsttagare" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="Fornamn" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="Efternamn" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="Gatuadress" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="Postnummer" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="Postort" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="LandskodPostort" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="Fodelsetid" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="AnnatIDNr" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="OrgNamn" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="Gatuadress2" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="FriAdress" minOccurs="0" maxOccurs="1" />
+    </xs:all>
+  </xs:complexType>
+  
+  <xs:element name="KU25" type="KU25TYPE" substitutionGroup="Kontrolluppgift" />
+  <xs:complexType name="KU25TYPE">
+    <xs:complexContent>
+      <xs:extension base="KontrolluppgiftsTYPE">
+      <xs:all>
+        <xs:element ref="Delagare" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="Inkomstar" minOccurs="1" maxOccurs="1"/>
+        <xs:element ref="Borttag" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="AvdragsgillRanta" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="TotaltInbetaldRanta" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="BetaldRantekompensation" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="GemensamtLan" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="Specifikationsnummer" minOccurs="1" maxOccurs="1"/>
+        <xs:element ref="UppgiftslamnareKU25" />
+        <xs:element ref="InkomsttagareKU25" />
+      </xs:all>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  
+  <xs:element name="UppgiftslamnareKU25" type="UppgiftslamnareKU25TYPE" />
+  <xs:complexType name="UppgiftslamnareKU25TYPE">
+    <xs:all>
+      <xs:element ref="UppgiftslamnarId" minOccurs="1" maxOccurs="1" />
+      <xs:element ref="NamnUppgiftslamnare" minOccurs="0" maxOccurs="1" />
+    </xs:all>
+  </xs:complexType>
+  
+  <xs:element name="InkomsttagareKU25" type="InkomsttagareKU25TYPE" />
+  <xs:complexType name="InkomsttagareKU25TYPE">
+    <xs:all>
+      <xs:element ref="Inkomsttagare" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="Fornamn" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="Efternamn" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="Gatuadress" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="Postnummer" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="Postort" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="LandskodPostort" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="Fodelsetid" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="AnnatIDNr" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="OrgNamn" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="Gatuadress2" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="FriAdress" minOccurs="0" maxOccurs="1" />
+    </xs:all>
+  </xs:complexType>
+  
+  <xs:element name="KU68" type="KU68TYPE" substitutionGroup="Kontrolluppgift" />
+  <xs:complexType name="KU68TYPE">
+    <xs:complexContent>
+      <xs:extension base="KontrolluppgiftsTYPE">
+      <xs:all>
+        <xs:element ref="UppgiftslamnareKU68" />
+        <xs:element ref="Inkomstar" minOccurs="1" maxOccurs="1"/>
+        <xs:element ref="Borttag" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="Specifikationsnummer" minOccurs="1" maxOccurs="1"/>
+        <xs:element ref="AvgiftArbetsloshetskassa" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="InkomsttagareKU68" />
+      </xs:all>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  
+  <xs:element name="UppgiftslamnareKU68" type="UppgiftslamnareKU68TYPE" />
+  <xs:complexType name="UppgiftslamnareKU68TYPE">
+    <xs:all>
+      <xs:element ref="UppgiftslamnarId" minOccurs="1" maxOccurs="1" />
+      <xs:element ref="NamnUppgiftslamnare" minOccurs="0" maxOccurs="1" />
+    </xs:all>
+  </xs:complexType>
+  
+  <xs:element name="InkomsttagareKU68" type="InkomsttagareKU68TYPE" />
+  <xs:complexType name="InkomsttagareKU68TYPE">
+    <xs:all>
+      <xs:element ref="Inkomsttagare" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="Fornamn" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="Efternamn" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="Gatuadress" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="Postnummer" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="Postort" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="LandskodPostort" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="Fodelsetid" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="AnnatIDNr" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="OrgNamn" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="Gatuadress2" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="FriAdress" minOccurs="0" maxOccurs="1" />
+    </xs:all>
+  </xs:complexType>
+  
+  <xs:element name="KU28" type="KU28TYPE" substitutionGroup="Kontrolluppgift" />
+  <xs:complexType name="KU28TYPE">
+    <xs:complexContent>
+      <xs:extension base="KontrolluppgiftsTYPE">
+      <xs:all>
+        <xs:element ref="Delagare" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="Inkomstar" minOccurs="1" maxOccurs="1"/>
+        <xs:element ref="Borttag" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="UnderlagForInvesteraravdrag" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="TotUnderlagInvesteraravdrag" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="Betalningsar" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="AterforingAvyttring" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="AterforingUtflyttning" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="AterforingHogVardeoverforing" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="AterforingInternaForvarv" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="DatumForvarv" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="Region" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="Verksamhetsomrade" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="Specifikationsnummer" minOccurs="1" maxOccurs="1"/>
+        <xs:element ref="InkomsttagareKU28" />
+        <xs:element ref="UppgiftslamnareKU28" />
+      </xs:all>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  
+  <xs:element name="InkomsttagareKU28" type="InkomsttagareKU28TYPE" />
+  <xs:complexType name="InkomsttagareKU28TYPE">
+    <xs:all>
+      <xs:element ref="LandskodTIN" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="Inkomsttagare" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="Fornamn" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="Efternamn" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="Gatuadress" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="Postnummer" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="Postort" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="LandskodPostort" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="Fodelsetid" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="AnnatIDNr" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="OrgNamn" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="Gatuadress2" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="FriAdress" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="TIN" minOccurs="0" maxOccurs="1" />
+    </xs:all>
+  </xs:complexType>
+  
+  <xs:element name="UppgiftslamnareKU28" type="UppgiftslamnareKU28TYPE" />
+  <xs:complexType name="UppgiftslamnareKU28TYPE">
+    <xs:all>
+      <xs:element ref="UppgiftslamnarId" minOccurs="1" maxOccurs="1" />
+      <xs:element ref="NamnUppgiftslamnare" minOccurs="0" maxOccurs="1" />
+    </xs:all>
+  </xs:complexType>
+  
+  <xs:element name="KU70" type="KU70TYPE" substitutionGroup="Kontrolluppgift" />
+  <xs:complexType name="KU70TYPE">
+    <xs:complexContent>
+      <xs:extension base="KontrolluppgiftsTYPE">
+      <xs:all>
+        <xs:element ref="InkomsttagareKU70" />
+        <xs:element ref="UppgiftslamnareKU70" />
+        <xs:element ref="Inkomstar" minOccurs="1" maxOccurs="1"/>
+        <xs:element ref="Borttag" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="Specifikationsnummer" minOccurs="1" maxOccurs="1"/>
+        <xs:element ref="Naringsbidrag" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="Royalty" minOccurs="0" maxOccurs="1"/>
+      </xs:all>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  
+  <xs:element name="InkomsttagareKU70" type="InkomsttagareKU70TYPE" />
+  <xs:complexType name="InkomsttagareKU70TYPE">
+    <xs:all>
+      <xs:element ref="LandskodTIN" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="Inkomsttagare" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="Fornamn" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="Efternamn" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="Gatuadress" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="Postnummer" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="Postort" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="LandskodPostort" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="Fodelsetid" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="AnnatIDNr" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="OrgNamn" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="Gatuadress2" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="FriAdress" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="TIN" minOccurs="0" maxOccurs="1" />
+    </xs:all>
+  </xs:complexType>
+  
+  <xs:element name="UppgiftslamnareKU70" type="UppgiftslamnareKU70TYPE" />
+  <xs:complexType name="UppgiftslamnareKU70TYPE">
+    <xs:all>
+      <xs:element ref="UppgiftslamnarId" minOccurs="1" maxOccurs="1" />
+      <xs:element ref="NamnUppgiftslamnare" minOccurs="0" maxOccurs="1" />
+    </xs:all>
+  </xs:complexType>
+  
+  <xs:element name="KU30" type="KU30TYPE" substitutionGroup="Kontrolluppgift" />
+  <xs:complexType name="KU30TYPE">
+    <xs:complexContent>
+      <xs:extension base="KontrolluppgiftsTYPE">
+      <xs:all>
+        <xs:element ref="AvdragenUtlandskSkatt" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="Inkomstar" minOccurs="1" maxOccurs="1"/>
+        <xs:element ref="Borttag" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="Specifikationsnummer" minOccurs="1" maxOccurs="1"/>
+        <xs:element ref="Schablonintakt" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="Kontonummer" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="UppgiftslamnareKU30" />
+        <xs:element ref="InkomsttagareKU30" />
+      </xs:all>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  
+  <xs:element name="UppgiftslamnareKU30" type="UppgiftslamnareKU30TYPE" />
+  <xs:complexType name="UppgiftslamnareKU30TYPE">
+    <xs:all>
+      <xs:element ref="UppgiftslamnarId" minOccurs="1" maxOccurs="1" />
+      <xs:element ref="NamnUppgiftslamnare" minOccurs="0" maxOccurs="1" />
+    </xs:all>
+  </xs:complexType>
+  
+  <xs:element name="InkomsttagareKU30" type="InkomsttagareKU30TYPE" />
+  <xs:complexType name="InkomsttagareKU30TYPE">
+    <xs:all>
+      <xs:element ref="Inkomsttagare" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="Fornamn" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="Efternamn" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="Gatuadress" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="Postnummer" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="Postort" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="LandskodPostort" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="Fodelsetid" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="AnnatIDNr" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="OrgNamn" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="Gatuadress2" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="FriAdress" minOccurs="0" maxOccurs="1" />
+    </xs:all>
+  </xs:complexType>
+  
+  <xs:element name="KU52" type="KU52TYPE" substitutionGroup="Kontrolluppgift" />
+  <xs:complexType name="KU52TYPE">
+    <xs:complexContent>
+      <xs:extension base="KontrolluppgiftsTYPE">
+      <xs:all>
+        <xs:element ref="UppgiftslamnareKU52" />
+        <xs:element ref="Inkomstar" minOccurs="1" maxOccurs="1"/>
+        <xs:element ref="Borttag" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="Forsakringsavtalsnummer" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="Specifikationsnummer" minOccurs="1" maxOccurs="1"/>
+        <xs:element ref="Kapitalunderlag" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="TypForsakring" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="InkomsttagareKU52" />
+      </xs:all>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  
+  <xs:element name="UppgiftslamnareKU52" type="UppgiftslamnareKU52TYPE" />
+  <xs:complexType name="UppgiftslamnareKU52TYPE">
+    <xs:all>
+      <xs:element ref="LandskodUL" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="UppgiftslamnarId" minOccurs="1" maxOccurs="1" />
+      <xs:element ref="NamnUppgiftslamnare" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="ULUtlandsktOrgnr" minOccurs="0" maxOccurs="1" />
+    </xs:all>
+  </xs:complexType>
+  
+  <xs:element name="InkomsttagareKU52" type="InkomsttagareKU52TYPE" />
+  <xs:complexType name="InkomsttagareKU52TYPE">
+    <xs:all>
+      <xs:element ref="Inkomsttagare" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="Fornamn" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="Efternamn" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="Gatuadress" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="Postnummer" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="Postort" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="LandskodPostort" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="Fodelsetid" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="AnnatIDNr" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="OrgNamn" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="Gatuadress2" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="FriAdress" minOccurs="0" maxOccurs="1" />
+    </xs:all>
+  </xs:complexType>
+  
+  <xs:element name="KU73" type="KU73TYPE" substitutionGroup="Kontrolluppgift" />
+  <xs:complexType name="KU73TYPE">
+    <xs:complexContent>
+      <xs:extension base="KontrolluppgiftsTYPE">
+      <xs:all>
+        <xs:element ref="UppgiftslamnareKU73" />
+        <xs:element ref="Inkomstar" minOccurs="1" maxOccurs="1"/>
+        <xs:element ref="Borttag" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="Specifikationsnummer" minOccurs="1" maxOccurs="1"/>
+        <xs:element ref="TillgodoUtdelning" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="DelUtdelnSkog" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="SkplDelKapital" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="InkomsttagareKU73" />
+      </xs:all>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  
+  <xs:element name="UppgiftslamnareKU73" type="UppgiftslamnareKU73TYPE" />
+  <xs:complexType name="UppgiftslamnareKU73TYPE">
+    <xs:all>
+      <xs:element ref="UppgiftslamnarId" minOccurs="1" maxOccurs="1" />
+      <xs:element ref="NamnUppgiftslamnare" minOccurs="0" maxOccurs="1" />
+    </xs:all>
+  </xs:complexType>
+  
+  <xs:element name="InkomsttagareKU73" type="InkomsttagareKU73TYPE" />
+  <xs:complexType name="InkomsttagareKU73TYPE">
+    <xs:all>
+      <xs:element ref="Inkomsttagare" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="Fornamn" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="Efternamn" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="Gatuadress" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="Postnummer" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="Postort" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="LandskodPostort" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="Fodelsetid" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="AnnatIDNr" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="OrgNamn" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="Gatuadress2" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="FriAdress" minOccurs="0" maxOccurs="1" />
+    </xs:all>
+  </xs:complexType>
+  
+  <xs:element name="KU50" type="KU50TYPE" substitutionGroup="Kontrolluppgift" />
+  <xs:complexType name="KU50TYPE">
+    <xs:complexContent>
+      <xs:extension base="KontrolluppgiftsTYPE">
+      <xs:all>
+        <xs:element ref="UppgiftslamnareKU50" />
+        <xs:element ref="Inkomstar" minOccurs="1" maxOccurs="1"/>
+        <xs:element ref="Borttag" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="Specifikationsnummer" minOccurs="1" maxOccurs="1"/>
+        <xs:element ref="BetaldPremie" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="InkomsttagareKU50" />
+      </xs:all>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  
+  <xs:element name="UppgiftslamnareKU50" type="UppgiftslamnareKU50TYPE" />
+  <xs:complexType name="UppgiftslamnareKU50TYPE">
+    <xs:all>
+      <xs:element ref="LandskodUL" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="UppgiftslamnarId" minOccurs="1" maxOccurs="1" />
+      <xs:element ref="NamnUppgiftslamnare" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="ULUtlandsktOrgnr" minOccurs="0" maxOccurs="1" />
+    </xs:all>
+  </xs:complexType>
+  
+  <xs:element name="InkomsttagareKU50" type="InkomsttagareKU50TYPE" />
+  <xs:complexType name="InkomsttagareKU50TYPE">
+    <xs:all>
+      <xs:element ref="Inkomsttagare" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="Fornamn" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="Efternamn" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="Gatuadress" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="Postnummer" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="Postort" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="LandskodPostort" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="Fodelsetid" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="AnnatIDNr" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="OrgNamn" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="Gatuadress2" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="FriAdress" minOccurs="0" maxOccurs="1" />
+    </xs:all>
+  </xs:complexType>
+  
+  <xs:element name="KU72" type="KU72TYPE" substitutionGroup="Kontrolluppgift" />
+  <xs:complexType name="KU72TYPE">
+    <xs:complexContent>
+      <xs:extension base="KontrolluppgiftsTYPE">
+      <xs:all>
+        <xs:element ref="InkomsttagareKU72" />
+        <xs:element ref="UppgiftslamnareKU72" />
+        <xs:element ref="Inkomstar" minOccurs="1" maxOccurs="1"/>
+        <xs:element ref="Borttag" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="Specifikationsnummer" minOccurs="1" maxOccurs="1"/>
+        <xs:element ref="Kontoslag" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="InsattBelopp" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="DatumInsattning" minOccurs="0" maxOccurs="1"/>
+      </xs:all>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  
+  <xs:element name="InkomsttagareKU72" type="InkomsttagareKU72TYPE" />
+  <xs:complexType name="InkomsttagareKU72TYPE">
+    <xs:all>
+      <xs:element ref="LandskodTIN" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="Inkomsttagare" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="Fornamn" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="Efternamn" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="Gatuadress" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="Postnummer" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="Postort" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="LandskodPostort" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="Fodelsetid" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="AnnatIDNr" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="OrgNamn" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="Gatuadress2" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="FriAdress" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="TIN" minOccurs="0" maxOccurs="1" />
+    </xs:all>
+  </xs:complexType>
+  
+  <xs:element name="UppgiftslamnareKU72" type="UppgiftslamnareKU72TYPE" />
+  <xs:complexType name="UppgiftslamnareKU72TYPE">
+    <xs:all>
+      <xs:element ref="UppgiftslamnarId" minOccurs="1" maxOccurs="1" />
+      <xs:element ref="NamnUppgiftslamnare" minOccurs="0" maxOccurs="1" />
+    </xs:all>
+  </xs:complexType>
+  
+  <xs:element name="KU71" type="KU71TYPE" substitutionGroup="Kontrolluppgift" />
+  <xs:complexType name="KU71TYPE">
+    <xs:complexContent>
+      <xs:extension base="KontrolluppgiftsTYPE">
+      <xs:all>
+        <xs:element ref="InkomsttagareKU71" />
+        <xs:element ref="UppgiftslamnareKU71" />
+        <xs:element ref="Inkomstar" minOccurs="1" maxOccurs="1"/>
+        <xs:element ref="Borttag" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="Specifikationsnummer" minOccurs="1" maxOccurs="1"/>
+        <xs:element ref="Kontoslag" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="OverlatPantOvertag" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="UtbetaltBelopp" minOccurs="0" maxOccurs="1"/>
+      </xs:all>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  
+  <xs:element name="InkomsttagareKU71" type="InkomsttagareKU71TYPE" />
+  <xs:complexType name="InkomsttagareKU71TYPE">
+    <xs:all>
+      <xs:element ref="LandskodTIN" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="Inkomsttagare" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="Fornamn" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="Efternamn" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="Gatuadress" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="Postnummer" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="Postort" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="LandskodPostort" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="Fodelsetid" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="AnnatIDNr" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="OrgNamn" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="Gatuadress2" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="FriAdress" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="TIN" minOccurs="0" maxOccurs="1" />
+    </xs:all>
+  </xs:complexType>
+  
+  <xs:element name="UppgiftslamnareKU71" type="UppgiftslamnareKU71TYPE" />
+  <xs:complexType name="UppgiftslamnareKU71TYPE">
+    <xs:all>
+      <xs:element ref="UppgiftslamnarId" minOccurs="1" maxOccurs="1" />
+      <xs:element ref="NamnUppgiftslamnare" minOccurs="0" maxOccurs="1" />
+    </xs:all>
+  </xs:complexType>
+  
+  <xs:element name="KU34" type="KU34TYPE" substitutionGroup="Kontrolluppgift" />
+  <xs:complexType name="KU34TYPE">
+    <xs:complexContent>
+      <xs:extension base="KontrolluppgiftsTYPE">
+      <xs:all>
+        <xs:element ref="InkomsttagareKU34" />
+        <xs:element ref="UppgiftslamnareKU34" />
+        <xs:element ref="Inkomstar" minOccurs="1" maxOccurs="1"/>
+        <xs:element ref="Borttag" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="Depanummer" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="AndelAvDepan" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="Specifikationsnummer" minOccurs="1" maxOccurs="1"/>
+        <xs:element ref="VPNamn" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="ISIN" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="AvyttradTillISK" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="AntalKontrakt" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="OkandVarde" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="ErhallenErsattning" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="TypAvOption" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="OptionenForfallen" minOccurs="0" maxOccurs="1"/>
+      </xs:all>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  
+  <xs:element name="InkomsttagareKU34" type="InkomsttagareKU34TYPE" />
+  <xs:complexType name="InkomsttagareKU34TYPE">
+    <xs:all>
+      <xs:element ref="LandskodTIN" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="Inkomsttagare" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="Fornamn" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="Efternamn" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="Gatuadress" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="Postnummer" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="Postort" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="LandskodPostort" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="Fodelsetid" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="AnnatIDNr" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="OrgNamn" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="Gatuadress2" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="FriAdress" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="TIN" minOccurs="0" maxOccurs="1" />
+    </xs:all>
+  </xs:complexType>
+  
+  <xs:element name="UppgiftslamnareKU34" type="UppgiftslamnareKU34TYPE" />
+  <xs:complexType name="UppgiftslamnareKU34TYPE">
+    <xs:all>
+      <xs:element ref="UppgiftslamnarId" minOccurs="1" maxOccurs="1" />
+      <xs:element ref="NamnUppgiftslamnare" minOccurs="0" maxOccurs="1" />
+    </xs:all>
+  </xs:complexType>
+  
+  <xs:element name="KU55" type="KU55TYPE" substitutionGroup="Kontrolluppgift" />
+  <xs:complexType name="KU55TYPE">
+    <xs:complexContent>
+      <xs:extension base="KontrolluppgiftsTYPE">
+      <xs:all>
+        <xs:element ref="InkomsttagareKU55" />
+        <xs:element ref="UppgiftslamnareKU55" />
+        <xs:element ref="Inkomstar" minOccurs="1" maxOccurs="1"/>
+        <xs:element ref="Borttag" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="Specifikationsnummer" minOccurs="1" maxOccurs="1"/>
+        <xs:element ref="BostRattBeteckning" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="Overlatelsedatum" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="OverlatenAndel" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="OverlatelseArvBodeln" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="Overlatelsepris" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="InreRepFondOverlatelse" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="Kapitaltillskott" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="OaktaBostadsftg" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="Tillaggskopeskilling" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="Forvarvsdatum" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="ForvarvArvBodeln" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="Forvarvspris" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="InreRepFondForvarv" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="AndelBRFFormogenhet1974" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="GemensamIndividuell" minOccurs="0" maxOccurs="1"/>
+      </xs:all>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  
+  <xs:element name="InkomsttagareKU55" type="InkomsttagareKU55TYPE" />
+  <xs:complexType name="InkomsttagareKU55TYPE">
+    <xs:all>
+      <xs:element ref="LandskodTIN" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="Inkomsttagare" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="Fornamn" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="Efternamn" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="Gatuadress" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="Postnummer" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="Postort" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="LandskodPostort" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="Fodelsetid" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="AnnatIDNr" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="OrgNamn" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="Gatuadress2" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="FriAdress" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="TIN" minOccurs="0" maxOccurs="1" />
+    </xs:all>
+  </xs:complexType>
+  
+  <xs:element name="UppgiftslamnareKU55" type="UppgiftslamnareKU55TYPE" />
+  <xs:complexType name="UppgiftslamnareKU55TYPE">
+    <xs:all>
+      <xs:element ref="UppgiftslamnarId" minOccurs="1" maxOccurs="1" />
+      <xs:element ref="NamnUppgiftslamnare" minOccurs="0" maxOccurs="1" />
+    </xs:all>
+  </xs:complexType>
+  
+  <xs:element name="KupongS" type="KupongSTYPE" substitutionGroup="Kontrolluppgift" />
+  <xs:complexType name="KupongSTYPE">
+    <xs:complexContent>
+      <xs:extension base="KontrolluppgiftsTYPE">
+      <xs:all>
+        <xs:element ref="UppgiftslamnareKupongS" />
+        <xs:element ref="Inkomstar" minOccurs="1" maxOccurs="1"/>
+        <xs:element ref="Borttag" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="VPNamn" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="ISIN" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="Redovisningsnummer" minOccurs="1" maxOccurs="1"/>
+        <xs:element ref="Avstamningsdag" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="NummerAterbetalning" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="Insattningsdatum" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="UtdelningEjSkSkKSkatt" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="UtdelningNollProcKSkatt" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="UtdelningFemProcKSkatt" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="UtdelningTioProcKSkatt" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="UtdelningFemtonProcKSkatt" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="UtdelningTjugoProcKSkatt" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="UtdelningTjugofemProcKSkatt" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="UtdelningTrettioProcKSkatt" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="SaUtdelningAB" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="KSkattFemProc" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="KSkattTioProc" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="KSkattFemtonProc" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="KSkattTjugoProc" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="KSkattTjugofemProc" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="KSkattTrettioProc" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="SaKSkattAB" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="SaTidigareRedUtdelning" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="TotalsummaUtdelning" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="TotalsummaKSkatt" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="UtdFranEuroclear" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="OrgnrUtdelandeBolag" minOccurs="0" maxOccurs="1"/>
+      </xs:all>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  
+  <xs:element name="UppgiftslamnareKupongS" type="UppgiftslamnareKupongSTYPE" />
+  <xs:complexType name="UppgiftslamnareKupongSTYPE">
+    <xs:all>
+      <xs:element ref="UppgiftslamnarId" minOccurs="1" maxOccurs="1" />
+      <xs:element ref="NamnUppgiftslamnare" minOccurs="0" maxOccurs="1" />
+    </xs:all>
+  </xs:complexType>
+  
+  <xs:element name="KU10" type="KU10TYPE" substitutionGroup="Kontrolluppgift" />
+  <xs:complexType name="KU10TYPE">
+    <xs:complexContent>
+      <xs:extension base="KontrolluppgiftsTYPE">
+      <xs:all>
+        <xs:element ref="KontantBruttolonMm" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="FormanUtomBilDrivmedel" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="BilformanUtomDrivmedel" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="DrivmedelVidBilforman" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="AndraKostnadsers" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="UnderlagRutarbete" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="UnderlagRotarbete" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="AndelStyrelsearvode" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="ErsMEgenavgifter" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="Tjanstepension" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="ErsEjSocAvg" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="ErsEjSocAvgEjJobbavd" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="Forskarskattenamnden" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="VissaAvdrag" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="Hyresersattning" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="BostadSmahus" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="BostadEjSmahus" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="FormanHarJusterats" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="FormanSomPension" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="Bilersattning" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="Traktamente" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="PersonaloptionForvarvAndel" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="Arbetsstallenummer" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="Delagare" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="SocialAvgiftsAvtal" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="Inkomstar" minOccurs="1" maxOccurs="1"/>
+        <xs:element ref="Borttag" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="Specifikationsnummer" minOccurs="1" maxOccurs="1"/>
+        <xs:element ref="InkomsttagareKU10" />
+        <xs:element ref="UppgiftslamnareKU10" />
+      </xs:all>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  
+  <xs:element name="InkomsttagareKU10" type="InkomsttagareKU10TYPE" />
+  <xs:complexType name="InkomsttagareKU10TYPE">
+    <xs:all>
+      <xs:element ref="LandskodTIN" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="Inkomsttagare" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="Fornamn" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="Efternamn" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="Gatuadress" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="Postnummer" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="Postort" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="LandskodPostort" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="Fodelsetid" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="AnnatIDNr" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="OrgNamn" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="Gatuadress2" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="FriAdress" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="ArbetsplatsensAdress" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="ArbetsplatsensOrt" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="TIN" minOccurs="0" maxOccurs="1" />
+    </xs:all>
+  </xs:complexType>
+  
+  <xs:element name="UppgiftslamnareKU10" type="UppgiftslamnareKU10TYPE" />
+  <xs:complexType name="UppgiftslamnareKU10TYPE">
+    <xs:all>
+      <xs:element ref="UppgiftslamnarId" minOccurs="1" maxOccurs="1" />
+      <xs:element ref="NamnUppgiftslamnare" minOccurs="0" maxOccurs="1" />
+    </xs:all>
+  </xs:complexType>
+  
+  <xs:element name="KU32" type="KU32TYPE" substitutionGroup="Kontrolluppgift" />
+  <xs:complexType name="KU32TYPE">
+    <xs:complexContent>
+      <xs:extension base="KontrolluppgiftsTYPE">
+      <xs:all>
+        <xs:element ref="Delagare" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="Inkomstar" minOccurs="1" maxOccurs="1"/>
+        <xs:element ref="Borttag" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="Depanummer" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="AndelAvDepan" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="Specifikationsnummer" minOccurs="1" maxOccurs="1"/>
+        <xs:element ref="VPNamn" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="ISIN" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="AvyttradTillISK" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="AntalAvyttrade" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="OkandVarde" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="ErhallenErsattning" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="InkomsttagareKU32" />
+        <xs:element ref="UppgiftslamnareKU32" />
+      </xs:all>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  
+  <xs:element name="InkomsttagareKU32" type="InkomsttagareKU32TYPE" />
+  <xs:complexType name="InkomsttagareKU32TYPE">
+    <xs:all>
+      <xs:element ref="LandskodTIN" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="Inkomsttagare" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="Fornamn" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="Efternamn" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="Gatuadress" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="Postnummer" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="Postort" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="LandskodPostort" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="Fodelsetid" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="AnnatIDNr" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="OrgNamn" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="Gatuadress2" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="FriAdress" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="TIN" minOccurs="0" maxOccurs="1" />
+    </xs:all>
+  </xs:complexType>
+  
+  <xs:element name="UppgiftslamnareKU32" type="UppgiftslamnareKU32TYPE" />
+  <xs:complexType name="UppgiftslamnareKU32TYPE">
+    <xs:all>
+      <xs:element ref="UppgiftslamnarId" minOccurs="1" maxOccurs="1" />
+      <xs:element ref="NamnUppgiftslamnare" minOccurs="0" maxOccurs="1" />
+    </xs:all>
+  </xs:complexType>
+  
+  <xs:element name="KU31" type="KU31TYPE" substitutionGroup="Kontrolluppgift" />
+  <xs:complexType name="KU31TYPE">
+    <xs:complexContent>
+      <xs:extension base="KontrolluppgiftsTYPE">
+      <xs:all>
+        <xs:element ref="AvdragenSkatt" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="AvdragenUtlandskSkatt" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="AvdragenKupongskatt" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="Delagare" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="Inkomstar" minOccurs="1" maxOccurs="1"/>
+        <xs:element ref="Borttag" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="AnnanInkomst" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="Depanummer" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="AndelAvDepan" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="Specifikationsnummer" minOccurs="1" maxOccurs="1"/>
+        <xs:element ref="VPNamn" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="ISIN" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="UtbetaldUtdelning" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="AnnanKupongErsattning" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="OkandVarde" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="Avstamningsdag" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="InkomsttagareKU31" />
+        <xs:element ref="UppgiftslamnareKU31" />
+      </xs:all>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  
+  <xs:element name="InkomsttagareKU31" type="InkomsttagareKU31TYPE" />
+  <xs:complexType name="InkomsttagareKU31TYPE">
+    <xs:all>
+      <xs:element ref="LandskodTIN" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="Fodelseort" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="LandskodFodelseort" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="LandskodHemvist" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="Inkomsttagare" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="Fornamn" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="Efternamn" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="Gatuadress" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="Postnummer" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="Postort" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="LandskodPostort" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="Fodelsetid" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="AnnatIDNr" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="OrgNamn" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="Gatuadress2" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="FriAdress" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="TIN" minOccurs="0" maxOccurs="1" />
+    </xs:all>
+  </xs:complexType>
+  
+  <xs:element name="UppgiftslamnareKU31" type="UppgiftslamnareKU31TYPE" />
+  <xs:complexType name="UppgiftslamnareKU31TYPE">
+    <xs:all>
+      <xs:element ref="UppgiftslamnarId" minOccurs="1" maxOccurs="1" />
+      <xs:element ref="NamnUppgiftslamnare" minOccurs="0" maxOccurs="1" />
+    </xs:all>
+  </xs:complexType>
+  
+  <xs:element name="KU53" type="KU53TYPE" substitutionGroup="Kontrolluppgift" />
+  <xs:complexType name="KU53TYPE">
+    <xs:complexContent>
+      <xs:extension base="KontrolluppgiftsTYPE">
+      <xs:all>
+        <xs:element ref="LandskodUL" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="Inkomstar" minOccurs="1" maxOccurs="1"/>
+        <xs:element ref="Borttag" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="ULUtlandsktOrgnr" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="Specifikationsnummer" minOccurs="1" maxOccurs="1"/>
+        <xs:element ref="NamnForsakrGivare" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="AdrForsakrGivare" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="PostadrForsakrGivare" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="SvensktRegNr" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="UppgiftslamnareKU53" />
+        <xs:element ref="InkomsttagareKU53" />
+      </xs:all>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  
+  <xs:element name="UppgiftslamnareKU53" type="UppgiftslamnareKU53TYPE" />
+  <xs:complexType name="UppgiftslamnareKU53TYPE">
+    <xs:all>
+      <xs:element ref="UppgiftslamnarId" minOccurs="1" maxOccurs="1" />
+      <xs:element ref="NamnUppgiftslamnare" minOccurs="0" maxOccurs="1" />
+    </xs:all>
+  </xs:complexType>
+  
+  <xs:element name="InkomsttagareKU53" type="InkomsttagareKU53TYPE" />
+  <xs:complexType name="InkomsttagareKU53TYPE">
+    <xs:all>
+      <xs:element ref="Inkomsttagare" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="Fornamn" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="Efternamn" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="Gatuadress" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="Postnummer" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="Postort" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="LandskodPostort" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="Fodelsetid" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="AnnatIDNr" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="OrgNamn" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="Gatuadress2" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="FriAdress" minOccurs="0" maxOccurs="1" />
+    </xs:all>
+  </xs:complexType>
+  
+  <xs:element name="KU16" type="KU16TYPE" substitutionGroup="Kontrolluppgift" />
+  <xs:complexType name="KU16TYPE">
+    <xs:complexContent>
+      <xs:extension base="KontrolluppgiftsTYPE">
+      <xs:all>
+        <xs:element ref="KontantBruttolonMm" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="FormanUtomBilDrivmedel" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="AndraKostnadsers" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="UnderlagRutarbete" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="UnderlagRotarbete" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="Fartygssignal" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="AntalDagarSjoinkomst" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="NarfartFjarrfart" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="ErsEjSocAvg" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="Traktamente" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="Arbetsstallenummer" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="Delagare" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="SocialAvgiftsAvtal" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="Inkomstar" minOccurs="1" maxOccurs="1"/>
+        <xs:element ref="Borttag" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="FartygetsNamn" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="Specifikationsnummer" minOccurs="1" maxOccurs="1"/>
+        <xs:element ref="InkomsttagareKU16" />
+        <xs:element ref="UppgiftslamnareKU16" />
+      </xs:all>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  
+  <xs:element name="InkomsttagareKU16" type="InkomsttagareKU16TYPE" />
+  <xs:complexType name="InkomsttagareKU16TYPE">
+    <xs:all>
+      <xs:element ref="LandskodTIN" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="Inkomsttagare" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="Fornamn" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="Efternamn" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="Gatuadress" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="Postnummer" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="Postort" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="LandskodPostort" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="Fodelsetid" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="AnnatIDNr" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="OrgNamn" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="Gatuadress2" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="FriAdress" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="ArbetsplatsensAdress" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="ArbetsplatsensOrt" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="TIN" minOccurs="0" maxOccurs="1" />
+    </xs:all>
+  </xs:complexType>
+  
+  <xs:element name="UppgiftslamnareKU16" type="UppgiftslamnareKU16TYPE" />
+  <xs:complexType name="UppgiftslamnareKU16TYPE">
+    <xs:all>
+      <xs:element ref="UppgiftslamnarId" minOccurs="1" maxOccurs="1" />
+      <xs:element ref="NamnUppgiftslamnare" minOccurs="0" maxOccurs="1" />
+    </xs:all>
+  </xs:complexType>
+  
+  <xs:element name="KU14" type="KU14TYPE" substitutionGroup="Kontrolluppgift" />
+  <xs:complexType name="KU14TYPE">
+    <xs:complexContent>
+      <xs:extension base="KontrolluppgiftsTYPE">
+      <xs:all>
+        <xs:element ref="KontantBruttolonMm" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="FormanUtomBilDrivmedel" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="BilformanUtomDrivmedel" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="DrivmedelVidBilforman" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="AndraKostnadsers" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="UnderlagRutarbete" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="UnderlagRotarbete" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="AndelStyrelsearvode" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="ErsMEgenavgifter" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="Tjanstepension" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="ErsEjSocAvg" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="Forskarskattenamnden" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="BostadSmahus" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="BostadEjSmahus" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="FormanHarJusterats" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="FormanSomPension" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="Bilersattning" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="Traktamente" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="PersonaloptionForvarvAndel" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="Arbetsstallenummer" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="Delagare" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="LandskodArbetsland" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="UtsandUnderTid" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="Kategori" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="SocialAvgiftsAvtal" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="Inkomstar" minOccurs="1" maxOccurs="1"/>
+        <xs:element ref="Borttag" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="Specifikationsnummer" minOccurs="1" maxOccurs="1"/>
+        <xs:element ref="InkomsttagareKU14" />
+        <xs:element ref="UppgiftslamnareKU14" />
+      </xs:all>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  
+  <xs:element name="InkomsttagareKU14" type="InkomsttagareKU14TYPE" />
+  <xs:complexType name="InkomsttagareKU14TYPE">
+    <xs:all>
+      <xs:element ref="LandskodTIN" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="LandskodMedborgare" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="Inkomsttagare" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="Fornamn" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="Efternamn" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="Gatuadress" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="Postnummer" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="Postort" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="LandskodPostort" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="Fodelsetid" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="AnnatIDNr" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="OrgNamn" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="Gatuadress2" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="FriAdress" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="ArbetsplatsensAdress" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="ArbetsplatsensOrt" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="TIN" minOccurs="0" maxOccurs="1" />
+    </xs:all>
+  </xs:complexType>
+  
+  <xs:element name="UppgiftslamnareKU14" type="UppgiftslamnareKU14TYPE" />
+  <xs:complexType name="UppgiftslamnareKU14TYPE">
+    <xs:all>
+      <xs:element ref="UppgiftslamnarId" minOccurs="1" maxOccurs="1" />
+      <xs:element ref="NamnUppgiftslamnare" minOccurs="0" maxOccurs="1" />
+    </xs:all>
+  </xs:complexType>
+  
+  <xs:element name="KU13" type="KU13TYPE" substitutionGroup="Kontrolluppgift" />
+  <xs:complexType name="KU13TYPE">
+    <xs:complexContent>
+      <xs:extension base="KontrolluppgiftsTYPE">
+      <xs:all>
+        <xs:element ref="KontantBruttolonMm" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="FormanUtomBilDrivmedel" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="BilformanUtomDrivmedel" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="DrivmedelVidBilforman" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="AndelStyrelsearvode" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="Tjanstepension" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="ErsEjSocAvg" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="ErsFormanBostadMmSINK" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="BostadSmahus" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="BostadEjSmahus" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="FormanHarJusterats" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="PersonaloptionForvarvAndel" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="Arbetsstallenummer" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="Delagare" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="SocialAvgiftsAvtal" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="Inkomstar" minOccurs="1" maxOccurs="1"/>
+        <xs:element ref="Borttag" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="Specifikationsnummer" minOccurs="1" maxOccurs="1"/>
+        <xs:element ref="InkomsttagareKU13" />
+        <xs:element ref="UppgiftslamnareKU13" />
+      </xs:all>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  
+  <xs:element name="InkomsttagareKU13" type="InkomsttagareKU13TYPE" />
+  <xs:complexType name="InkomsttagareKU13TYPE">
+    <xs:all>
+      <xs:element ref="LandskodTIN" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="LandskodMedborgare" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="Inkomsttagare" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="Fornamn" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="Efternamn" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="Gatuadress" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="Postnummer" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="Postort" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="LandskodPostort" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="Fodelsetid" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="AnnatIDNr" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="OrgNamn" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="Gatuadress2" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="FriAdress" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="ArbetsplatsensAdress" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="ArbetsplatsensOrt" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="TIN" minOccurs="0" maxOccurs="1" />
+    </xs:all>
+  </xs:complexType>
+  
+  <xs:element name="UppgiftslamnareKU13" type="UppgiftslamnareKU13TYPE" />
+  <xs:complexType name="UppgiftslamnareKU13TYPE">
+    <xs:all>
+      <xs:element ref="UppgiftslamnarId" minOccurs="1" maxOccurs="1" />
+      <xs:element ref="NamnUppgiftslamnare" minOccurs="0" maxOccurs="1" />
+    </xs:all>
+  </xs:complexType>
+  
+  <xs:element name="KU35" type="KU35TYPE" substitutionGroup="Kontrolluppgift" />
+  <xs:complexType name="KU35TYPE">
+    <xs:complexContent>
+      <xs:extension base="KontrolluppgiftsTYPE">
+      <xs:all>
+        <xs:element ref="InkomsttagareKU35" />
+        <xs:element ref="UppgiftslamnareKU35" />
+        <xs:element ref="Inkomstar" minOccurs="1" maxOccurs="1"/>
+        <xs:element ref="Borttag" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="Depanummer" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="AndelAvDepan" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="Specifikationsnummer" minOccurs="1" maxOccurs="1"/>
+        <xs:element ref="VPNamn" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="ISIN" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="AvyttradTillISK" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="AntalKontrakt" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="OkandVarde" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="ErhallenErsattning" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="ErlagdErsattning" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="Redovisningsmetod" minOccurs="0" maxOccurs="1"/>
+      </xs:all>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  
+  <xs:element name="InkomsttagareKU35" type="InkomsttagareKU35TYPE" />
+  <xs:complexType name="InkomsttagareKU35TYPE">
+    <xs:all>
+      <xs:element ref="LandskodTIN" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="Inkomsttagare" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="Fornamn" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="Efternamn" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="Gatuadress" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="Postnummer" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="Postort" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="LandskodPostort" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="Fodelsetid" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="AnnatIDNr" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="OrgNamn" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="Gatuadress2" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="FriAdress" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="TIN" minOccurs="0" maxOccurs="1" />
+    </xs:all>
+  </xs:complexType>
+  
+  <xs:element name="UppgiftslamnareKU35" type="UppgiftslamnareKU35TYPE" />
+  <xs:complexType name="UppgiftslamnareKU35TYPE">
+    <xs:all>
+      <xs:element ref="UppgiftslamnarId" minOccurs="1" maxOccurs="1" />
+      <xs:element ref="NamnUppgiftslamnare" minOccurs="0" maxOccurs="1" />
+    </xs:all>
+  </xs:complexType>
+  
+  <xs:element name="KU19" type="KU19TYPE" substitutionGroup="Kontrolluppgift" />
+  <xs:complexType name="KU19TYPE">
+    <xs:complexContent>
+      <xs:extension base="KontrolluppgiftsTYPE">
+      <xs:all>
+        <xs:element ref="AvdragenSkatt" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="Ersattningskod" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="ErsattningBelopp" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="Inkomstar" minOccurs="1" maxOccurs="1"/>
+        <xs:element ref="Borttag" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="Specifikationsnummer" minOccurs="1" maxOccurs="1"/>
+        <xs:element ref="InkomsttagareKU19" />
+        <xs:element ref="UppgiftslamnareKU19" />
+      </xs:all>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  
+  <xs:element name="InkomsttagareKU19" type="InkomsttagareKU19TYPE" />
+  <xs:complexType name="InkomsttagareKU19TYPE">
+    <xs:all>
+      <xs:element ref="LandskodTIN" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="LandskodMedborgare" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="Inkomsttagare" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="Fornamn" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="Efternamn" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="Gatuadress" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="Postnummer" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="Postort" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="LandskodPostort" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="Fodelsetid" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="AnnatIDNr" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="OrgNamn" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="Gatuadress2" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="FriAdress" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="TIN" minOccurs="0" maxOccurs="1" />
+    </xs:all>
+  </xs:complexType>
+  
+  <xs:element name="UppgiftslamnareKU19" type="UppgiftslamnareKU19TYPE" />
+  <xs:complexType name="UppgiftslamnareKU19TYPE">
+    <xs:all>
+      <xs:element ref="UppgiftslamnarId" minOccurs="1" maxOccurs="1" />
+      <xs:element ref="NamnUppgiftslamnare" minOccurs="0" maxOccurs="1" />
+    </xs:all>
+  </xs:complexType>
+  
+  <xs:element name="KU18" type="KU18TYPE" substitutionGroup="Kontrolluppgift" />
+  <xs:complexType name="KU18TYPE">
+    <xs:complexContent>
+      <xs:extension base="KontrolluppgiftsTYPE">
+      <xs:all>
+        <xs:element ref="AvdragenSkatt" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="Ersattningskod" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="ErsattningBelopp" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="Inkomstar" minOccurs="1" maxOccurs="1"/>
+        <xs:element ref="Borttag" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="Specifikationsnummer" minOccurs="1" maxOccurs="1"/>
+        <xs:element ref="InkomsttagareKU18" />
+        <xs:element ref="UppgiftslamnareKU18" />
+      </xs:all>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  
+  <xs:element name="InkomsttagareKU18" type="InkomsttagareKU18TYPE" />
+  <xs:complexType name="InkomsttagareKU18TYPE">
+    <xs:all>
+      <xs:element ref="LandskodTIN" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="Inkomsttagare" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="Fornamn" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="Efternamn" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="Gatuadress" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="Postnummer" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="Postort" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="LandskodPostort" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="Fodelsetid" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="AnnatIDNr" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="OrgNamn" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="Gatuadress2" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="FriAdress" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="TIN" minOccurs="0" maxOccurs="1" />
+    </xs:all>
+  </xs:complexType>
+  
+  <xs:element name="UppgiftslamnareKU18" type="UppgiftslamnareKU18TYPE" />
+  <xs:complexType name="UppgiftslamnareKU18TYPE">
+    <xs:all>
+      <xs:element ref="UppgiftslamnarId" minOccurs="1" maxOccurs="1" />
+      <xs:element ref="NamnUppgiftslamnare" minOccurs="0" maxOccurs="1" />
+    </xs:all>
+  </xs:complexType>
+  
+  <xs:element name="KU17" type="KU17TYPE" substitutionGroup="Kontrolluppgift" />
+  <xs:complexType name="KU17TYPE">
+    <xs:complexContent>
+      <xs:extension base="KontrolluppgiftsTYPE">
+      <xs:all>
+        <xs:element ref="KontantBruttolonMm" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="FormanUtomBilDrivmedel" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="Fartygssignal" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="AntalDagarSjoinkomst" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="NarfartFjarrfart" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="ErsEjSocAvg" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="Arbetsstallenummer" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="Delagare" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="SocialAvgiftsAvtal" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="Inkomstar" minOccurs="1" maxOccurs="1"/>
+        <xs:element ref="Borttag" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="FartygetsNamn" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="Specifikationsnummer" minOccurs="1" maxOccurs="1"/>
+        <xs:element ref="InkomsttagareKU17" />
+        <xs:element ref="UppgiftslamnareKU17" />
+      </xs:all>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  
+  <xs:element name="InkomsttagareKU17" type="InkomsttagareKU17TYPE" />
+  <xs:complexType name="InkomsttagareKU17TYPE">
+    <xs:all>
+      <xs:element ref="LandskodTIN" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="LandskodMedborgare" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="Inkomsttagare" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="Fornamn" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="Efternamn" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="Gatuadress" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="Postnummer" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="Postort" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="LandskodPostort" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="Fodelsetid" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="AnnatIDNr" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="OrgNamn" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="Gatuadress2" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="FriAdress" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="ArbetsplatsensAdress" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="ArbetsplatsensOrt" minOccurs="0" maxOccurs="1" />
+      <xs:element ref="TIN" minOccurs="0" maxOccurs="1" />
+    </xs:all>
+  </xs:complexType>
+  
+  <xs:element name="UppgiftslamnareKU17" type="UppgiftslamnareKU17TYPE" />
+  <xs:complexType name="UppgiftslamnareKU17TYPE">
+    <xs:all>
+      <xs:element ref="UppgiftslamnarId" minOccurs="1" maxOccurs="1" />
+      <xs:element ref="NamnUppgiftslamnare" minOccurs="0" maxOccurs="1" />
+    </xs:all>
+  </xs:complexType>
+  
+
+  <xs:element name="UppgiftslamnarId">
+    <xs:annotation>
+      <xs:documentation>Organisationsnummer</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:simpleContent>
+        <xs:extension base="gm:IdentitetsbeteckningForPersonTYPE" >
+          <xs:attribute name="faltkod" fixed="201" use="required" type="xs:string"/>
+        </xs:extension>
+      </xs:simpleContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="NamnUppgiftslamnare">
+    <xs:annotation>
+      <xs:documentation>Namn</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:simpleContent>
+        <xs:extension base="Text50TYPE" >
+          <xs:attribute name="faltkod" fixed="202" use="required" type="xs:string"/>
+        </xs:extension>
+      </xs:simpleContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="Inkomstar">
+    <xs:annotation>
+      <xs:documentation>Inkomstår</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:simpleContent>
+        <xs:extension base="InkomstarTYPE" >
+          <xs:attribute name="faltkod" fixed="203" use="required" type="xs:string"/>
+        </xs:extension>
+      </xs:simpleContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="Borttag">
+    <xs:annotation>
+      <xs:documentation>Denna kontrolluppgift ska ta bort tidigare inlämnad kontrolluppgift</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:simpleContent>
+        <xs:extension base="KryssTYPE" >
+          <xs:attribute name="faltkod" fixed="205" use="required" type="xs:string"/>
+        </xs:extension>
+      </xs:simpleContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="Inkomsttagare">
+    <xs:annotation>
+      <xs:documentation>Person-/organisationsnummer</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:simpleContent>
+        <xs:extension base="gm:IdentitetsbeteckningForPersonTYPE" >
+          <xs:attribute name="faltkod" fixed="215" use="required" type="xs:string"/>
+        </xs:extension>
+      </xs:simpleContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="Fornamn">
+    <xs:annotation>
+      <xs:documentation>Namn</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:simpleContent>
+        <xs:extension base="Text50TYPE" >
+          <xs:attribute name="faltkod" fixed="216" use="required" type="xs:string"/>
+        </xs:extension>
+      </xs:simpleContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="Efternamn">
+    <xs:annotation>
+      <xs:documentation>Namn</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:simpleContent>
+        <xs:extension base="Text50TYPE" >
+          <xs:attribute name="faltkod" fixed="217" use="required" type="xs:string"/>
+        </xs:extension>
+      </xs:simpleContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="Gatuadress">
+    <xs:annotation>
+      <xs:documentation>Gatuadress</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:simpleContent>
+        <xs:extension base="Text50TYPE" >
+          <xs:attribute name="faltkod" fixed="218" use="required" type="xs:string"/>
+        </xs:extension>
+      </xs:simpleContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="Postnummer">
+    <xs:annotation>
+      <xs:documentation>Postnummer</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:simpleContent>
+        <xs:extension base="gm:PostNrTYPE" >
+          <xs:attribute name="faltkod" fixed="219" use="required" type="xs:string"/>
+        </xs:extension>
+      </xs:simpleContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="Postort">
+    <xs:annotation>
+      <xs:documentation>Postort</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:simpleContent>
+        <xs:extension base="Text50TYPE" >
+          <xs:attribute name="faltkod" fixed="220" use="required" type="xs:string"/>
+        </xs:extension>
+      </xs:simpleContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="LandskodPostort">
+    <xs:complexType>
+      <xs:simpleContent>
+        <xs:extension base="gm:LandskodTYPE" >
+          <xs:attribute name="faltkod" fixed="221" use="required" type="xs:string"/>
+        </xs:extension>
+      </xs:simpleContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="Fodelsetid">
+    <xs:complexType>
+      <xs:simpleContent>
+        <xs:extension base="FodelsetidTYPE" >
+          <xs:attribute name="faltkod" fixed="222" use="required" type="xs:string"/>
+        </xs:extension>
+      </xs:simpleContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="OrgNamn">
+    <xs:annotation>
+      <xs:documentation>Namn</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:simpleContent>
+        <xs:extension base="Text50TYPE" >
+          <xs:attribute name="faltkod" fixed="226" use="required" type="xs:string"/>
+        </xs:extension>
+      </xs:simpleContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="Gatuadress2">
+    <xs:complexType>
+      <xs:simpleContent>
+        <xs:extension base="Text50TYPE" >
+          <xs:attribute name="faltkod" fixed="228" use="required" type="xs:string"/>
+        </xs:extension>
+      </xs:simpleContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="FriAdress">
+    <xs:annotation>
+      <xs:documentation>Adress i fritt format</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:simpleContent>
+        <xs:extension base="Text350TYPE" >
+          <xs:attribute name="faltkod" fixed="230" use="required" type="xs:string"/>
+        </xs:extension>
+      </xs:simpleContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="Specifikationsnummer">
+    <xs:annotation>
+      <xs:documentation>Specifikationsnummer</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:simpleContent>
+        <xs:extension base="SpecifikationsNummerTYPE" >
+          <xs:attribute name="faltkod" fixed="570" use="required" type="xs:string"/>
+        </xs:extension>
+      </xs:simpleContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="Belopp">
+    <xs:annotation>
+      <xs:documentation>Belopp i den aktuella valutan</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:simpleContent>
+        <xs:extension base="Belopp12TYPE" >
+          <xs:attribute name="faltkod" fixed="660" use="required" type="xs:string"/>
+        </xs:extension>
+      </xs:simpleContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="Betalningskod">
+    <xs:annotation>
+      <xs:documentation>Betalningskod</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:simpleContent>
+        <xs:extension base="gm:BetalkodTYPE" >
+          <xs:attribute name="faltkod" fixed="661" use="required" type="xs:string"/>
+        </xs:extension>
+      </xs:simpleContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="LandskodBetalning">
+    <xs:annotation>
+      <xs:documentation>Landskod</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:simpleContent>
+        <xs:extension base="gm:LandskodTYPE" >
+          <xs:attribute name="faltkod" fixed="662" use="required" type="xs:string"/>
+        </xs:extension>
+      </xs:simpleContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="Betalningsdatum">
+    <xs:annotation>
+      <xs:documentation>Betalningsdatum</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:simpleContent>
+        <xs:extension base="DatumTYPE" >
+          <xs:attribute name="faltkod" fixed="663" use="required" type="xs:string"/>
+        </xs:extension>
+      </xs:simpleContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="Valutakod">
+    <xs:annotation>
+      <xs:documentation>Valutakod</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:simpleContent>
+        <xs:extension base="gm:ValutakodTYPE" >
+          <xs:attribute name="faltkod" fixed="664" use="required" type="xs:string"/>
+        </xs:extension>
+      </xs:simpleContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="NamnBetalningsmottagare">
+    <xs:annotation>
+      <xs:documentation>Namn på betalningsmottagare</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:simpleContent>
+        <xs:extension base="Text36TYPE" >
+          <xs:attribute name="faltkod" fixed="671" use="required" type="xs:string"/>
+        </xs:extension>
+      </xs:simpleContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="LandskodTIN">
+    <xs:annotation>
+      <xs:documentation>Landskod</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:simpleContent>
+        <xs:extension base="gm:LandskodTYPE" >
+          <xs:attribute name="faltkod" fixed="076" use="required" type="xs:string"/>
+        </xs:extension>
+      </xs:simpleContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="Fodelseort">
+    <xs:annotation>
+      <xs:documentation>Födelseort</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:simpleContent>
+        <xs:extension base="Text35TYPE" >
+          <xs:attribute name="faltkod" fixed="077" use="required" type="xs:string"/>
+        </xs:extension>
+      </xs:simpleContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="LandskodFodelseort">
+    <xs:annotation>
+      <xs:documentation>Landskod</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:simpleContent>
+        <xs:extension base="gm:LandskodTYPE" >
+          <xs:attribute name="faltkod" fixed="078" use="required" type="xs:string"/>
+        </xs:extension>
+      </xs:simpleContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="AnnatIDNr">
+    <xs:complexType>
+      <xs:simpleContent>
+        <xs:extension base="Text20TYPE" >
+          <xs:attribute name="faltkod" fixed="224" use="required" type="xs:string"/>
+        </xs:extension>
+      </xs:simpleContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="TIN">
+    <xs:annotation>
+      <xs:documentation>Utländskt skatteregistreringsnummer (TIN)</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:simpleContent>
+        <xs:extension base="Text20TYPE" >
+          <xs:attribute name="faltkod" fixed="252" use="required" type="xs:string"/>
+        </xs:extension>
+      </xs:simpleContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="VPNamn">
+    <xs:annotation>
+      <xs:documentation>Namn på fonden</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:simpleContent>
+        <xs:extension base="Text50TYPE" >
+          <xs:attribute name="faltkod" fixed="571" use="required" type="xs:string"/>
+        </xs:extension>
+      </xs:simpleContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="ISIN">
+    <xs:annotation>
+      <xs:documentation>ISIN</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:simpleContent>
+        <xs:extension base="IsinTYPE" >
+          <xs:attribute name="faltkod" fixed="572" use="required" type="xs:string"/>
+        </xs:extension>
+      </xs:simpleContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="Schablonintakt">
+    <xs:annotation>
+      <xs:documentation>Schablonintäkt</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:simpleContent>
+        <xs:extension base="Belopp10TYPE" >
+          <xs:attribute name="faltkod" fixed="815" use="required" type="xs:string"/>
+        </xs:extension>
+      </xs:simpleContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="AvyttradTillISK">
+    <xs:annotation>
+      <xs:documentation>Avyttrad till investeringssparkonto</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:simpleContent>
+        <xs:extension base="KryssTYPE" >
+          <xs:attribute name="faltkod" fixed="573" use="required" type="xs:string"/>
+        </xs:extension>
+      </xs:simpleContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="Kapitalvinst">
+    <xs:annotation>
+      <xs:documentation>Kapitalvinst</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:simpleContent>
+        <xs:extension base="Belopp10TYPE" >
+          <xs:attribute name="faltkod" fixed="600" use="required" type="xs:string"/>
+        </xs:extension>
+      </xs:simpleContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="Kapitalforlust">
+    <xs:annotation>
+      <xs:documentation>Kapitalförlust</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:simpleContent>
+        <xs:extension base="Belopp10TYPE" >
+          <xs:attribute name="faltkod" fixed="601" use="required" type="xs:string"/>
+        </xs:extension>
+      </xs:simpleContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="FondInteMarknadsnoterad">
+    <xs:annotation>
+      <xs:documentation>Fonden är inte marknadsnoterad</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:simpleContent>
+        <xs:extension base="KryssTYPE" >
+          <xs:attribute name="faltkod" fixed="602" use="required" type="xs:string"/>
+        </xs:extension>
+      </xs:simpleContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="Rantefond">
+    <xs:annotation>
+      <xs:documentation>Fonden är en räntefonnd</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:simpleContent>
+        <xs:extension base="KryssTYPE" >
+          <xs:attribute name="faltkod" fixed="606" use="required" type="xs:string"/>
+        </xs:extension>
+      </xs:simpleContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="ErhallenErsattning">
+    <xs:annotation>
+      <xs:documentation>Erhållen ersättning</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:simpleContent>
+        <xs:extension base="Belopp10TYPE" >
+          <xs:attribute name="faltkod" fixed="810" use="required" type="xs:string"/>
+        </xs:extension>
+      </xs:simpleContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="KWhMatatsIn">
+    <xs:annotation>
+      <xs:documentation>Antal kwh som matats in i anslutningspunkten under året</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:simpleContent>
+        <xs:extension base="KWh10TYPE" >
+          <xs:attribute name="faltkod" fixed="270" use="required" type="xs:string"/>
+        </xs:extension>
+      </xs:simpleContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="KWhTagitsUt">
+    <xs:annotation>
+      <xs:documentation>Antal kwh som tagits ut från anslutningspunkten under året</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:simpleContent>
+        <xs:extension base="KWh10TYPE" >
+          <xs:attribute name="faltkod" fixed="271" use="required" type="xs:string"/>
+        </xs:extension>
+      </xs:simpleContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="AnlaggningsID">
+    <xs:annotation>
+      <xs:documentation>AnläggningsID</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:simpleContent>
+        <xs:extension base="AnlIDTYPE" >
+          <xs:attribute name="faltkod" fixed="272" use="required" type="xs:string"/>
+        </xs:extension>
+      </xs:simpleContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="AndelIAnslPunkt">
+    <xs:annotation>
+      <xs:documentation>Andel i anslutningspunkten (i procent)</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:simpleContent>
+        <xs:extension base="Decimal2TYPE" >
+          <xs:attribute name="faltkod" fixed="273" use="required" type="xs:string"/>
+        </xs:extension>
+      </xs:simpleContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="AvdragenSkatt">
+    <xs:annotation>
+      <xs:documentation>Avdragen skatt</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:simpleContent>
+        <xs:extension base="Belopp10TYPE" >
+          <xs:attribute name="faltkod" fixed="001" use="required" type="xs:string"/>
+        </xs:extension>
+      </xs:simpleContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="AnnanInkomst">
+    <xs:annotation>
+      <xs:documentation>Annan inkomst</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:simpleContent>
+        <xs:extension base="Belopp7TYPE" >
+          <xs:attribute name="faltkod" fixed="504" use="required" type="xs:string"/>
+        </xs:extension>
+      </xs:simpleContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="RantaFordringsratter">
+    <xs:annotation>
+      <xs:documentation>Sammanlagd ränta, fordringsrätter</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:simpleContent>
+        <xs:extension base="Belopp10TYPE" >
+          <xs:attribute name="faltkod" fixed="520" use="required" type="xs:string"/>
+        </xs:extension>
+      </xs:simpleContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="UtbetaltIVissaFall">
+    <xs:annotation>
+      <xs:documentation>Utbetalt belopp i vissa fall</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:simpleContent>
+        <xs:extension base="Belopp10TYPE" >
+          <xs:attribute name="faltkod" fixed="522" use="required" type="xs:string"/>
+        </xs:extension>
+      </xs:simpleContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="Depanummer">
+    <xs:annotation>
+      <xs:documentation>Depånummer</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:simpleContent>
+        <xs:extension base="Belopp12TYPE" >
+          <xs:attribute name="faltkod" fixed="523" use="required" type="xs:string"/>
+        </xs:extension>
+      </xs:simpleContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="AndelAvDepan">
+    <xs:annotation>
+      <xs:documentation>Andel av depån</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:simpleContent>
+        <xs:extension base="Decimal2TYPE" >
+          <xs:attribute name="faltkod" fixed="524" use="required" type="xs:string"/>
+        </xs:extension>
+      </xs:simpleContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="ErhallenRantekompensation">
+    <xs:annotation>
+      <xs:documentation>Erhållen räntekompensation</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:simpleContent>
+        <xs:extension base="Belopp10TYPE" >
+          <xs:attribute name="faltkod" fixed="525" use="required" type="xs:string"/>
+        </xs:extension>
+      </xs:simpleContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="OkandVarde">
+    <xs:annotation>
+      <xs:documentation>Okänt värde</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:simpleContent>
+        <xs:extension base="KryssTYPE" >
+          <xs:attribute name="faltkod" fixed="599" use="required" type="xs:string"/>
+        </xs:extension>
+      </xs:simpleContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="MottagetGavobelopp">
+    <xs:annotation>
+      <xs:documentation>Mottaget gåvobelopp</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:simpleContent>
+        <xs:extension base="Belopp10TYPE" >
+          <xs:attribute name="faltkod" fixed="621" use="required" type="xs:string"/>
+        </xs:extension>
+      </xs:simpleContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="Delagare">
+    <xs:annotation>
+      <xs:documentation>Delägare m.fl. i fåmansföretag</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:simpleContent>
+        <xs:extension base="KryssTYPE" >
+          <xs:attribute name="faltkod" fixed="061" use="required" type="xs:string"/>
+        </xs:extension>
+      </xs:simpleContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="Ranteinkomst">
+    <xs:annotation>
+      <xs:documentation>Ränteinkomst, konto</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:simpleContent>
+        <xs:extension base="Belopp10TYPE" >
+          <xs:attribute name="faltkod" fixed="500" use="required" type="xs:string"/>
+        </xs:extension>
+      </xs:simpleContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="Forfogarkonto">
+    <xs:annotation>
+      <xs:documentation>Förfogarkonto (fler än fem)</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:simpleContent>
+        <xs:extension base="KryssTYPE" >
+          <xs:attribute name="faltkod" fixed="502" use="required" type="xs:string"/>
+        </xs:extension>
+      </xs:simpleContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="RanteinkomstEjKonto">
+    <xs:annotation>
+      <xs:documentation>Ränteinkomst, ej konto</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:simpleContent>
+        <xs:extension base="Belopp10TYPE" >
+          <xs:attribute name="faltkod" fixed="503" use="required" type="xs:string"/>
+        </xs:extension>
+      </xs:simpleContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="BetaldTomtrattsavgald">
+    <xs:annotation>
+      <xs:documentation>Betald tomträttsavgäld</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:simpleContent>
+        <xs:extension base="Belopp7TYPE" >
+          <xs:attribute name="faltkod" fixed="560" use="required" type="xs:string"/>
+        </xs:extension>
+      </xs:simpleContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="Fastighetsbeteckning">
+    <xs:annotation>
+      <xs:documentation>Fastighetsbeteckning</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:simpleContent>
+        <xs:extension base="Text36TYPE" >
+          <xs:attribute name="faltkod" fixed="561" use="required" type="xs:string"/>
+        </xs:extension>
+      </xs:simpleContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="AvdragsgillRanta">
+    <xs:annotation>
+      <xs:documentation>Betald och för året avdragsgill ränta</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:simpleContent>
+        <xs:extension base="Belopp10TYPE" >
+          <xs:attribute name="faltkod" fixed="540" use="required" type="xs:string"/>
+        </xs:extension>
+      </xs:simpleContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="TotaltInbetaldRanta">
+    <xs:annotation>
+      <xs:documentation>Totalt inbetald ränta (anges endast om förskotts-ränta erlagts som inte är avdragsgill för året)</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:simpleContent>
+        <xs:extension base="Belopp10TYPE" >
+          <xs:attribute name="faltkod" fixed="541" use="required" type="xs:string"/>
+        </xs:extension>
+      </xs:simpleContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="BetaldRantekompensation">
+    <xs:annotation>
+      <xs:documentation>Betald räntekompensation</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:simpleContent>
+        <xs:extension base="Belopp10TYPE" >
+          <xs:attribute name="faltkod" fixed="543" use="required" type="xs:string"/>
+        </xs:extension>
+      </xs:simpleContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="GemensamtLan">
+    <xs:annotation>
+      <xs:documentation>Gemensamt lån (fler än fem)</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:simpleContent>
+        <xs:extension base="KryssTYPE" >
+          <xs:attribute name="faltkod" fixed="544" use="required" type="xs:string"/>
+        </xs:extension>
+      </xs:simpleContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="AvgiftArbetsloshetskassa">
+    <xs:annotation>
+      <xs:documentation>Avgift till arbetslöshetskassa</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:simpleContent>
+        <xs:extension base="Belopp6TYPE" >
+          <xs:attribute name="faltkod" fixed="551" use="required" type="xs:string"/>
+        </xs:extension>
+      </xs:simpleContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="UnderlagForInvesteraravdrag">
+    <xs:annotation>
+      <xs:documentation>Underlag för investeraravdrag</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:simpleContent>
+        <xs:extension base="Belopp10TYPE" >
+          <xs:attribute name="faltkod" fixed="528" use="required" type="xs:string"/>
+        </xs:extension>
+      </xs:simpleContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="TotUnderlagInvesteraravdrag">
+    <xs:annotation>
+      <xs:documentation>Totalt underlag för investeraravdrag</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:simpleContent>
+        <xs:extension base="Belopp10TYPE" >
+          <xs:attribute name="faltkod" fixed="529" use="required" type="xs:string"/>
+        </xs:extension>
+      </xs:simpleContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="Betalningsar">
+    <xs:annotation>
+      <xs:documentation>Inbetalning gjord året före inkomståret</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:simpleContent>
+        <xs:extension base="KryssTYPE" >
+          <xs:attribute name="faltkod" fixed="530" use="required" type="xs:string"/>
+        </xs:extension>
+      </xs:simpleContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="AterforingAvyttring">
+    <xs:annotation>
+      <xs:documentation>Återföring på grund av Avyttring</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:simpleContent>
+        <xs:extension base="KryssTYPE" >
+          <xs:attribute name="faltkod" fixed="531" use="required" type="xs:string"/>
+        </xs:extension>
+      </xs:simpleContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="AterforingUtflyttning">
+    <xs:annotation>
+      <xs:documentation>Återföring på grund av Utflyttning</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:simpleContent>
+        <xs:extension base="KryssTYPE" >
+          <xs:attribute name="faltkod" fixed="532" use="required" type="xs:string"/>
+        </xs:extension>
+      </xs:simpleContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="AterforingHogVardeoverforing">
+    <xs:annotation>
+      <xs:documentation>Återföring på grund av För hög värdeöverföring</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:simpleContent>
+        <xs:extension base="KryssTYPE" >
+          <xs:attribute name="faltkod" fixed="533" use="required" type="xs:string"/>
+        </xs:extension>
+      </xs:simpleContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="AterforingInternaForvarv">
+    <xs:annotation>
+      <xs:documentation>Återföring på grund av Vissa interna förvärv</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:simpleContent>
+        <xs:extension base="KryssTYPE" >
+          <xs:attribute name="faltkod" fixed="534" use="required" type="xs:string"/>
+        </xs:extension>
+      </xs:simpleContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="DatumForvarv">
+    <xs:annotation>
+      <xs:documentation>Datum när andelarna förvärvades</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:simpleContent>
+        <xs:extension base="DatumTYPE" >
+          <xs:attribute name="faltkod" fixed="535" use="required" type="xs:string"/>
+        </xs:extension>
+      </xs:simpleContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="Region">
+    <xs:annotation>
+      <xs:documentation>Region där företaget finns (NUTS 2-nivå)</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:simpleContent>
+        <xs:extension base="gm:RegionTYPE" >
+          <xs:attribute name="faltkod" fixed="536" use="required" type="xs:string"/>
+        </xs:extension>
+      </xs:simpleContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="Verksamhetsomrade">
+    <xs:annotation>
+      <xs:documentation>Företagets verksamhetsområde (Nace-gruppnivå)</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:simpleContent>
+        <xs:extension base="VerksamhetsomradeTYPE" >
+          <xs:attribute name="faltkod" fixed="537" use="required" type="xs:string"/>
+        </xs:extension>
+      </xs:simpleContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="Naringsbidrag">
+    <xs:annotation>
+      <xs:documentation>Belopp som utbetalats/eftergetts</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:simpleContent>
+        <xs:extension base="Belopp10TYPE" >
+          <xs:attribute name="faltkod" fixed="716" use="required" type="xs:string"/>
+        </xs:extension>
+      </xs:simpleContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="Royalty">
+    <xs:annotation>
+      <xs:documentation>Utbetalt belopp</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:simpleContent>
+        <xs:extension base="Belopp10TYPE" >
+          <xs:attribute name="faltkod" fixed="717" use="required" type="xs:string"/>
+        </xs:extension>
+      </xs:simpleContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="AvdragenUtlandskSkatt">
+    <xs:annotation>
+      <xs:documentation>Avdragen utländsk skatt</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:simpleContent>
+        <xs:extension base="Belopp10TYPE" >
+          <xs:attribute name="faltkod" fixed="002" use="required" type="xs:string"/>
+        </xs:extension>
+      </xs:simpleContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="Kontonummer">
+    <xs:annotation>
+      <xs:documentation>Kontonummer</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:simpleContent>
+        <xs:extension base="Text30TYPE" >
+          <xs:attribute name="faltkod" fixed="817" use="required" type="xs:string"/>
+        </xs:extension>
+      </xs:simpleContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="LandskodUL">
+    <xs:annotation>
+      <xs:documentation>Landskod</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:simpleContent>
+        <xs:extension base="gm:LandskodTYPE" >
+          <xs:attribute name="faltkod" fixed="075" use="required" type="xs:string"/>
+        </xs:extension>
+      </xs:simpleContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="ULUtlandsktOrgnr">
+    <xs:annotation>
+      <xs:documentation>Utländskt organisationsnummer</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:simpleContent>
+        <xs:extension base="Text13TYPE" >
+          <xs:attribute name="faltkod" fixed="506" use="required" type="xs:string"/>
+        </xs:extension>
+      </xs:simpleContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="Forsakringsavtalsnummer">
+    <xs:annotation>
+      <xs:documentation>Pensionsförsäkringens försäkringsavtalsnummer</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:simpleContent>
+        <xs:extension base="Text30TYPE" >
+          <xs:attribute name="faltkod" fixed="507" use="required" type="xs:string"/>
+        </xs:extension>
+      </xs:simpleContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="Kapitalunderlag">
+    <xs:annotation>
+      <xs:documentation>Kapitalunderlag</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:simpleContent>
+        <xs:extension base="Belopp12TYPE" >
+          <xs:attribute name="faltkod" fixed="652" use="required" type="xs:string"/>
+        </xs:extension>
+      </xs:simpleContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="TypForsakring">
+    <xs:annotation>
+      <xs:documentation>Kontrolluppgiften gäller en</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:simpleContent>
+        <xs:extension base="TypForsakringTYPE" >
+          <xs:attribute name="faltkod" fixed="654" use="required" type="xs:string"/>
+        </xs:extension>
+      </xs:simpleContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="TillgodoUtdelning">
+    <xs:annotation>
+      <xs:documentation>Tillgodoräknad utdelning</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:simpleContent>
+        <xs:extension base="Belopp10TYPE" >
+          <xs:attribute name="faltkod" fixed="730" use="required" type="xs:string"/>
+        </xs:extension>
+      </xs:simpleContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="DelUtdelnSkog">
+    <xs:annotation>
+      <xs:documentation>Del av utdelningen som kommer från intäkt av skogsbruk</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:simpleContent>
+        <xs:extension base="Belopp10TYPE" >
+          <xs:attribute name="faltkod" fixed="731" use="required" type="xs:string"/>
+        </xs:extension>
+      </xs:simpleContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="SkplDelKapital">
+    <xs:annotation>
+      <xs:documentation>Delägarens skattepliktiga andel i samfällighetens         inkomster som är avkastning på kapital</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:simpleContent>
+        <xs:extension base="Belopp10TYPE" >
+          <xs:attribute name="faltkod" fixed="732" use="required" type="xs:string"/>
+        </xs:extension>
+      </xs:simpleContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="BetaldPremie">
+    <xs:annotation>
+      <xs:documentation>Betald premie i aktuell valuta/Inbetalning på pensionssparkonto</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:simpleContent>
+        <xs:extension base="Belopp10TYPE" >
+          <xs:attribute name="faltkod" fixed="620" use="required" type="xs:string"/>
+        </xs:extension>
+      </xs:simpleContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="Kontoslag">
+    <xs:annotation>
+      <xs:documentation>Kontrolluppgiften avser insättning på</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:simpleContent>
+        <xs:extension base="KontoslagTYPE" >
+          <xs:attribute name="faltkod" fixed="740" use="required" type="xs:string"/>
+        </xs:extension>
+      </xs:simpleContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="InsattBelopp">
+    <xs:annotation>
+      <xs:documentation>Insatt belopp</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:simpleContent>
+        <xs:extension base="Belopp10TYPE" >
+          <xs:attribute name="faltkod" fixed="745" use="required" type="xs:string"/>
+        </xs:extension>
+      </xs:simpleContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="DatumInsattning">
+    <xs:annotation>
+      <xs:documentation>Datum för insättning</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:simpleContent>
+        <xs:extension base="DatumTYPE" >
+          <xs:attribute name="faltkod" fixed="746" use="required" type="xs:string"/>
+        </xs:extension>
+      </xs:simpleContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="OverlatPantOvertag">
+    <xs:annotation>
+      <xs:documentation>Överlåtelse, pantsättning eller övertagande av kontomedel</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:simpleContent>
+        <xs:extension base="KryssTYPE" >
+          <xs:attribute name="faltkod" fixed="743" use="required" type="xs:string"/>
+        </xs:extension>
+      </xs:simpleContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="UtbetaltBelopp">
+    <xs:annotation>
+      <xs:documentation>Utbetalt belopp</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:simpleContent>
+        <xs:extension base="Belopp10TYPE" >
+          <xs:attribute name="faltkod" fixed="744" use="required" type="xs:string"/>
+        </xs:extension>
+      </xs:simpleContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="AntalKontrakt">
+    <xs:annotation>
+      <xs:documentation>Antal kontrakt</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:simpleContent>
+        <xs:extension base="Belopp10TYPE" >
+          <xs:attribute name="faltkod" fixed="578" use="required" type="xs:string"/>
+        </xs:extension>
+      </xs:simpleContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="TypAvOption">
+    <xs:annotation>
+      <xs:documentation>Typ av option</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:simpleContent>
+        <xs:extension base="TypOptionTYPE" >
+          <xs:attribute name="faltkod" fixed="812" use="required" type="xs:string"/>
+        </xs:extension>
+      </xs:simpleContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="OptionenForfallen">
+    <xs:annotation>
+      <xs:documentation>Optionen förfallen</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:simpleContent>
+        <xs:extension base="KryssTYPE" >
+          <xs:attribute name="faltkod" fixed="813" use="required" type="xs:string"/>
+        </xs:extension>
+      </xs:simpleContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="BostRattBeteckning">
+    <xs:annotation>
+      <xs:documentation>Bostadsrättens/ lägenhetens beteckning</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:simpleContent>
+        <xs:extension base="Text36TYPE" >
+          <xs:attribute name="faltkod" fixed="630" use="required" type="xs:string"/>
+        </xs:extension>
+      </xs:simpleContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="Overlatelsedatum">
+    <xs:annotation>
+      <xs:documentation>Överlåtelsedatum (ÅÅÅÅMMDD)</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:simpleContent>
+        <xs:extension base="DatumTYPE" >
+          <xs:attribute name="faltkod" fixed="631" use="required" type="xs:string"/>
+        </xs:extension>
+      </xs:simpleContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="OverlatenAndel">
+    <xs:annotation>
+      <xs:documentation>Överlåten andel</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:simpleContent>
+        <xs:extension base="Decimal2-100TYPE" >
+          <xs:attribute name="faltkod" fixed="632" use="required" type="xs:string"/>
+        </xs:extension>
+      </xs:simpleContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="OverlatelseArvBodeln">
+    <xs:annotation>
+      <xs:documentation>Överlåtelsen har skett genom arv, gåva, bodelning eller liknande</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:simpleContent>
+        <xs:extension base="KryssTYPE" >
+          <xs:attribute name="faltkod" fixed="633" use="required" type="xs:string"/>
+        </xs:extension>
+      </xs:simpleContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="Overlatelsepris">
+    <xs:annotation>
+      <xs:documentation>Överlåtelsepris</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:simpleContent>
+        <xs:extension base="Belopp10TYPE" >
+          <xs:attribute name="faltkod" fixed="634" use="required" type="xs:string"/>
+        </xs:extension>
+      </xs:simpleContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="InreRepFondOverlatelse">
+    <xs:annotation>
+      <xs:documentation>Bostadsrättens andel av innestående medel på inre reparationsfond vid överlåtelsen</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:simpleContent>
+        <xs:extension base="Belopp7TYPE" >
+          <xs:attribute name="faltkod" fixed="635" use="required" type="xs:string"/>
+        </xs:extension>
+      </xs:simpleContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="Kapitaltillskott">
+    <xs:annotation>
+      <xs:documentation>Kapitaltillskott</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:simpleContent>
+        <xs:extension base="Belopp7TYPE" >
+          <xs:attribute name="faltkod" fixed="636" use="required" type="xs:string"/>
+        </xs:extension>
+      </xs:simpleContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="OaktaBostadsftg">
+    <xs:annotation>
+      <xs:documentation>Bostadsföretaget var oäkta (inte privatbostadsföretag) vid ingången av inkomståret.</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:simpleContent>
+        <xs:extension base="KryssTYPE" >
+          <xs:attribute name="faltkod" fixed="638" use="required" type="xs:string"/>
+        </xs:extension>
+      </xs:simpleContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="Tillaggskopeskilling">
+    <xs:annotation>
+      <xs:documentation>Tilläggsköpeskilling</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:simpleContent>
+        <xs:extension base="Belopp7TYPE" >
+          <xs:attribute name="faltkod" fixed="639" use="required" type="xs:string"/>
+        </xs:extension>
+      </xs:simpleContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="Forvarvsdatum">
+    <xs:annotation>
+      <xs:documentation>Förvärvsdatum (ÅÅÅÅMMDD)</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:simpleContent>
+        <xs:extension base="DatumTYPE" >
+          <xs:attribute name="faltkod" fixed="640" use="required" type="xs:string"/>
+        </xs:extension>
+      </xs:simpleContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="ForvarvArvBodeln">
+    <xs:annotation>
+      <xs:documentation>Förvärvet har helt eller delvis skett genom arv, gåva, bodelning eller liknande</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:simpleContent>
+        <xs:extension base="KryssTYPE" >
+          <xs:attribute name="faltkod" fixed="642" use="required" type="xs:string"/>
+        </xs:extension>
+      </xs:simpleContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="Forvarvspris">
+    <xs:annotation>
+      <xs:documentation>Förvärvspris</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:simpleContent>
+        <xs:extension base="Belopp10TYPE" >
+          <xs:attribute name="faltkod" fixed="643" use="required" type="xs:string"/>
+        </xs:extension>
+      </xs:simpleContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="InreRepFondForvarv">
+    <xs:annotation>
+      <xs:documentation>Bostadsrättens andel av innestående medel på inre reparationsfond vid förvärvet</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:simpleContent>
+        <xs:extension base="Belopp7TYPE" >
+          <xs:attribute name="faltkod" fixed="644" use="required" type="xs:string"/>
+        </xs:extension>
+      </xs:simpleContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="AndelBRFFormogenhet1974">
+    <xs:annotation>
+      <xs:documentation>Bostadsrättens andel av föreningens behållna förmögenhet den 1 januari 1974</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:simpleContent>
+        <xs:extension base="Belopp10TYPE" >
+          <xs:attribute name="faltkod" fixed="645" use="required" type="xs:string"/>
+        </xs:extension>
+      </xs:simpleContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="GemensamIndividuell">
+    <xs:annotation>
+      <xs:documentation>Uppgifterna i denna blankett är</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:simpleContent>
+        <xs:extension base="GemensamIndividuellTYPE" >
+          <xs:attribute name="faltkod" fixed="646" use="required" type="xs:string"/>
+        </xs:extension>
+      </xs:simpleContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="Redovisningsnummer">
+    <xs:annotation>
+      <xs:documentation>Redovisningsnummer</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:simpleContent>
+        <xs:extension base="Text10TYPE" >
+          <xs:attribute name="faltkod" fixed="851" use="required" type="xs:string"/>
+        </xs:extension>
+      </xs:simpleContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="Avstamningsdag">
+    <xs:annotation>
+      <xs:documentation>Avstämningsdag</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:simpleContent>
+        <xs:extension base="DatumTYPE" >
+          <xs:attribute name="faltkod" fixed="853" use="required" type="xs:string"/>
+        </xs:extension>
+      </xs:simpleContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="NummerAterbetalning">
+    <xs:annotation>
+      <xs:documentation>Plusgiro-/bankgironummer för eventuell återbetalning</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:simpleContent>
+        <xs:extension base="Text13TYPE" >
+          <xs:attribute name="faltkod" fixed="854" use="required" type="xs:string"/>
+        </xs:extension>
+      </xs:simpleContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="Insattningsdatum">
+    <xs:annotation>
+      <xs:documentation>Belopp i ruta 883 insatt på Skatteverkets plusgiro 1 60 90-3 den (datum)</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:simpleContent>
+        <xs:extension base="DatumTYPE" >
+          <xs:attribute name="faltkod" fixed="855" use="required" type="xs:string"/>
+        </xs:extension>
+      </xs:simpleContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="UtdelningEjSkSkKSkatt">
+    <xs:annotation>
+      <xs:documentation>A. Utdelning utan skattskyldighet för kupongskatt</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:simpleContent>
+        <xs:extension base="BeloppNeg12TYPE" >
+          <xs:attribute name="faltkod" fixed="860" use="required" type="xs:string"/>
+        </xs:extension>
+      </xs:simpleContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="UtdelningNollProcKSkatt">
+    <xs:annotation>
+      <xs:documentation>Utdelning, kr, 0 procent kupongskatt</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:simpleContent>
+        <xs:extension base="BeloppNeg12TYPE" >
+          <xs:attribute name="faltkod" fixed="861" use="required" type="xs:string"/>
+        </xs:extension>
+      </xs:simpleContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="UtdelningFemProcKSkatt">
+    <xs:annotation>
+      <xs:documentation>Utdelning, kr, 5 procent kupongskatt</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:simpleContent>
+        <xs:extension base="BeloppNeg12TYPE" >
+          <xs:attribute name="faltkod" fixed="862" use="required" type="xs:string"/>
+        </xs:extension>
+      </xs:simpleContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="UtdelningTioProcKSkatt">
+    <xs:annotation>
+      <xs:documentation>Utdelning, kr, 10 procent kupongskatt</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:simpleContent>
+        <xs:extension base="BeloppNeg12TYPE" >
+          <xs:attribute name="faltkod" fixed="863" use="required" type="xs:string"/>
+        </xs:extension>
+      </xs:simpleContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="UtdelningFemtonProcKSkatt">
+    <xs:annotation>
+      <xs:documentation>Utdelning, kr, 15 procent kupongskatt</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:simpleContent>
+        <xs:extension base="BeloppNeg12TYPE" >
+          <xs:attribute name="faltkod" fixed="864" use="required" type="xs:string"/>
+        </xs:extension>
+      </xs:simpleContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="UtdelningTjugoProcKSkatt">
+    <xs:annotation>
+      <xs:documentation>Utdelning, kr, 20 procent kupongskatt</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:simpleContent>
+        <xs:extension base="BeloppNeg12TYPE" >
+          <xs:attribute name="faltkod" fixed="865" use="required" type="xs:string"/>
+        </xs:extension>
+      </xs:simpleContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="UtdelningTjugofemProcKSkatt">
+    <xs:annotation>
+      <xs:documentation>Utdelning, kr, 25 procent kupongskatt</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:simpleContent>
+        <xs:extension base="BeloppNeg12TYPE" >
+          <xs:attribute name="faltkod" fixed="866" use="required" type="xs:string"/>
+        </xs:extension>
+      </xs:simpleContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="UtdelningTrettioProcKSkatt">
+    <xs:annotation>
+      <xs:documentation>Utdelning, kr, 30 procent kupongskatt</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:simpleContent>
+        <xs:extension base="BeloppNeg12TYPE" >
+          <xs:attribute name="faltkod" fixed="867" use="required" type="xs:string"/>
+        </xs:extension>
+      </xs:simpleContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="SaUtdelningAB">
+    <xs:annotation>
+      <xs:documentation>Utdelning, Summa A och B</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:simpleContent>
+        <xs:extension base="BeloppNeg12TYPE" >
+          <xs:attribute name="faltkod" fixed="869" use="required" type="xs:string"/>
+        </xs:extension>
+      </xs:simpleContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="KSkattFemProc">
+    <xs:annotation>
+      <xs:documentation>5 procent kupongskatt</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:simpleContent>
+        <xs:extension base="BeloppNeg12TYPE" >
+          <xs:attribute name="faltkod" fixed="872" use="required" type="xs:string"/>
+        </xs:extension>
+      </xs:simpleContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="KSkattTioProc">
+    <xs:annotation>
+      <xs:documentation>10 procent kupongskatt</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:simpleContent>
+        <xs:extension base="BeloppNeg12TYPE" >
+          <xs:attribute name="faltkod" fixed="873" use="required" type="xs:string"/>
+        </xs:extension>
+      </xs:simpleContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="KSkattFemtonProc">
+    <xs:annotation>
+      <xs:documentation>15 procent kupongskatt</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:simpleContent>
+        <xs:extension base="BeloppNeg12TYPE" >
+          <xs:attribute name="faltkod" fixed="874" use="required" type="xs:string"/>
+        </xs:extension>
+      </xs:simpleContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="KSkattTjugoProc">
+    <xs:annotation>
+      <xs:documentation>20 procent kupongskatt</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:simpleContent>
+        <xs:extension base="BeloppNeg12TYPE" >
+          <xs:attribute name="faltkod" fixed="875" use="required" type="xs:string"/>
+        </xs:extension>
+      </xs:simpleContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="KSkattTjugofemProc">
+    <xs:annotation>
+      <xs:documentation>25 procent kupongskatt</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:simpleContent>
+        <xs:extension base="BeloppNeg12TYPE" >
+          <xs:attribute name="faltkod" fixed="876" use="required" type="xs:string"/>
+        </xs:extension>
+      </xs:simpleContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="KSkattTrettioProc">
+    <xs:annotation>
+      <xs:documentation>30 procent kupongskatt</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:simpleContent>
+        <xs:extension base="BeloppNeg12TYPE" >
+          <xs:attribute name="faltkod" fixed="877" use="required" type="xs:string"/>
+        </xs:extension>
+      </xs:simpleContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="SaKSkattAB">
+    <xs:annotation>
+      <xs:documentation>Kupongskatt, Summa A och B</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:simpleContent>
+        <xs:extension base="BeloppNeg12TYPE" >
+          <xs:attribute name="faltkod" fixed="879" use="required" type="xs:string"/>
+        </xs:extension>
+      </xs:simpleContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="SaTidigareRedUtdelning">
+    <xs:annotation>
+      <xs:documentation>Summa tidigare redovisad utdelning för inkomståret</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:simpleContent>
+        <xs:extension base="Belopp12TYPE" >
+          <xs:attribute name="faltkod" fixed="881" use="required" type="xs:string"/>
+        </xs:extension>
+      </xs:simpleContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="TotalsummaUtdelning">
+    <xs:annotation>
+      <xs:documentation>Utdelning, kr, TOTALSUMMA</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:simpleContent>
+        <xs:extension base="BeloppNeg12TYPE" >
+          <xs:attribute name="faltkod" fixed="882" use="required" type="xs:string"/>
+        </xs:extension>
+      </xs:simpleContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="TotalsummaKSkatt">
+    <xs:annotation>
+      <xs:documentation>Kupongskatt, kr, TOTALSUMMA</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:simpleContent>
+        <xs:extension base="BeloppNeg12TYPE" >
+          <xs:attribute name="faltkod" fixed="883" use="required" type="xs:string"/>
+        </xs:extension>
+      </xs:simpleContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="UtdFranEuroclear">
+    <xs:annotation>
+      <xs:documentation>Från Euroclear erhållen utdelning</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:simpleContent>
+        <xs:extension base="Belopp12TYPE" >
+          <xs:attribute name="faltkod" fixed="884" use="required" type="xs:string"/>
+        </xs:extension>
+      </xs:simpleContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="OrgnrUtdelandeBolag">
+    <xs:annotation>
+      <xs:documentation>Organisationsnummer utdelande bolag</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:simpleContent>
+        <xs:extension base="gm:IdentitetsbeteckningForPersonTYPE" >
+          <xs:attribute name="faltkod" fixed="890" use="required" type="xs:string"/>
+        </xs:extension>
+      </xs:simpleContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="KontantBruttolonMm">
+    <xs:annotation>
+      <xs:documentation>Kontant bruttolön m.m. </xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:simpleContent>
+        <xs:extension base="Belopp10TYPE" >
+          <xs:attribute name="faltkod" fixed="011" use="required" type="xs:string"/>
+        </xs:extension>
+      </xs:simpleContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="FormanUtomBilDrivmedel">
+    <xs:annotation>
+      <xs:documentation>Skattepliktiga förmåner utom bilförmån och drivmedel vid bilförmån</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:simpleContent>
+        <xs:extension base="Belopp10TYPE" >
+          <xs:attribute name="faltkod" fixed="012" use="required" type="xs:string"/>
+        </xs:extension>
+      </xs:simpleContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="BilformanUtomDrivmedel">
+    <xs:annotation>
+      <xs:documentation>Skattepliktig bilförmån utom drivmedel</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:simpleContent>
+        <xs:extension base="Belopp7TYPE" >
+          <xs:attribute name="faltkod" fixed="013" use="required" type="xs:string"/>
+        </xs:extension>
+      </xs:simpleContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="DrivmedelVidBilforman">
+    <xs:annotation>
+      <xs:documentation>Drivmedel vid bilförmån</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:simpleContent>
+        <xs:extension base="Belopp7TYPE" >
+          <xs:attribute name="faltkod" fixed="018" use="required" type="xs:string"/>
+        </xs:extension>
+      </xs:simpleContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="AndraKostnadsers">
+    <xs:annotation>
+      <xs:documentation>Kostnadsersättningar som inte kryssats i ruta 050 - 051</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:simpleContent>
+        <xs:extension base="Belopp7TYPE" >
+          <xs:attribute name="faltkod" fixed="020" use="required" type="xs:string"/>
+        </xs:extension>
+      </xs:simpleContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="UnderlagRutarbete">
+    <xs:annotation>
+      <xs:documentation>Underlag för skattereduktion för rutarbete</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:simpleContent>
+        <xs:extension base="Belopp7TYPE" >
+          <xs:attribute name="faltkod" fixed="021" use="required" type="xs:string"/>
+        </xs:extension>
+      </xs:simpleContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="UnderlagRotarbete">
+    <xs:annotation>
+      <xs:documentation>Underlag för skattereduktion för rotarbete</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:simpleContent>
+        <xs:extension base="Belopp7TYPE" >
+          <xs:attribute name="faltkod" fixed="022" use="required" type="xs:string"/>
+        </xs:extension>
+      </xs:simpleContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="AndelStyrelsearvode">
+    <xs:annotation>
+      <xs:documentation>Uppgift om del av ersättningen i 011, 025, 031, 012, 013, 018 som avser Styrelsearvode </xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:simpleContent>
+        <xs:extension base="Belopp10TYPE" >
+          <xs:attribute name="faltkod" fixed="023" use="required" type="xs:string"/>
+        </xs:extension>
+      </xs:simpleContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="ErsMEgenavgifter">
+    <xs:annotation>
+      <xs:documentation>Ersättningar som ligger till grund för egenavgifter</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:simpleContent>
+        <xs:extension base="Belopp10TYPE" >
+          <xs:attribute name="faltkod" fixed="025" use="required" type="xs:string"/>
+        </xs:extension>
+      </xs:simpleContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="Tjanstepension">
+    <xs:annotation>
+      <xs:documentation>Tjänstepension</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:simpleContent>
+        <xs:extension base="Belopp10TYPE" >
+          <xs:attribute name="faltkod" fixed="030" use="required" type="xs:string"/>
+        </xs:extension>
+      </xs:simpleContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="ErsEjSocAvg">
+    <xs:annotation>
+      <xs:documentation>Ersättningar som inte är underlag för socialavgifter </xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:simpleContent>
+        <xs:extension base="Belopp10TYPE" >
+          <xs:attribute name="faltkod" fixed="031" use="required" type="xs:string"/>
+        </xs:extension>
+      </xs:simpleContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="ErsEjSocAvgEjJobbavd">
+    <xs:annotation>
+      <xs:documentation>Ersättningar som inte är underlag för socialavgifter och som inte ger rätt till skattereduktion för arbetsinkomst (jobbskatteavdrag)</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:simpleContent>
+        <xs:extension base="Belopp10TYPE" >
+          <xs:attribute name="faltkod" fixed="032" use="required" type="xs:string"/>
+        </xs:extension>
+      </xs:simpleContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="Forskarskattenamnden">
+    <xs:annotation>
+      <xs:documentation>Vissa inte skattepliktiga ersättningar till utländska experter m.fl. enligt beslut från Forskarskattenämnden</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:simpleContent>
+        <xs:extension base="Belopp10TYPE" >
+          <xs:attribute name="faltkod" fixed="035" use="required" type="xs:string"/>
+        </xs:extension>
+      </xs:simpleContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="VissaAvdrag">
+    <xs:annotation>
+      <xs:documentation>Vissa avdrag </xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:simpleContent>
+        <xs:extension base="Belopp6TYPE" >
+          <xs:attribute name="faltkod" fixed="037" use="required" type="xs:string"/>
+        </xs:extension>
+      </xs:simpleContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="Hyresersattning">
+    <xs:annotation>
+      <xs:documentation>Hyresersättning</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:simpleContent>
+        <xs:extension base="Belopp7TYPE" >
+          <xs:attribute name="faltkod" fixed="039" use="required" type="xs:string"/>
+        </xs:extension>
+      </xs:simpleContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="BostadSmahus">
+    <xs:annotation>
+      <xs:documentation>Bostad småhus</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:simpleContent>
+        <xs:extension base="KryssTYPE" >
+          <xs:attribute name="faltkod" fixed="041" use="required" type="xs:string"/>
+        </xs:extension>
+      </xs:simpleContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="BostadEjSmahus">
+    <xs:annotation>
+      <xs:documentation>Bostad ej småhus</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:simpleContent>
+        <xs:extension base="KryssTYPE" >
+          <xs:attribute name="faltkod" fixed="043" use="required" type="xs:string"/>
+        </xs:extension>
+      </xs:simpleContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="FormanHarJusterats">
+    <xs:annotation>
+      <xs:documentation>Förmån har justerats</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:simpleContent>
+        <xs:extension base="KryssTYPE" >
+          <xs:attribute name="faltkod" fixed="048" use="required" type="xs:string"/>
+        </xs:extension>
+      </xs:simpleContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="FormanSomPension">
+    <xs:annotation>
+      <xs:documentation>Förmån som pension</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:simpleContent>
+        <xs:extension base="KryssTYPE" >
+          <xs:attribute name="faltkod" fixed="049" use="required" type="xs:string"/>
+        </xs:extension>
+      </xs:simpleContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="Bilersattning">
+    <xs:annotation>
+      <xs:documentation>Enligt schablon Bilersättning</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:simpleContent>
+        <xs:extension base="KryssTYPE" >
+          <xs:attribute name="faltkod" fixed="050" use="required" type="xs:string"/>
+        </xs:extension>
+      </xs:simpleContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="Traktamente">
+    <xs:annotation>
+      <xs:documentation>Enligt schablon Traktamente</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:simpleContent>
+        <xs:extension base="KryssTYPE" >
+          <xs:attribute name="faltkod" fixed="051" use="required" type="xs:string"/>
+        </xs:extension>
+      </xs:simpleContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="PersonaloptionForvarvAndel">
+    <xs:annotation>
+      <xs:documentation>Personaloption som inte ska förmånsbeskattas har utnyttjats för förvärv av andel</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:simpleContent>
+        <xs:extension base="KryssTYPE" >
+          <xs:attribute name="faltkod" fixed="059" use="required" type="xs:string"/>
+        </xs:extension>
+      </xs:simpleContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="Arbetsstallenummer">
+    <xs:annotation>
+      <xs:documentation>Arbetsställenummer från SCB</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:simpleContent>
+        <xs:extension base="ArbetsstalleNummerTYPE" >
+          <xs:attribute name="faltkod" fixed="060" use="required" type="xs:string"/>
+        </xs:extension>
+      </xs:simpleContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="SocialAvgiftsAvtal">
+    <xs:annotation>
+      <xs:documentation>Socialavgiftsavtal finns</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:simpleContent>
+        <xs:extension base="KryssTYPE" >
+          <xs:attribute name="faltkod" fixed="093" use="required" type="xs:string"/>
+        </xs:extension>
+      </xs:simpleContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="ArbetsplatsensAdress">
+    <xs:annotation>
+      <xs:documentation>Arbetsplatsens gatuadress</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:simpleContent>
+        <xs:extension base="Text50TYPE" >
+          <xs:attribute name="faltkod" fixed="245" use="required" type="xs:string"/>
+        </xs:extension>
+      </xs:simpleContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="ArbetsplatsensOrt">
+    <xs:annotation>
+      <xs:documentation>Arbetsplatsens ort</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:simpleContent>
+        <xs:extension base="Text50TYPE" >
+          <xs:attribute name="faltkod" fixed="246" use="required" type="xs:string"/>
+        </xs:extension>
+      </xs:simpleContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="AntalAvyttrade">
+    <xs:annotation>
+      <xs:documentation>Antal avyttrade</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:simpleContent>
+        <xs:extension base="Belopp12TYPE" >
+          <xs:attribute name="faltkod" fixed="576" use="required" type="xs:string"/>
+        </xs:extension>
+      </xs:simpleContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="AvdragenKupongskatt">
+    <xs:annotation>
+      <xs:documentation>Innehållen svensk kupongskatt</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:simpleContent>
+        <xs:extension base="Belopp10TYPE" >
+          <xs:attribute name="faltkod" fixed="003" use="required" type="xs:string"/>
+        </xs:extension>
+      </xs:simpleContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="LandskodHemvist">
+    <xs:annotation>
+      <xs:documentation>Landskod Hemviststat</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:simpleContent>
+        <xs:extension base="gm:LandskodTYPE" >
+          <xs:attribute name="faltkod" fixed="079" use="required" type="xs:string"/>
+        </xs:extension>
+      </xs:simpleContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="UtbetaldUtdelning">
+    <xs:annotation>
+      <xs:documentation>Utbetald utdelning m.m.</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:simpleContent>
+        <xs:extension base="Belopp10TYPE" >
+          <xs:attribute name="faltkod" fixed="574" use="required" type="xs:string"/>
+        </xs:extension>
+      </xs:simpleContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="AnnanKupongErsattning">
+    <xs:annotation>
+      <xs:documentation>Annan kupongskattepliktig ersättning än utdelning</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:simpleContent>
+        <xs:extension base="Belopp10TYPE" >
+          <xs:attribute name="faltkod" fixed="581" use="required" type="xs:string"/>
+        </xs:extension>
+      </xs:simpleContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="NamnForsakrGivare">
+    <xs:annotation>
+      <xs:documentation>Namn</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:simpleContent>
+        <xs:extension base="Text50TYPE" >
+          <xs:attribute name="faltkod" fixed="680" use="required" type="xs:string"/>
+        </xs:extension>
+      </xs:simpleContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="AdrForsakrGivare">
+    <xs:annotation>
+      <xs:documentation>Adress</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:simpleContent>
+        <xs:extension base="Text50TYPE" >
+          <xs:attribute name="faltkod" fixed="681" use="required" type="xs:string"/>
+        </xs:extension>
+      </xs:simpleContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="PostadrForsakrGivare">
+    <xs:annotation>
+      <xs:documentation>Postadress</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:simpleContent>
+        <xs:extension base="Text50TYPE" >
+          <xs:attribute name="faltkod" fixed="682" use="required" type="xs:string"/>
+        </xs:extension>
+      </xs:simpleContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="SvensktRegNr">
+    <xs:annotation>
+      <xs:documentation>Svenskt registreringsnummer</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:simpleContent>
+        <xs:extension base="gm:IdentitetsbeteckningForPersonTYPE" >
+          <xs:attribute name="faltkod" fixed="683" use="required" type="xs:string"/>
+        </xs:extension>
+      </xs:simpleContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="Fartygssignal">
+    <xs:annotation>
+      <xs:documentation>Fartygssignal</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:simpleContent>
+        <xs:extension base="FartygssignalTYPE" >
+          <xs:attribute name="faltkod" fixed="026" use="required" type="xs:string"/>
+        </xs:extension>
+      </xs:simpleContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="AntalDagarSjoinkomst">
+    <xs:annotation>
+      <xs:documentation>Antal dagar med sjöinkomst</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:simpleContent>
+        <xs:extension base="DagarTYPE" >
+          <xs:attribute name="faltkod" fixed="027" use="required" type="xs:string"/>
+        </xs:extension>
+      </xs:simpleContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="NarfartFjarrfart">
+    <xs:annotation>
+      <xs:documentation>Närfart/Fjärrfart</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:simpleContent>
+        <xs:extension base="NarfartFjarrfartTYPE" >
+          <xs:attribute name="faltkod" fixed="028" use="required" type="xs:string"/>
+        </xs:extension>
+      </xs:simpleContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="FartygetsNamn">
+    <xs:annotation>
+      <xs:documentation>Fartygets namn</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:simpleContent>
+        <xs:extension base="Text50TYPE" >
+          <xs:attribute name="faltkod" fixed="223" use="required" type="xs:string"/>
+        </xs:extension>
+      </xs:simpleContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="LandskodMedborgare">
+    <xs:annotation>
+      <xs:documentation>Landskod</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:simpleContent>
+        <xs:extension base="gm:LandskodTYPE" >
+          <xs:attribute name="faltkod" fixed="081" use="required" type="xs:string"/>
+        </xs:extension>
+      </xs:simpleContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="LandskodArbetsland">
+    <xs:annotation>
+      <xs:documentation>Landskod</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:simpleContent>
+        <xs:extension base="gm:LandskodTYPE" >
+          <xs:attribute name="faltkod" fixed="090" use="required" type="xs:string"/>
+        </xs:extension>
+      </xs:simpleContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="UtsandUnderTid">
+    <xs:annotation>
+      <xs:documentation>Inkomsttagaren utsänd för arbete utomlands</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:simpleContent>
+        <xs:extension base="SandUnderTidTYPE" >
+          <xs:attribute name="faltkod" fixed="091" use="required" type="xs:string"/>
+        </xs:extension>
+      </xs:simpleContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="Kategori">
+    <xs:annotation>
+      <xs:documentation>Ett av alternativen A - F ska fyllas i</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:simpleContent>
+        <xs:extension base="KategoriKU14TYPE" >
+          <xs:attribute name="faltkod" fixed="092" use="required" type="xs:string"/>
+        </xs:extension>
+      </xs:simpleContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="ErsFormanBostadMmSINK">
+    <xs:annotation>
+      <xs:documentation>Ersättning/förmån avseende bostad samt resa till och från anställning/förrättning </xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:simpleContent>
+        <xs:extension base="Belopp6TYPE" >
+          <xs:attribute name="faltkod" fixed="036" use="required" type="xs:string"/>
+        </xs:extension>
+      </xs:simpleContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="ErlagdErsattning">
+    <xs:annotation>
+      <xs:documentation>Erlagd ersättning</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:simpleContent>
+        <xs:extension base="Belopp10TYPE" >
+          <xs:attribute name="faltkod" fixed="811" use="required" type="xs:string"/>
+        </xs:extension>
+      </xs:simpleContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="Redovisningsmetod">
+    <xs:annotation>
+      <xs:documentation>Redovisningsmetod</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:simpleContent>
+        <xs:extension base="RedovisningsmetodTYPE" >
+          <xs:attribute name="faltkod" fixed="814" use="required" type="xs:string"/>
+        </xs:extension>
+      </xs:simpleContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="Ersattningskod">
+    <xs:annotation>
+      <xs:documentation>Ersättningskod</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:simpleContent>
+        <xs:extension base="gm:ErsattningskodTYPE" >
+          <xs:attribute name="faltkod" fixed="004" use="required" type="xs:string"/>
+        </xs:extension>
+      </xs:simpleContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="ErsattningBelopp">
+    <xs:annotation>
+      <xs:documentation>Ersättningsbelopp </xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:simpleContent>
+        <xs:extension base="Belopp10TYPE" >
+          <xs:attribute name="faltkod" fixed="005" use="required" type="xs:string"/>
+        </xs:extension>
+      </xs:simpleContent>
+    </xs:complexType>
+  </xs:element>
+
+
+  <xs:simpleType name="AnlIDTYPE">
+    <xs:restriction base="xs:string">
+      <xs:length value="18" />
+      <xs:pattern value="(735999)[0-9]{12}"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="AntalKmTYPE">
+    <xs:restriction base="xs:long">
+      <xs:minInclusive value="0" />
+      <xs:maxInclusive value="999999" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="AntalManaderTYPE">
+    <xs:restriction base="xs:long">
+      <xs:minInclusive value="1" />
+      <xs:maxInclusive value="12" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="ArbetsstalleNummerTYPE">
+    <xs:restriction base="xs:long">
+      <xs:minInclusive value="0" />
+      <xs:maxInclusive value="99999" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="Belopp10TYPE">
+    <xs:restriction base="xs:long">
+      <xs:minInclusive value="0" />
+      <xs:maxInclusive value="9999999999" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="Belopp12TYPE">
+    <xs:restriction base="xs:long">
+      <xs:minInclusive value="0" />
+      <xs:maxInclusive value="999999999999" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="Belopp6TYPE">
+    <xs:restriction base="xs:long">
+      <xs:minInclusive value="0" />
+      <xs:maxInclusive value="999999" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="Belopp7TYPE">
+    <xs:restriction base="xs:long">
+      <xs:minInclusive value="0" />
+      <xs:maxInclusive value="9999999" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="DagarTYPE">
+    <xs:restriction base="xs:long">
+      <xs:minInclusive value="0" />
+      <xs:maxInclusive value="366" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="DatumTYPE">
+    <xs:restriction base="xs:string">
+      <xs:length value="8" />
+      <xs:pattern value="((19|20)[0-9][0-9](((01|03|05|07|08|10|12)(0[1-9]|1[0-9]|2[0-9]|3[0-1]))|((04|06|09|11)(0[1-9]|1[0-9]|2[0-9]|30))|((02)(0[1-9]|1[0-9]|2[0-8]))))|((19|20)(04|08|12|16|20|24|28|32|36|40|44|48|52|56|60|64|68|72|76|80|84|88|92|96)(0229))|(20000229)"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="Decimal2TYPE">
+    <xs:restriction base="xs:decimal">
+      <xs:minInclusive value="0.01" />
+      <xs:maxInclusive value="99.99" />
+      <xs:pattern value="\d{1,2}(\.\d{1,2})?"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="Decimal2-100TYPE">
+    <xs:restriction base="xs:decimal">
+      <xs:minInclusive value="0.01" />
+      <xs:maxInclusive value="100.00" />
+      <xs:pattern value="\d{1,3}(\.\d{1,2})?"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="FartygssignalTYPE">
+    <xs:restriction base="xs:string">
+      <xs:length value="4" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="FodelsetidTYPE">
+    <xs:restriction base="xs:string">
+      <xs:length value="11" />
+      <xs:pattern value="((((18|19|20)[0-9][0-9])(((01|03|05|07|08|10|12)(0[1-9]|1[0-9]|2[0-9]|3[0-1]))|((04|06|09|11)(0[1-9]|1[0-9]|2[0-9]|30))|((02)(0[1-9]|1[0-9]|2[0-8]))))|(((18|19|20)(04|08|12|16|20|24|28|32|36|40|44|48|52|56|60|64|68|72|76|80|84|88|92|96)(0229))|(20000229)))[0-9]{3}"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="GemensamIndividuellTYPE">
+    <xs:restriction base="xs:token">
+      <xs:enumeration value="G" />
+      <xs:enumeration value="I" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="IdentitetInmatningTYPE">
+    <xs:restriction base="xs:string">
+      <xs:minLength value="10" />
+      <xs:maxLength value="13" />
+      <xs:pattern value="\d{6,8}(\+|\-)?\d{4}"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="InkomstarTYPE">
+    <xs:restriction base="xs:integer">
+      <xs:pattern value="20\d{2}"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="IsinTYPE">
+    <xs:restriction base="xs:string">
+      <xs:length value="12" />
+      <xs:pattern value="[A-Z]{2}[A-Z0-9]{9}\d"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="KategoriKU14TYPE">
+    <xs:restriction base="xs:token">
+      <xs:enumeration value="A" />
+      <xs:enumeration value="B" />
+      <xs:enumeration value="C" />
+      <xs:enumeration value="D" />
+      <xs:enumeration value="E" />
+      <xs:enumeration value="F" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="KontoslagTYPE">
+    <xs:restriction base="xs:token">
+      <xs:enumeration value="S" />
+      <xs:enumeration value="A" />
+      <xs:enumeration value="U" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="KryssTYPE">
+    <xs:restriction base="xs:boolean">
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="KWh10TYPE">
+    <xs:restriction base="xs:long">
+      <xs:minInclusive value="0" />
+      <xs:maxInclusive value="9999999999" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="ManadTYPE">
+    <xs:restriction base="xs:int">
+      <xs:minInclusive value="1" />
+      <xs:maxInclusive value="12" />
+      <xs:pattern value="1|2|3|4|5|6|7|8|9|10|11|12"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="NarfartFjarrfartTYPE">
+    <xs:restriction base="xs:token">
+      <xs:enumeration value="N" />
+      <xs:enumeration value="F" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="RedovisningsmetodTYPE">
+    <xs:restriction base="xs:token">
+      <xs:enumeration value="B" />
+      <xs:enumeration value="N" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="SandUnderTidTYPE">
+    <xs:restriction base="xs:token">
+      <xs:enumeration value="A" />
+      <xs:enumeration value="B" />
+      <xs:enumeration value="C" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="SkapadTYPE">
+    <xs:restriction base="xs:dateTime">
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="SpecifikationsNummerTYPE">
+    <xs:restriction base="xs:long">
+      <xs:minInclusive value="1" />
+      <xs:maxInclusive value="9999999999" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="Text10TYPE">
+    <xs:restriction base="xs:string">
+      <xs:minLength value="1" />
+      <xs:maxLength value="10" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="Text13TYPE">
+    <xs:restriction base="xs:string">
+      <xs:minLength value="1" />
+      <xs:maxLength value="13" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="Text20TYPE">
+    <xs:restriction base="xs:string">
+      <xs:minLength value="1" />
+      <xs:maxLength value="20" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="Text30TYPE">
+    <xs:restriction base="xs:string">
+      <xs:minLength value="1" />
+      <xs:maxLength value="30" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="Text35TYPE">
+    <xs:restriction base="xs:string">
+      <xs:minLength value="1" />
+      <xs:maxLength value="35" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="Text36TYPE">
+    <xs:restriction base="xs:string">
+      <xs:minLength value="1" />
+      <xs:maxLength value="36" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="Text40TYPE">
+    <xs:restriction base="xs:string">
+      <xs:minLength value="1" />
+      <xs:maxLength value="40" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="Text50TYPE">
+    <xs:restriction base="xs:string">
+      <xs:minLength value="1" />
+      <xs:maxLength value="50" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="Text350TYPE">
+    <xs:restriction base="xs:string">
+      <xs:minLength value="1" />
+      <xs:maxLength value="350" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="TypForsakringTYPE">
+    <xs:restriction base="xs:token">
+      <xs:enumeration value="P" />
+      <xs:enumeration value="K" />
+      <xs:enumeration value="E" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="TypOptionTYPE">
+    <xs:restriction base="xs:token">
+      <xs:enumeration value="I" />
+      <xs:enumeration value="U" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="VerksamhetsomradeTYPE">
+    <xs:restriction base="xs:string">
+      <xs:length value="3" />
+      <xs:pattern value="[0-9][0-9][0-9]"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="BeloppNeg12TYPE">
+    <xs:restriction base="xs:long">
+      <xs:minInclusive value="-99999999999" />
+      <xs:maxInclusive value="999999999999" />
+    </xs:restriction>
+  </xs:simpleType>
+</xs:schema>

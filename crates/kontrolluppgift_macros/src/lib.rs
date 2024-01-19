@@ -6,6 +6,13 @@ use syn::{
     parenthesized, parse_macro_input, Attribute, Data, DataEnum, DataStruct, DeriveInput, Error,
     Field, Fields, FieldsNamed, Ident, LitBool, LitByteStr, LitStr, Type, Variant,
 };
+use type_generator::generate_types;
+mod type_generator;
+#[proc_macro]
+pub fn load_types(_input: TokenStream) -> TokenStream {
+   vec![generate_types(include_str!("Kontrolluppgifter_COMPONENT_9.0.xsd")),
+generate_types(include_str!("SKV_COMMON_9.0.xsd")) ].into_iter().collect::<proc_macro2::TokenStream>().into()
+}
 
 #[proc_macro_derive(KontrolluppgiftRead, attributes(ku))]
 pub fn read_macro(input: TokenStream) -> TokenStream {

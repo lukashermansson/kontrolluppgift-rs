@@ -1,4 +1,5 @@
 pub mod error;
+/* 
 pub mod ku10;
 pub mod ku13;
 pub mod ku14;
@@ -14,8 +15,9 @@ pub mod ku28;
 pub mod ku30;
 pub mod ku31;
 pub mod ku32;
-
+ */
 use crate::error::Error;
+/*
 use crate::error::Error::{MissingElement, NonDecodable};
 use crate::ku10::KU10Type;
 use crate::ku13::KU13Type;
@@ -31,10 +33,9 @@ use crate::ku26::KU26Type;
 use crate::ku28::KU28Type;
 use crate::ku30::KU30Type;
 use crate::ku31::KU31Type;
-use crate::ku32::KU32Type;
-use crate::KontrolluppgiftType::*;
+use crate::ku32::KU32Type; */
 use kontrolluppgift_macros::{
-    KUStringEnum, KUVariantsEnum, KontrolluppgiftRead, KontrolluppgiftWrite,
+    KUStringEnum, KUVariantsEnum, KontrolluppgiftRead, KontrolluppgiftWrite, load_types,
 };
 use quick_xml::events::{BytesStart, BytesText, Event};
 use quick_xml::{NsReader, Writer};
@@ -47,7 +48,9 @@ use std::str::FromStr;
 use time::error::Parse;
 use time::{format_description, Date};
 
-#[derive(Debug, PartialEq)]
+
+load_types!();
+/* #[derive(Debug, PartialEq)]
 pub struct Kontrolluppgift<'a> {
     pub avsandare: Avsandare<'a>,
     pub blankettgemensamt: Blankettgemensamt<'a>,
@@ -428,6 +431,7 @@ impl<'a, T: Writable, W: std::io::Write> Write<'a, T> for Writer<W> {
     }
 }
 
+*/
 pub(crate) trait Writable {
     fn get_str(&self) -> Option<String>;
 }
@@ -437,6 +441,7 @@ pub(crate) trait Readable<'a, 'b> {
     where
         Self: Sized + 'b;
 }
+/*
 
 impl<'a, 'b> Readable<'a, 'b> for bool {
     fn get_str(data: Cow<str>) -> Result<Self, Error> {
@@ -895,3 +900,4 @@ impl Writable for IdentitetsbeteckningForPerson<'_> {
         Some(self.0.to_string())
     }
 }
+ */
