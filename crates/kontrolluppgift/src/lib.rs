@@ -36,6 +36,7 @@ use crate::KontrolluppgiftType::*;
 use kontrolluppgift_macros::{
     KUStringEnum, KUVariantsEnum, KontrolluppgiftRead, KontrolluppgiftWrite,
 };
+use once_cell::sync::Lazy;
 use quick_xml::events::{BytesStart, BytesText, Event};
 use quick_xml::{NsReader, Writer};
 use regex::Regex;
@@ -869,14 +870,13 @@ impl TryFrom<&str> for IdentitetsbeteckningForPerson<'_> {
     type Error = &'static str;
 
     fn try_from(value: &str) -> Result<Self, Self::Error> {
-        let person_nr_regex = Regex::new(r"((((18|19|20)[0-9][0-9])(((01|03|05|07|08|10|12)(0[1-9]|1[0-9]|2[0-9]|3[0-1]))|((04|06|09|11)(0[1-9]|1[0-9]|2[0-9]|30))|((02)(0[1-9]|1[0-9]|2[0-8]))))|(((18|19|20)(04|08|12|16|20|24|28|32|36|40|44|48|52|56|60|64|68|72|76|80|84|88|92|96)(0229))|(20000229)))(00[1-9]|0[1-9][0-9]|[1-9][0-9][0-9])[0-9]").expect("These are constructed and should be valid");
-        let samordnings_nr_regex = Regex::new(r"((((18|19|20)[0-9][0-9])(((01|03|05|07|08|10|12)(6[1-9]|7[0-9]|8[0-9]|9[0-1]))|((04|06|09|11)(6[1-9]|7[0-9]|8[0-9]|90))|((02)(6[1-9]|7[0-9]|8[0-8]))))|(((18|19|20)(04|08|12|16|20|24|28|32|36|40|44|48|52|56|60|64|68|72|76|80|84|88|92|96)(0289))|(20000289)))(00[1-9]|0[1-9][0-9]|[1-9][0-9][0-9])[0-9]").expect("These are constructed and should be valid");
-        let org_nr_regex =
-            Regex::new(r"16\d{2}[2-9]\d{7}").expect("These are constructed and should be valid");
+        static PERSON_NR_REGEX: Lazy<Regex> = Lazy::new(|| Regex::new(r"((((18|19|20)[0-9][0-9])(((01|03|05|07|08|10|12)(0[1-9]|1[0-9]|2[0-9]|3[0-1]))|((04|06|09|11)(0[1-9]|1[0-9]|2[0-9]|30))|((02)(0[1-9]|1[0-9]|2[0-8]))))|(((18|19|20)(04|08|12|16|20|24|28|32|36|40|44|48|52|56|60|64|68|72|76|80|84|88|92|96)(0229))|(20000229)))(00[1-9]|0[1-9][0-9]|[1-9][0-9][0-9])[0-9]").expect("These are constructed and should be valid"));
+        static SAMORDNINGS_NR_REGEX: Lazy<Regex> = Lazy::new(|| Regex::new(r"((((18|19|20)[0-9][0-9])(((01|03|05|07|08|10|12)(6[1-9]|7[0-9]|8[0-9]|9[0-1]))|((04|06|09|11)(6[1-9]|7[0-9]|8[0-9]|90))|((02)(6[1-9]|7[0-9]|8[0-8]))))|(((18|19|20)(04|08|12|16|20|24|28|32|36|40|44|48|52|56|60|64|68|72|76|80|84|88|92|96)(0289))|(20000289)))(00[1-9]|0[1-9][0-9]|[1-9][0-9][0-9])[0-9]").expect("These are constructed and should be valid"));
+        static ORG_NR_REGEX: Lazy<Regex> = Lazy::new(||Regex::new(r"16\d{2}[2-9]\d{7}").expect("These are constructed and should be valid"));
 
-        if person_nr_regex.is_match(value)
-            || samordnings_nr_regex.is_match(value)
-            || org_nr_regex.is_match(value)
+        if PERSON_NR_REGEX.is_match(value)
+            || SAMORDNINGS_NR_REGEX.is_match(value)
+            || ORG_NR_REGEX.is_match(value)
         {
             return Ok(IdentitetsbeteckningForPerson(Cow::Owned(value.to_string())));
         }
